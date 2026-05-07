@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+import httpx
+
 from podsum.config import Settings
 from podsum.persistence.models import new_ulid
 
@@ -76,6 +78,49 @@ async def ingest_local_file(upload: UploadLike, settings: Settings) -> IngestedA
         raise
 
 
+async def ingest_direct_url(url: str, settings: Settings) -> IngestedAudio:
+    episode_id = new_ulid()
+    episode_dir = settings.DATA_DIR / episode_id
+    episode_dir.mkdir(parents=True, exist_ok=False)
+    original_tmp = episode_dir / "audio.original.download"
+
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=60.0) as client:
+            head = await client.head(url)
+            head.raise_for_status()
+            _validate_audio_content_type(head.headers.get("content-type"))
+            content_length = head.headers.get("content-length")
+            if content_length is not None and int(content_length) > MAX_FILE_BYTES:
+                raise PayloadTooLarge("audio file exceeds 1 GB limit")
+
+            async with client.stream("GET", url) as response:
+                response.raise_for_status()
+                _validate_audio_content_type(response.headers.get("content-type"))
+                file_size = await _write_response_stream(response, original_tmp)
+
+        detected_ext = _detect_audio_ext(original_tmp)
+        original_path = episode_dir / f"audio.original.{detected_ext}"
+        original_tmp.rename(original_path)
+
+        duration_seconds = await _probe_duration_seconds(original_path)
+        if duration_seconds > MAX_DURATION_SECONDS:
+            raise PayloadTooLarge("audio duration exceeds 6 hour limit")
+
+        normalized_path = episode_dir / "audio.normalized.mp3"
+        await _run_ffmpeg_normalize(original_path, normalized_path)
+        return IngestedAudio(
+            episode_id=episode_id,
+            original_path=original_path,
+            normalized_path=normalized_path,
+            duration_seconds=duration_seconds,
+            file_size_bytes=file_size,
+            detected_ext=detected_ext,
+        )
+    except Exception:
+        shutil.rmtree(episode_dir, ignore_errors=True)
+        raise
+
+
 async def _write_upload(upload: UploadLike, out_path: Path) -> int:
     total = 0
     with out_path.open("wb") as handle:
@@ -90,6 +135,26 @@ async def _write_upload(upload: UploadLike, out_path: Path) -> int:
     if total == 0:
         raise UnsupportedMedia("empty upload")
     return total
+
+
+async def _write_response_stream(response: httpx.Response, out_path: Path) -> int:
+    total = 0
+    with out_path.open("wb") as handle:
+        async for chunk in response.aiter_bytes():
+            if not chunk:
+                continue
+            total += len(chunk)
+            if total > MAX_FILE_BYTES:
+                raise PayloadTooLarge("audio file exceeds 1 GB limit")
+            handle.write(chunk)
+    if total == 0:
+        raise UnsupportedMedia("empty response")
+    return total
+
+
+def _validate_audio_content_type(content_type: str | None) -> None:
+    if content_type is None or not content_type.lower().split(";", 1)[0].strip().startswith("audio/"):
+        raise UnsupportedMedia("direct URL did not return an audio Content-Type")
 
 
 def _detect_audio_ext(path: Path) -> str:
