@@ -5,9 +5,27 @@ import re
 import unicodedata
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+
 
 class RetriableValidationError(ValueError):
     """Raised when the LLM output is structurally valid enough to retry with a hint."""
+
+
+class ThreeAct(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    background: str
+    core_argument: str
+    conclusion: str
+
+    @field_validator("background", "core_argument", "conclusion")
+    @classmethod
+    def non_empty(cls, value: str) -> str:
+        cleaned = _clean_text(value)
+        if not cleaned:
+            raise ValueError("field must not be empty")
+        return cleaned
 
 
 def parse_one_liner(raw_json: Any, episode_title: str, lang: str) -> str:
@@ -25,6 +43,13 @@ def parse_one_liner(raw_json: Any, episode_title: str, lang: str) -> str:
         raise RetriableValidationError("one-liner hook is too similar to episode title")
     _ = lang
     return hook
+
+
+def parse_three_act(raw_json: Any) -> ThreeAct:
+    try:
+        return ThreeAct.model_validate(_payload_dict(raw_json))
+    except (ValidationError, RetriableValidationError) as exc:
+        raise RetriableValidationError("three-act payload failed validation") from exc
 
 
 def _payload_dict(raw_json: Any) -> dict[str, Any]:
