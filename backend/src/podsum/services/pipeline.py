@@ -138,6 +138,11 @@ class Pipeline:
     async def _set_state(self, job: Job, state: str, *, error: str | None = None) -> None:
         job.state = state
         job.error = error
+        episode_status = self._episode_status_for_job(state)
+        episode = EpisodeRepo(self.session).get(job.episode_id)
+        if episode is not None:
+            episode.status = episode_status
+            self.session.add(episode)
         self.session.add(job)
         self.session.flush()
         await self._publish_job_update(job)
