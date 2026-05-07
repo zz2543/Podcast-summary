@@ -33,6 +33,7 @@ from podsum.persistence.repo import (
     SummaryArtifactRepo,
 )
 from podsum.services.asr_client import ASRClient, create_asr_client
+from podsum.services.digest_script import build as build_digest_script
 from podsum.services.ingest import (
     IngestedAudio,
     ingest_direct_url,
@@ -40,6 +41,7 @@ from podsum.services.ingest import (
     ingest_youtube,
 )
 from podsum.services.llm_client import LLMClient, create_llm_client
+from podsum.services.tts_client import TTSClient, create_tts_client
 
 StageResult = dict[str, Any] | None
 StageRun = Callable[["PipelineContext"], StageResult | Awaitable[StageResult]]
@@ -338,6 +340,19 @@ def create_us1_pipeline(
     )
 
 
+def create_tts_pipeline(
+    session: Session,
+    settings: Settings,
+    *,
+    broadcaster: Broadcaster = default_broadcaster,
+    tts_client: TTSClient | None = None,
+) -> Pipeline:
+    pipeline = Pipeline(session, broadcaster=broadcaster)
+    tts_client = tts_client or create_tts_client(settings)
+    pipeline.register_stage("tts", required=False, run=lambda context: _stage_tts(context, tts_client))
+    return pipeline
+
+
 async def _stage_fetch(context: PipelineContext, settings: Settings) -> StageResult:
     episode = _get_episode(context)
     audio_path = _normalized_audio_path(episode)
@@ -555,6 +570,31 @@ def _stage_entity_extract(context: PipelineContext, llm_client: LLMClient) -> St
     context.session.add(artifact)
     context.session.flush()
     return {"entities": len(entities)}
+
+
+def _stage_tts(context: PipelineContext, tts_client: TTSClient) -> StageResult:
+    from podsum.exporters import json_export
+
+    episode = _get_episode(context)
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    digest_path = Path(episode.data_dir) / "digest.mp3"
+    if digest_path.exists() and artifact.stage_status.get("tts") == "present":
+        artifact.tts_path = str(digest_path)
+        context.session.add(artifact)
+        context.session.flush()
+        return {"tts_path": str(digest_path), "cached": True}
+
+    detail = json_export.render(_episode_detail(context.session, episode))
+    script = build_digest_script(detail, episode.language or "en")
+    if not script:
+        raise ValueError("cannot build an empty digest script")
+    tts_client.synthesize(script, episode.language or "en", digest_path)
+
+    artifact.tts_path = str(digest_path)
+    artifact.stage_status = {**dict(artifact.stage_status), "tts": "present"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"tts_path": str(digest_path), "cached": False}
 
 
 def _stage_export(context: PipelineContext) -> StageResult:
