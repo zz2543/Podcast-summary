@@ -15,7 +15,8 @@ from tenacity import AsyncRetrying, RetryError, stop_after_attempt
 from podsum.api.ws_progress import Broadcaster
 from podsum.api.ws_progress import broadcaster as default_broadcaster
 from podsum.config import Settings
-from podsum.domain.chapter_segmenter import ChapterSpan, segment as segment_chapters
+from podsum.domain.chapter_segmenter import ChapterSpan
+from podsum.domain.chapter_segmenter import segment as segment_chapters
 from podsum.domain.entity_extractor import Entity as DomainEntity
 from podsum.domain.entity_extractor import extract as extract_entities
 from podsum.domain.prompt_assembler import PromptAssembler

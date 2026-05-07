@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 VERSION_RE = re.compile(r"^v[0-9]+$")
 PROMPT_HINTS = {
     "assistant",

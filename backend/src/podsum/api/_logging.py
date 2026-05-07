@@ -8,16 +8,16 @@ from collections.abc import Iterator
 from datetime import datetime, timezone
 from typing import Any
 
-
-_log_context: contextvars.ContextVar[dict[str, str | None]] = contextvars.ContextVar(
+_DEFAULT_CONTEXT = {"job_id": None, "episode_id": None, "stage": None}
+_log_context: contextvars.ContextVar[dict[str, str | None] | None] = contextvars.ContextVar(
     "podsum_log_context",
-    default={"job_id": None, "episode_id": None, "stage": None},
+    default=None,
 )
 
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        context = _log_context.get()
+        context = _current_context()
         payload: dict[str, Any] = {
             "timestamp": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
             "level": record.levelname,
@@ -53,7 +53,7 @@ def bind_log_context(
     episode_id: str | None = None,
     stage: str | None = None,
 ) -> Iterator[None]:
-    current = _log_context.get()
+    current = _current_context()
     token = _log_context.set(
         {
             "job_id": job_id if job_id is not None else current.get("job_id"),
@@ -65,3 +65,7 @@ def bind_log_context(
         yield
     finally:
         _log_context.reset(token)
+
+
+def _current_context() -> dict[str, str | None]:
+    return _log_context.get() or dict(_DEFAULT_CONTEXT)

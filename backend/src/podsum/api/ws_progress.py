@@ -7,7 +7,6 @@ from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-
 router = APIRouter(tags=["jobs"])
 SnapshotProvider = Callable[[], Awaitable[list[dict[str, Any]]]]
 

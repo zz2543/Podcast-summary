@@ -6,7 +6,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from podsum.exporters.json_export import render
-from podsum.persistence.models import Base, Chapter, Episode, Quote, SummaryArtifact, TranscriptSegment
+from podsum.persistence.models import (
+    Base,
+    Chapter,
+    Episode,
+    Quote,
+    SummaryArtifact,
+    TranscriptSegment,
+)
 
 
 def test_us2_quote_jump_math_preserves_quote_start_ms() -> None:

@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install dependencies
+        run: make install PYTHON=python
+      - name: Seed quote fixture
+        run: PYTHONPATH=backend/src .venv/bin/python scripts/seed_quote_fixture.py data/ci-quotes.sqlite3
+      - name: Lint and test
+        run: make lint && make test && make test-frontend && DB_PATH=data/ci-quotes.sqlite3 make verify-quotes

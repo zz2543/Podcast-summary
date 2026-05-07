@@ -7,8 +7,8 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from podsum.api._logging import configure_logging
 from podsum.api import episodes, jobs, ws_progress
+from podsum.api._logging import configure_logging
 from podsum.config import Settings, get_settings
 from podsum.services.job_queue import JobQueue
 from podsum.services.pipeline import recover_incomplete_jobs
