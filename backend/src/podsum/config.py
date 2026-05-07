@@ -7,7 +7,6 @@ from typing import Literal
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 ASRProvider = Literal["doubao", "openai_whisper", "deepgram", "qwen"]
 LLMProvider = Literal["deepseek", "qwen", "anthropic"]
 TTSProvider = Literal["doubao", "qwen"]
@@ -51,6 +50,8 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: SecretStr | None = None
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
     DEEPSEEK_MODEL: str = "deepseek-chat"
+    QWEN_LLM_MODEL: str = "qwen-max"
+    ANTHROPIC_MODEL: str | None = None
 
     DOUBAO_TTS_APP_ID: str | None = None
     DOUBAO_TTS_ACCESS_TOKEN: SecretStr | None = None
@@ -108,10 +109,24 @@ class Settings(BaseSettings):
                 )
                 if not _present(value)
             )
-        elif self.LLM_PROVIDER == "qwen" and not _present(self.DASHSCOPE_API_KEY):
-            missing.append("DASHSCOPE_API_KEY")
-        elif self.LLM_PROVIDER == "anthropic" and not _present(self.ANTHROPIC_API_KEY):
-            missing.append("ANTHROPIC_API_KEY")
+        elif self.LLM_PROVIDER == "qwen":
+            missing.extend(
+                key
+                for key, value in (
+                    ("DASHSCOPE_API_KEY", self.DASHSCOPE_API_KEY),
+                    ("QWEN_LLM_MODEL", self.QWEN_LLM_MODEL),
+                )
+                if not _present(value)
+            )
+        elif self.LLM_PROVIDER == "anthropic":
+            missing.extend(
+                key
+                for key, value in (
+                    ("ANTHROPIC_API_KEY", self.ANTHROPIC_API_KEY),
+                    ("ANTHROPIC_MODEL", self.ANTHROPIC_MODEL),
+                )
+                if not _present(value)
+            )
 
         if self.TTS_PROVIDER == "doubao":
             missing.extend(
