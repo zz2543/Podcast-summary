@@ -120,7 +120,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 **Batching & performance**
 
 - **FR-018**: System MUST support batch submission and process jobs in parallel up to a user-configurable concurrency limit; jobs above the limit MUST be queued and started as slots free up.
-- **FR-019**: For a 60-minute episode on the reference hardware (Apple M2 MacBook), end-to-end processing (audio acquisition through structured outputs) MUST complete in ≤ 10 minutes. Cloud APIs and local models are both acceptable as long as the budget is met. [NEEDS CLARIFICATION: is the 10-minute budget required on local-only execution, or is it acceptable for the default configuration to rely on cloud APIs while a local-only mode is permitted to be slower?]
+- **FR-019**: For a 60-minute episode on the reference hardware (Apple M2 MacBook), end-to-end processing (audio acquisition through structured outputs) MUST complete in ≤ 10 minutes. v1 is **cloud-only**: ASR, summarization, and TTS are all served by cloud APIs. A fully local execution mode is **explicitly out of scope for v1** and may be revisited in a later version.
 
 **Non-goals (binding)**
 
@@ -158,4 +158,5 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 - YouTube ingestion uses publicly available audio extraction; videos requiring login, age-gating, or active DRM are out of scope and expected to fail fast.
 - Speaker diarization beyond host-vs-guest prompt inference is out of scope (per user input non-goals).
 - Persistent storage of past episodes and their artifacts is in scope (jobs and outputs survive process restarts); specific storage technology choice is deferred to the planning phase per project constitution.
-- Both cloud LLM/ASR APIs and local models are acceptable implementation choices; selection is deferred to research.md per constitution.
+- v1 is cloud-only (ASR, summarization, TTS via cloud APIs). Local-only execution is explicitly deferred to a future version. Specific cloud vendors are still selected in research.md per constitution.
+- Internet connectivity to the chosen cloud APIs is assumed available during processing; offline operation is not supported in v1.

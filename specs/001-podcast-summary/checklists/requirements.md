@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — **1 outstanding** (FR-019: local-only vs. cloud-allowed performance budget)
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.
-- One [NEEDS CLARIFICATION] marker remains in FR-019 (performance budget on local-only vs. cloud-allowed configurations). Recommend running `/speckit-clarify` to resolve before `/speckit-plan`, or accept the cloud-or-local default.
+- All checklist items pass. Spec is ready for `/speckit-plan` (or `/speckit-clarify` if a deeper structured pass is desired).
+- Resolved Q1 (2026-05-07): v1 is cloud-only; local-only execution deferred to a future version (option C).
