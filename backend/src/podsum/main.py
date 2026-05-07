@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from podsum.api._logging import configure_logging
 from podsum.api import episodes, jobs, ws_progress
 from podsum.config import Settings, get_settings
+from podsum.services.job_queue import JobQueue
 from podsum.services.pipeline import recover_incomplete_jobs
 
 VERSION = "0.1.0"
@@ -22,6 +23,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     configure_logging(app.state.settings.LOG_LEVEL)
     app.state.engine = create_engine(app.state.settings.database_url)
     app.state.session_factory = sessionmaker(bind=app.state.engine)
+    app.state.job_queue = JobQueue(app)
+    if not callable(getattr(app.state, "enqueue_job", None)):
+        app.state.enqueue_job = app.state.job_queue.enqueue
+    app.state.job_queue.start()
     db_path = app.state.settings.DB_PATH
     recovered_jobs = []
     if db_path.exists():
@@ -35,6 +40,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         yield
     finally:
+        await app.state.job_queue.stop()
         app.state.engine.dispose()
 
 
