@@ -40,6 +40,27 @@ export interface ThreeAct {
   conclusion: string;
 }
 
+export interface Quote {
+  text: string;
+  start_ms: number;
+}
+
+export interface Chapter {
+  idx: number;
+  title: string;
+  start_ms: number;
+  end_ms: number;
+  key_points: string[];
+  quotes: Quote[];
+}
+
+export interface EntitySummary {
+  name: string;
+  kind: "person" | "book" | "product";
+  count: number;
+  sample_timestamps_ms?: number[];
+}
+
 export interface EpisodeDetail extends EpisodeSummary {
   source_ref: string;
   guests: string[] | null;
@@ -51,8 +72,8 @@ export interface EpisodeDetail extends EpisodeSummary {
   };
   hook: string | null;
   three_act: ThreeAct | null;
-  chapters: unknown[];
-  entities: unknown[];
+  chapters: Chapter[];
+  entities: EntitySummary[];
   artifact_paths?: {
     markdown?: string | null;
     json?: string | null;

@@ -12,6 +12,7 @@ import {
   useJobs
 } from "../api/client";
 import { AppHeader } from "../components/AppHeader";
+import { ChapterOutline } from "../components/ChapterOutline";
 
 const STAGE_COPY: Record<string, string> = {
   hook: "one-line hook",
@@ -111,7 +112,11 @@ export function EpisodeDetailPage({ episodeId }: { episodeId: string }) {
             <section className="detail-content-grid">
               <div className="detail-main-column">
                 <ThreeActSection episode={episode} onRetry={onRetry} />
-                <ChapterStub status={episode.stage_status.chapters} onRetry={onRetry} />
+                {episode.stage_status.chapters === "present" ? (
+                  <ChapterOutline chapters={episode.chapters} audioRef={audioRef} />
+                ) : (
+                  <ChapterStub status={episode.stage_status.chapters} onRetry={onRetry} />
+                )}
               </div>
               <EntityStub status={episode.stage_status.entities} onRetry={onRetry} />
             </section>

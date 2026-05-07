@@ -877,6 +877,148 @@ button:disabled {
   font-size: 12px;
 }
 
+.chapter-outline {
+  display: grid;
+  gap: 14px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: #202436;
+  font-size: 20px;
+}
+
+.section-heading span {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #f2f4fb;
+  color: #606779;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.chapter-list {
+  display: grid;
+  gap: 14px;
+}
+
+.chapter-card {
+  overflow: hidden;
+  border: 1px solid #e6e9f4;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(26, 32, 56, 0.07);
+}
+
+.chapter-card > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 20px;
+}
+
+.chapter-card h3,
+.chapter-card h4 {
+  margin: 0;
+  color: #202436;
+}
+
+.chapter-card h3 {
+  overflow: hidden;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chapter-card header span {
+  display: block;
+  margin-top: 6px;
+  color: #5b45f5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.chapter-index-button,
+.chapter-collapse-button {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  height: 42px;
+  border: 1px solid #e2e5f0;
+  border-radius: 999px;
+  background: #fff;
+  color: #5b45f5;
+  font-weight: 900;
+}
+
+.chapter-collapse-button {
+  color: #606779;
+}
+
+.chapter-card-body {
+  display: grid;
+  gap: 18px;
+  padding: 0 20px 20px 78px;
+}
+
+.chapter-card-body h4 {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.chapter-card-body ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #454b5f;
+  line-height: 1.7;
+}
+
+.quote-list {
+  display: grid;
+  gap: 10px;
+}
+
+.quote-chip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid #e6e9f4;
+  border-radius: 8px;
+  padding: 13px 14px;
+  background: #fbfcff;
+  color: #33394d;
+  text-align: left;
+}
+
+.quote-chip:hover,
+.quote-chip--flash {
+  border-color: #cfc8ff;
+  background: #f3f1ff;
+}
+
+.quote-chip span {
+  color: #5b45f5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 900;
+}
+
+.quote-chip q {
+  quotes: none;
+  line-height: 1.55;
+}
+
 .entity-panel {
   position: sticky;
   top: 92px;
