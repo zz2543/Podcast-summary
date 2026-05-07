@@ -157,7 +157,7 @@ description: "Task list for 001-podcast-summary implementation"
 
 - [X] T070 [US4] Replace pipeline's serial driver with an asyncio queue + `asyncio.Semaphore(Settings.MAX_CONCURRENCY)`. Each in-flight job is one task; the queue persists in SQLite (jobs in `state='queued'`) so the in-memory queue is just a cache (FR-006 + FR-018).
 - [X] T071 [US4] Implement `POST /api/episodes/batch` in `api/episodes.py` accepting `{ items: [{source_type, source_ref}|file] }`; creates N episode+job rows in one transaction, returns the list of `{episode, job}` tuples.
-- [ ] T072 [P] [US4] [integration-test] `backend/tests/integration/test_us4_concurrency.py` — submit 5 jobs with `MAX_CONCURRENCY=2`, mock ASR to sleep 200 ms, assert that at every 50 ms tick the count of `state='transcribing'` rows is ≤ 2.
+- [X] T072 [P] [US4] [integration-test] `backend/tests/integration/test_us4_concurrency.py` — submit 5 jobs with `MAX_CONCURRENCY=2`, mock ASR to sleep 200 ms, assert that at every 50 ms tick the count of `state='transcribing'` rows is ≤ 2.
 - [ ] T073 [US4] Frontend: batch submit form (multi-line URL paste + multi-file picker) + a small "队列：N 处理中 / M 等待中" badge (`QueueBadge`) in the header bound to WS snapshot. Visuals follow the SubmitPanel slice of `design/selected/list-page.png` and `ui-brief.md` §2.2 / §6.1.
 
 **Checkpoint**: FR-018 delivered; full feature-set complete.

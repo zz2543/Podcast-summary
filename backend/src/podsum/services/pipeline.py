@@ -113,7 +113,7 @@ class Pipeline:
                     artifact_stage,
                     "failed_after_retries",
                 )
-                self.session.flush()
+                self.session.commit()
                 await self.broadcaster.publish_stage_status(
                     episode_id=job.episode_id,
                     stage=artifact_stage,
@@ -147,7 +147,7 @@ class Pipeline:
         progress[stage] = payload
         job.stage_progress = progress
         self.session.add(job)
-        self.session.flush()
+        self.session.commit()
         await self._publish_job_update(job)
 
     async def _set_state(self, job: Job, state: str, *, error: str | None = None) -> None:
@@ -159,7 +159,7 @@ class Pipeline:
             episode.status = episode_status
             self.session.add(episode)
         self.session.add(job)
-        self.session.flush()
+        self.session.commit()
         await self._publish_job_update(job)
 
     async def _publish_job_update(self, job: Job) -> None:
