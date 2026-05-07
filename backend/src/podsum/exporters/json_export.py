@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -37,8 +38,8 @@ def render(episode_detail: Any) -> dict[str, Any]:
         "three_act": (
             _value(artifact, "three_act") if stage_status["three_act"] == "present" else None
         ),
-        "chapters": _plain_list(_value(episode_detail, "chapters")),
-        "entities": _plain_list(_value(episode_detail, "entities")),
+        "chapters": _render_chapters(_value(episode_detail, "chapters")),
+        "entities": _render_entities(_value(episode_detail, "entities")),
         "artifact_paths": {
             "markdown": _value(artifact, "markdown_path"),
             "json": _value(artifact, "json_path"),
@@ -55,10 +56,66 @@ def _value(source: Any, key: str) -> Any:
     return getattr(source, key, None)
 
 
-def _plain_list(value: Any) -> list[Any]:
-    if not isinstance(value, list):
-        return []
-    return [item for item in value if isinstance(item, dict)]
+def _render_chapters(value: Any) -> list[dict[str, Any]]:
+    chapters: list[dict[str, Any]] = []
+    for chapter in _iter_items(value):
+        chapters.append(
+            {
+                "idx": _int_value(_value(chapter, "idx")),
+                "title": str(_value(chapter, "title") or "Untitled chapter"),
+                "start_ms": _int_value(_value(chapter, "start_ms")),
+                "end_ms": max(1, _int_value(_value(chapter, "end_ms"))),
+                "key_points": [str(item) for item in _iter_items(_value(chapter, "key_points"))],
+                "quotes": _render_quotes(_value(chapter, "quotes")),
+            }
+        )
+    return chapters
+
+
+def _render_quotes(value: Any) -> list[dict[str, Any]]:
+    quotes: list[dict[str, Any]] = []
+    for quote in _iter_items(value):
+        if _value(quote, "verified") is not True:
+            continue
+        quotes.append(
+            {
+                "text": str(_value(quote, "text") or ""),
+                "start_ms": _int_value(_value(quote, "start_ms")),
+            }
+        )
+    return quotes
+
+
+def _render_entities(value: Any) -> list[dict[str, Any]]:
+    entities: list[dict[str, Any]] = []
+    for entity in _iter_items(value):
+        payload = {
+            "name": str(_value(entity, "name") or ""),
+            "kind": _value(entity, "kind"),
+            "count": max(1, _int_value(_value(entity, "count"))),
+        }
+        samples = list(_iter_items(_value(entity, "sample_timestamps_ms")))[:5]
+        if samples:
+            payload["sample_timestamps_ms"] = [_int_value(item) for item in samples]
+        entities.append(payload)
+    return entities
+
+
+def _iter_items(value: Any) -> list[Any]:
+    if isinstance(value, list):
+        return value
+    if isinstance(value, tuple):
+        return list(value)
+    if isinstance(value, Iterable) and not isinstance(value, (str, bytes, dict)):
+        return list(value)
+    return []
+
+
+def _int_value(value: Any) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
 
 
 def _stage_status(values: dict[str, str]) -> dict[str, str]:

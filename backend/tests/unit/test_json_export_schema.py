@@ -37,6 +37,24 @@ def test_us1_json_export_validates_against_contract_schema() -> None:
                 json_path="data/id/summary.json",
                 tts_path=None,
             ),
+            "chapters": [
+                SimpleNamespace(
+                    idx=0,
+                    title="Opening",
+                    start_ms=0,
+                    end_ms=65_000,
+                    key_points=["Point one"],
+                    quotes=[SimpleNamespace(text="Verified quote.", start_ms=12_000, verified=True)],
+                )
+            ],
+            "entities": [
+                SimpleNamespace(
+                    name="Ada Lovelace",
+                    kind="person",
+                    count=1,
+                    sample_timestamps_ms=[12_000],
+                )
+            ],
         }
     )
 
