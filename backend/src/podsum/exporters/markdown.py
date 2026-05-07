@@ -41,6 +41,44 @@ def render(episode_detail: Any) -> str:
             ]
         )
 
+    chapters = _list_value(episode_detail, "chapters")
+    if chapters:
+        lines.extend(["", "## Chapters"])
+        for chapter in chapters:
+            lines.extend(
+                [
+                    "",
+                    f"### {_value(chapter, 'idx') + 1}. {_value(chapter, 'title')}",
+                    f"- Time: {_timestamp(_value(chapter, 'start_ms'))}–{_timestamp(_value(chapter, 'end_ms'))}",
+                    "- Key points:",
+                ]
+            )
+            for point in _list_value(chapter, "key_points"):
+                lines.append(f"  - {point}")
+            quotes = [
+                quote
+                for quote in _list_value(chapter, "quotes")
+                if _value(quote, "verified") is not False
+            ]
+            if quotes:
+                lines.append("- Quotes:")
+                for quote in quotes:
+                    start_ms = _value(quote, "start_ms")
+                    lines.append(
+                        f"  - [{_timestamp(start_ms)}](#t={start_ms}) \"{_value(quote, 'text')}\""
+                    )
+
+    entities = _list_value(episode_detail, "entities")
+    if entities:
+        lines.extend(["", "## Entities"])
+        for kind in ("person", "book", "product"):
+            grouped = [entity for entity in entities if _value(entity, "kind") == kind]
+            if not grouped:
+                continue
+            lines.extend(["", f"### {kind.title()}"])
+            for entity in grouped:
+                lines.append(f"- {_value(entity, 'name')} × {_value(entity, 'count')}")
+
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -57,3 +95,17 @@ def _duration_label(value: Any) -> str:
         return "Unknown"
     minutes, remaining = divmod(seconds, 60)
     return f"{minutes}:{remaining:02d}"
+
+
+def _list_value(source: Any, key: str) -> list[Any]:
+    value = _value(source, key)
+    return value if isinstance(value, list) else []
+
+
+def _timestamp(value: Any) -> str:
+    try:
+        total_seconds = max(0, int(value) // 1000)
+    except (TypeError, ValueError):
+        total_seconds = 0
+    minutes, seconds = divmod(total_seconds, 60)
+    return f"{minutes:02d}:{seconds:02d}"

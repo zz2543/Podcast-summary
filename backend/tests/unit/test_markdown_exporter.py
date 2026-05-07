@@ -24,6 +24,22 @@ def test_markdown_render_emits_us1_sections() -> None:
                     "conclusion": "Ending.",
                 },
             ),
+            "chapters": [
+                SimpleNamespace(
+                    idx=0,
+                    title="Opening",
+                    start_ms=0,
+                    end_ms=65_000,
+                    key_points=["Point one"],
+                    quotes=[
+                        SimpleNamespace(text="Verbatim quote.", start_ms=12_000, verified=True)
+                    ],
+                )
+            ],
+            "entities": [
+                SimpleNamespace(name="Ada Lovelace", kind="person", count=2),
+                SimpleNamespace(name="DeepSeek", kind="product", count=1),
+            ],
         }
     )
 
@@ -32,3 +48,6 @@ def test_markdown_render_emits_us1_sections() -> None:
     assert "- Duration: 2:05" in markdown
     assert "## Hook\nA useful reason to listen" in markdown
     assert "### Core Argument\nArgument." in markdown
+    assert "## Chapters" in markdown
+    assert "[00:12](#t=12000) \"Verbatim quote.\"" in markdown
+    assert "### Person\n- Ada Lovelace × 2" in markdown

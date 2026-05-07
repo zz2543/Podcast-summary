@@ -656,6 +656,8 @@ def _episode_detail(session: Session, episode: Episode) -> dict[str, Any]:
         "episode": episode,
         "segments": SegmentRepo(session).list_for_episode(episode.id),
         "artifact": artifact,
+        "chapters": ChapterRepo(session).list_for_episode(episode.id),
+        "entities": EntityRepo(session).list_for_episode(episode.id),
     }
 
 

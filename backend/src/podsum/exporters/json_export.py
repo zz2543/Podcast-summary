@@ -37,8 +37,8 @@ def render(episode_detail: Any) -> dict[str, Any]:
         "three_act": (
             _value(artifact, "three_act") if stage_status["three_act"] == "present" else None
         ),
-        "chapters": _value(episode_detail, "chapters") or [],
-        "entities": _value(episode_detail, "entities") or [],
+        "chapters": _plain_list(_value(episode_detail, "chapters")),
+        "entities": _plain_list(_value(episode_detail, "entities")),
         "artifact_paths": {
             "markdown": _value(artifact, "markdown_path"),
             "json": _value(artifact, "json_path"),
@@ -53,6 +53,12 @@ def _value(source: Any, key: str) -> Any:
     if isinstance(source, dict):
         return source.get(key)
     return getattr(source, key, None)
+
+
+def _plain_list(value: Any) -> list[Any]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, dict)]
 
 
 def _stage_status(values: dict[str, str]) -> dict[str, str]:
