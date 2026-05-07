@@ -5,7 +5,7 @@ Version change: 0.0.0 → 1.0.0 (initial ratification)
 Bump rationale: 首次正式批准项目宪法，建立 5 条核心原则 + 2 章附加约束 + 治理章节。
 Modified principles: 无（首次创建）
 Added sections:
-  - Core Principles (I. 中文交付优先; II. Python 优先技术栈; III. 领域逻辑测试覆盖 (NON-NEGOTIABLE); IV. 配置外置化; V. Prompt 版本化集中管理)
+  - Core Principles (I. 英文交付优先; II. Python 优先技术栈; III. 领域逻辑测试覆盖 (NON-NEGOTIABLE); IV. 配置外置化; V. Prompt 版本化集中管理)
   - 交付与文档约束 (Delivery & Documentation Constraints)
   - SDD 流程纪律 (Spec-Driven Development Discipline)
   - Governance
@@ -25,12 +25,11 @@ Follow-up TODOs:
 
 ## Core Principles
 
-### I. 中文交付优先
+### I. 英文交付优先
 
-所有面向人类阅读的产出（报告、文档、代码注释、提交信息正文、CLI 用户提示）**必须**使用中文。
-英文术语在首次出现时可加括号注明，但主语境保持中文。
+所有面向人类阅读的产出（报告、文档、代码注释、提交信息正文、CLI 用户提示）**必须**使用英文。
 
-**Rationale**: 本项目为课程交付物，评审者使用中文阅读；统一语言可降低沟通成本并满足课程要求。
+**Rationale**: 本项目为课程交付物，评审者使用英文阅读；统一语言可降低沟通成本并满足课程要求。
 
 ### II. Python 优先技术栈
 
