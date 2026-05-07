@@ -23,7 +23,7 @@ from podsum.services.ingest import (
     ingest_local_file,
     ingest_youtube,
 )
-from podsum.services.pipeline import create_us1_pipeline
+from podsum.services.pipeline import create_tts_pipeline, create_us1_pipeline
 
 router = APIRouter(prefix="/api/episodes", tags=["episodes"])
 
@@ -143,6 +143,40 @@ async def retry_episode(
     return JSONResponse(status_code=202, content=_job_payload(job))
 
 
+@router.post("/{episode_id}/digest")
+async def create_digest(
+    request: Request,
+    episode_id: str,
+    session: Session = SESSION_DEP,
+) -> JSONResponse:
+    episode = EpisodeRepo(session).get(episode_id)
+    if episode is None:
+        return _api_error(404, "not_found", "episode not found")
+
+    artifact = SummaryArtifactRepo(session).get_or_create(episode_id)
+    if artifact.tts_path and artifact.stage_status.get("tts") == "present" and Path(artifact.tts_path).exists():
+        return JSONResponse(content={"tts_path": artifact.tts_path, "status": "present"})
+
+    active = session.scalars(
+        select(Job).where(Job.episode_id == episode_id, Job.state.in_(JobRepo.ACTIVE_STATES))
+    ).first()
+    if active is not None:
+        return _api_error(409, "conflict", "episode already has an active job")
+
+    latest = JobRepo(session).latest_for_episode(episode_id)
+    job = Job(
+        episode_id=episode_id,
+        state="queued",
+        attempt=(latest.attempt + 1) if latest is not None else 1,
+        stage_progress={"requested_stage": "tts"},
+    )
+    session.add(job)
+    session.commit()
+    session.refresh(job)
+    _enqueue_digest_job(request, job)
+    return JSONResponse(status_code=202, content=_job_payload(job))
+
+
 @router.get("/{episode_id}/files/markdown")
 async def get_markdown_file(
     episode_id: str,
@@ -159,6 +193,15 @@ async def get_json_file(
 ) -> Response:
     artifact = SummaryArtifactRepo(session).get(episode_id)
     return _file_response(artifact.json_path if artifact else None, "application/json")
+
+
+@router.get("/{episode_id}/files/digest")
+async def get_digest_file(
+    episode_id: str,
+    session: Session = SESSION_DEP,
+) -> Response:
+    artifact = SummaryArtifactRepo(session).get(episode_id)
+    return _file_response(artifact.tts_path if artifact else None, "audio/mpeg")
 
 
 @router.get("/{episode_id}/files/audio")
@@ -285,6 +328,19 @@ def _enqueue_job(request: Request, job: Job) -> None:
     task.add_done_callback(tasks.discard)
 
 
+def _enqueue_digest_job(request: Request, job: Job) -> None:
+    enqueue = getattr(request.app.state, "enqueue_digest_job", None)
+    if callable(enqueue):
+        enqueue(job)
+        return
+
+    tasks: set[asyncio.Task[None]] = getattr(request.app.state, "background_job_tasks", set())
+    request.app.state.background_job_tasks = tasks
+    task = asyncio.create_task(_run_digest_job(request.app, job.id))
+    tasks.add(task)
+    task.add_done_callback(tasks.discard)
+
+
 async def _run_pipeline_job(app: Any, job_id: str) -> None:
     with app.state.session_factory() as session:
         job = JobRepo(session).get(job_id)
@@ -295,6 +351,20 @@ async def _run_pipeline_job(app: Any, job_id: str) -> None:
             app.state.settings,
             asr_client=getattr(app.state, "asr_client", None),
             llm_client=getattr(app.state, "llm_client", None),
+        )
+        await pipeline.run(job)
+        session.commit()
+
+
+async def _run_digest_job(app: Any, job_id: str) -> None:
+    with app.state.session_factory() as session:
+        job = JobRepo(session).get(job_id)
+        if job is None:
+            return
+        pipeline = create_tts_pipeline(
+            session,
+            app.state.settings,
+            tts_client=getattr(app.state, "tts_client", None),
         )
         await pipeline.run(job)
         session.commit()
