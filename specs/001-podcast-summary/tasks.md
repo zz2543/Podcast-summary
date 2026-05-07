@@ -26,7 +26,7 @@ description: "Task list for 001-podcast-summary implementation"
 - [X] T003 Initialize the frontend with `frontend/package.json` + `frontend/vite.config.ts` + `frontend/tsconfig.json` for a Vite + React + TypeScript SPA; declare `react`, `react-dom`, `vite`, `typescript`, `vitest`, `@types/react`, `@types/react-dom` per plan.md. Configure the dev server to proxy `/api` and `/api/ws` to `http://127.0.0.1:8000`.
 - [X] T004 [P] Configure backend lint/format: `backend/.ruff.toml` (ruff: pyflakes + isort + bugbear), `backend/pyproject.toml` `[tool.black]` (line length 100), `backend/mypy.ini` (strict on `podsum.domain` only).
 - [X] T005 [P] Configure frontend lint: `frontend/.eslintrc.cjs` (typescript-eslint recommended), `frontend/.prettierrc.json`. Add `tsc --noEmit` to lint script.
-- [ ] T006 [P] Author `.env.example` at repo root listing every env var read by `backend/src/podsum/config.py`:
+- [X] T006 [P] Author `.env.example` at repo root listing every env var read by `backend/src/podsum/config.py`:
   - **Core**: `DATA_DIR`, `DB_PATH`, `MAX_CONCURRENCY`, `LOG_LEVEL`.
   - **Provider selection**: `ASR_PROVIDER` (default `doubao`), `LLM_PROVIDER` (default `deepseek`), `TTS_PROVIDER` (default `doubao`).
   - **火山引擎 shared credentials (required for default ASR + TTS)**: `VOLC_ACCESS_KEY_ID`, `VOLC_SECRET_ACCESS_KEY`.
