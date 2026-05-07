@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     DOUBAO_TTS_VOICE_TYPE_ZH: str = "BV700_streaming"
     DOUBAO_TTS_VOICE_TYPE_EN: str = "BV701_streaming"
     DOUBAO_TTS_CLUSTER: str = "volcano_tts"
+    QWEN_TTS_MODEL: str = "cosyvoice-v2"
+    QWEN_TTS_VOICE: str = "longxiaochun"
 
     OPENAI_API_KEY: SecretStr | None = None
     DEEPGRAM_API_KEY: SecretStr | None = None
