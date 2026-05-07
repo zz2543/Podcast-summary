@@ -28,6 +28,45 @@ class ThreeAct(BaseModel):
         return cleaned
 
 
+class CandidateQuote(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    text: str
+    start_ms: int
+
+    @field_validator("text")
+    @classmethod
+    def quote_text_non_empty(cls, value: str) -> str:
+        cleaned = _clean_text(value)
+        if not cleaned:
+            raise ValueError("quote text must not be empty")
+        return cleaned
+
+
+class ChapterDraft(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    title: str
+    key_points: list[str]
+    candidate_quotes: list[CandidateQuote] = []
+
+    @field_validator("title")
+    @classmethod
+    def title_non_empty(cls, value: str) -> str:
+        cleaned = _clean_text(value)
+        if not cleaned:
+            raise ValueError("chapter title must not be empty")
+        return cleaned
+
+    @field_validator("key_points")
+    @classmethod
+    def key_points_non_empty(cls, value: list[str]) -> list[str]:
+        cleaned = [_clean_text(item) for item in value if _clean_text(item)]
+        if not cleaned:
+            raise ValueError("chapter key_points must not be empty")
+        return cleaned
+
+
 def parse_one_liner(raw_json: Any, episode_title: str, lang: str) -> str:
     payload = _payload_dict(raw_json)
     value = payload.get("hook")
@@ -52,6 +91,20 @@ def parse_three_act(raw_json: Any) -> ThreeAct:
         raise RetriableValidationError("three-act payload failed validation") from exc
 
 
+def parse_chapter_payload(raw_json: Any) -> list[ChapterDraft]:
+    payload = _payload(raw_json)
+    raw_chapters = payload.get("chapters") if isinstance(payload, dict) else payload
+    if not isinstance(raw_chapters, list):
+        raise RetriableValidationError("chapter payload must contain a chapters list")
+    try:
+        chapters = [ChapterDraft.model_validate(item) for item in raw_chapters]
+    except ValidationError as exc:
+        raise RetriableValidationError("chapter payload failed validation") from exc
+    if not chapters:
+        raise RetriableValidationError("chapter payload must contain at least one chapter")
+    return chapters
+
+
 def _payload_dict(raw_json: Any) -> dict[str, Any]:
     if isinstance(raw_json, dict):
         return raw_json
@@ -63,6 +116,17 @@ def _payload_dict(raw_json: Any) -> dict[str, Any]:
         if isinstance(payload, dict):
             return payload
     raise RetriableValidationError("LLM output must be a JSON object")
+
+
+def _payload(raw_json: Any) -> Any:
+    if isinstance(raw_json, (dict, list)):
+        return raw_json
+    if isinstance(raw_json, str):
+        try:
+            return json.loads(raw_json)
+        except json.JSONDecodeError as exc:
+            raise RetriableValidationError("LLM output must be valid JSON") from exc
+    raise RetriableValidationError("LLM output must be valid JSON")
 
 
 def _clean_text(value: str) -> str:
