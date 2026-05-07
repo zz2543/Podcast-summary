@@ -83,7 +83,7 @@ description: "Task list for 001-podcast-summary implementation"
   4. `summarize_three_act` (same path with the three-act prompt),
   5. `export` (T037 + T038).
   Stages 3 and 4 are `required=True`; failures here mark the job failed.
-- [ ] T037 [US1] Implement `backend/src/podsum/exporters/markdown.py::render(episode_detail) -> str`: emits H1 title, metadata block, hook line, three-act block. (Chapters/quotes/entities added in US2 — keep the function feature-flag friendly so US2 just adds sections.)
+- [X] T037 [US1] Implement `backend/src/podsum/exporters/markdown.py::render(episode_detail) -> str`: emits H1 title, metadata block, hook line, three-act block. (Chapters/quotes/entities added in US2 — keep the function feature-flag friendly so US2 just adds sections.)
 - [ ] T038 [P] [US1] Implement `backend/src/podsum/exporters/json_export.py::render(episode_detail) -> dict` returning a structure that **validates** against `specs/001-podcast-summary/contracts/episode-output.schema.json` (load the schema at import time and assert in tests). For US1, populate `hook`, `three_act`, `stage_status`, `prompt_versions`; leave `chapters: []` and `entities: []` until US2.
 - [ ] T039 [P] [US1] [unit-test] `backend/tests/unit/test_json_export_schema.py` — loads the JSON Schema from `contracts/`, runs `jsonschema.validate` on a synthesized US1 export. Catches schema drift early.
 - [ ] T040 [US1] Implement `backend/src/podsum/api/episodes.py`:
