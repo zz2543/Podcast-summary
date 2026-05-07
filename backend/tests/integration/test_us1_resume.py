@@ -28,6 +28,18 @@ class FakeLLMClient:
     def complete_json(self, prompt: str, schema: Any) -> dict[str, Any]:
         if "hook" in schema.model_fields:
             return {"hook": "A restart avoids duplicate cloud costs"}
+        if "chapters" in schema.model_fields:
+            return {
+                "chapters": [
+                    {
+                        "title": "Cached transcript",
+                        "key_points": ["The transcript was already saved."],
+                        "candidate_quotes": [{"text": "hello world", "start_ms": 0}],
+                    }
+                ]
+            }
+        if "entities" in schema.model_fields:
+            return {"entities": [{"name": "world", "kind": "product", "count": 1}]}
         return {
             "background": "The run already transcribed audio.",
             "core_argument": "Resume should skip ASR costs.",

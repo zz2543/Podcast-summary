@@ -15,11 +15,23 @@ from tenacity import AsyncRetrying, RetryError, stop_after_attempt
 from podsum.api.ws_progress import Broadcaster
 from podsum.api.ws_progress import broadcaster as default_broadcaster
 from podsum.config import Settings
+from podsum.domain.chapter_segmenter import ChapterSpan, segment as segment_chapters
+from podsum.domain.entity_extractor import Entity as DomainEntity
+from podsum.domain.entity_extractor import extract as extract_entities
 from podsum.domain.prompt_assembler import PromptAssembler
-from podsum.domain.structured_parser import parse_one_liner, parse_three_act
+from podsum.domain.quote_verifier import verify_against_segments
+from podsum.domain.structured_parser import parse_chapter_payload, parse_one_liner, parse_three_act
 from podsum.domain.transcript_postprocess import normalize
-from podsum.persistence.models import Episode, Job, TranscriptSegment
-from podsum.persistence.repo import EpisodeRepo, JobRepo, SegmentRepo, SummaryArtifactRepo
+from podsum.persistence.models import Chapter, Entity, Episode, Job, TranscriptSegment
+from podsum.persistence.repo import (
+    ChapterRepo,
+    EntityRepo,
+    EpisodeRepo,
+    JobRepo,
+    QuoteRepo,
+    SegmentRepo,
+    SummaryArtifactRepo,
+)
 from podsum.services.asr_client import ASRClient, create_asr_client
 from podsum.services.ingest import (
     IngestedAudio,
@@ -93,15 +105,16 @@ class Pipeline:
                     await self._set_state(job, "failed", error=str(exc))
                     return job
                 optional_failed = True
+                artifact_stage = self._artifact_stage_key(stage.name)
                 SummaryArtifactRepo(self.session).update_stage_status(
                     job.episode_id,
-                    stage.name,
+                    artifact_stage,
                     "failed_after_retries",
                 )
                 self.session.flush()
                 await self.broadcaster.publish_stage_status(
                     episode_id=job.episode_id,
-                    stage=stage.name,
+                    stage=artifact_stage,
                     status="failed_after_retries",
                 )
                 continue
@@ -196,6 +209,18 @@ class Pipeline:
             return state
         return "processing"
 
+    @staticmethod
+    def _artifact_stage_key(stage_name: str) -> str:
+        if stage_name == "entity_extract":
+            return "entities"
+        if stage_name in {"chapter_outline", "quote_verify"}:
+            return "chapters"
+        if stage_name == "summarize_hook":
+            return "hook"
+        if stage_name == "summarize_three_act":
+            return "three_act"
+        return stage_name
+
 
 class _OneLinerPayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -209,6 +234,27 @@ class _ThreeActPayload(BaseModel):
     background: str
     core_argument: str
     conclusion: str
+
+
+class _CandidateQuotePayload(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    text: str
+    start_ms: int
+
+
+class _ChapterPayload(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    title: str
+    key_points: list[str]
+    candidate_quotes: list[_CandidateQuotePayload] = []
+
+
+class _ChapterOutlinePayload(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    chapters: list[_ChapterPayload]
 
 
 class _PathUpload:
@@ -259,6 +305,17 @@ def register_us1_stages(
         "summarize_three_act",
         required=True,
         run=lambda context: _stage_summarize_three_act(context, llm_client, prompt_assembler),
+    )
+    pipeline.register_stage(
+        "chapter_outline",
+        required=True,
+        run=lambda context: _stage_chapter_outline(context, llm_client, prompt_assembler),
+    )
+    pipeline.register_stage("quote_verify", required=True, run=_stage_quote_verify)
+    pipeline.register_stage(
+        "entity_extract",
+        required=False,
+        run=lambda context: _stage_entity_extract(context, llm_client),
     )
     pipeline.register_stage("export", required=True, run=_stage_export)
     return pipeline
@@ -386,6 +443,120 @@ def _stage_summarize_three_act(
     return {"three_act": artifact.three_act}
 
 
+def _stage_chapter_outline(
+    context: PipelineContext,
+    llm_client: LLMClient,
+    prompt_assembler: PromptAssembler,
+) -> StageResult:
+    episode = _get_episode(context)
+    segments = SegmentRepo(context.session).list_for_episode(episode.id)
+    spans = segment_chapters(segments)
+    prompt = prompt_assembler.render(
+        "chapter_outline",
+        "v1",
+        lang=episode.language or "mixed",
+        transcript=_chapter_prompt_transcript(spans),
+    )
+    payload = llm_client.complete_json(prompt, _ChapterOutlinePayload)
+    drafts = parse_chapter_payload(payload)
+
+    for chapter in ChapterRepo(context.session).list_for_episode(episode.id):
+        context.session.delete(chapter)
+    context.session.flush()
+
+    quote_candidates: list[dict[str, Any]] = []
+    for idx, draft in enumerate(drafts):
+        span = spans[min(idx, len(spans) - 1)] if spans else None
+        chapter = Chapter(
+            episode_id=episode.id,
+            idx=idx,
+            title=draft.title,
+            start_ms=span.start_ms if span is not None else 0,
+            end_ms=span.end_ms if span is not None else max(1, episode.duration_seconds or 1) * 1000,
+            key_points=draft.key_points,
+        )
+        context.session.add(chapter)
+        context.session.flush()
+        for quote in draft.candidate_quotes:
+            quote_candidates.append(
+                {
+                    "chapter_id": chapter.id,
+                    "chapter_idx": idx,
+                    "text": quote.text,
+                    "start_ms": quote.start_ms,
+                }
+            )
+
+    progress = dict(context.job.stage_progress or {})
+    progress["quote_candidates"] = quote_candidates
+    context.job.stage_progress = progress
+    context.session.add(context.job)
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.prompt_versions = {**dict(artifact.prompt_versions), "chapter_outline": "v1"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"chapters": len(drafts), "quote_candidates": len(quote_candidates)}
+
+
+def _stage_quote_verify(context: PipelineContext) -> StageResult:
+    episode = _get_episode(context)
+    segments = SegmentRepo(context.session).list_for_episode(episode.id)
+    transcript = _transcript_text(context.session, episode.id)
+    candidates = (context.job.stage_progress or {}).get("quote_candidates", [])
+    if not isinstance(candidates, list):
+        candidates = []
+
+    verified_count = 0
+    quote_indexes_by_chapter: dict[int, int] = {}
+    quote_repo = QuoteRepo(context.session)
+    chapter_ids = {chapter.id for chapter in ChapterRepo(context.session).list_for_episode(episode.id)}
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        chapter_id = candidate.get("chapter_id")
+        text = candidate.get("text")
+        if not isinstance(chapter_id, int) or chapter_id not in chapter_ids or not isinstance(text, str):
+            continue
+        ok, matched_start_ms = verify_against_segments(text, segments)
+        if not ok:
+            continue
+        quote_index = quote_indexes_by_chapter.get(chapter_id, 0)
+        quote_repo.insert_verified(
+            chapter_id=chapter_id,
+            idx=quote_index,
+            text=text,
+            start_ms=matched_start_ms if matched_start_ms is not None else int(candidate.get("start_ms", 0)),
+            transcript_text=transcript,
+        )
+        quote_indexes_by_chapter[chapter_id] = quote_index + 1
+        verified_count += 1
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.stage_status = {**dict(artifact.stage_status), "chapters": "present"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"verified_quotes": verified_count}
+
+
+def _stage_entity_extract(context: PipelineContext, llm_client: LLMClient) -> StageResult:
+    episode = _get_episode(context)
+    segments = SegmentRepo(context.session).list_for_episode(episode.id)
+    entities = extract_entities(segments, llm_client)
+
+    for entity in EntityRepo(context.session).list_for_episode(episode.id):
+        context.session.delete(entity)
+    for entity in entities:
+        context.session.add(_entity_row(episode.id, entity))
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.stage_status = {**dict(artifact.stage_status), "entities": "present"}
+    artifact.prompt_versions = {**dict(artifact.prompt_versions), "entity_extraction": "v1"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"entities": len(entities)}
+
+
 def _stage_export(context: PipelineContext) -> StageResult:
     from podsum.exporters import json_export, markdown
 
@@ -453,6 +624,30 @@ def _write_normalized_transcript(episode: Episode, segments: list[TranscriptSegm
 
 def _transcript_text(session: Session, episode_id: str) -> str:
     return "\n".join(segment.text for segment in SegmentRepo(session).list_for_episode(episode_id))
+
+
+def _chapter_prompt_transcript(spans: list[ChapterSpan]) -> str:
+    return "\n\n".join(
+        f"[{_format_ms(span.start_ms)}-{_format_ms(span.end_ms)}]\n{span.text_window}"
+        for span in spans
+    )
+
+
+def _format_ms(value: int) -> str:
+    total_seconds = max(0, value // 1000)
+    minutes = total_seconds // 60
+    seconds = total_seconds % 60
+    return f"{minutes:02d}:{seconds:02d}"
+
+
+def _entity_row(episode_id: str, entity: DomainEntity) -> Entity:
+    return Entity(
+        episode_id=episode_id,
+        name=entity.name,
+        kind=entity.kind,
+        count=entity.count,
+        sample_timestamps_ms=entity.sample_timestamps_ms,
+    )
 
 
 def _episode_detail(session: Session, episode: Episode) -> dict[str, Any]:

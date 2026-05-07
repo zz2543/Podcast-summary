@@ -76,6 +76,46 @@ def test_us1_end_to_end_upload_reaches_done(tmp_path: Path) -> None:
                         ]
                     },
                 ),
+                httpx.Response(
+                    200,
+                    json={
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": json.dumps(
+                                    {
+                                        "chapters": [
+                                            {
+                                                "title": "Opening",
+                                                "key_points": ["The sample introduces the idea."],
+                                                "candidate_quotes": [
+                                                    {"text": "hello world", "start_ms": 0}
+                                                ],
+                                            }
+                                        ]
+                                    }
+                                ),
+                            }
+                        ]
+                    },
+                ),
+                httpx.Response(
+                    200,
+                    json={
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": json.dumps(
+                                    {
+                                        "entities": [
+                                            {"name": "world", "kind": "product", "count": 9}
+                                        ]
+                                    }
+                                ),
+                            }
+                        ]
+                    },
+                ),
             ]
         )
 
