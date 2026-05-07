@@ -76,7 +76,7 @@ description: "Task list for 001-podcast-summary implementation"
 - [X] T033 [US1] Implement `backend/src/podsum/domain/structured_parser.py::parse_one_liner(raw_json, episode_title, lang) -> str`: validates ≤ 50 chars (Unicode-aware: Chinese counts per char, English counts per word ≤ 50? — clarify: per spec FR-009 "≤ 50 characters" applies as code-point count for both languages), validates **informational distinctness from `episode_title`** (Levenshtein ratio ≤ 0.6 against the lowercased title), raises `RetriableValidationError` on failure so the pipeline asks the LLM again with the corrective hint.
 - [X] T034 [US1] Implement `backend/src/podsum/domain/structured_parser.py::parse_three_act(raw_json) -> ThreeAct`: strict pydantic validation of `{background, core_argument, conclusion}` non-empty strings; rejects extra keys; rejects whitespace-only fields.
 - [X] T035 [P] [US1] [unit-test] `backend/tests/unit/test_structured_parser_us1.py` — exhaustive cases for `parse_one_liner` (51-char Chinese, 51-char English, identical-to-title, near-paraphrase of title, valid case) and `parse_three_act` (missing key, extra key, whitespace-only, valid case).
-- [ ] T036 [US1] Wire pipeline stages for US1 in `services/pipeline.py`:
+- [X] T036 [US1] Wire pipeline stages for US1 in `services/pipeline.py`:
   1. `fetch` (calls T026/T027/T028 based on `episode.source_type`),
   2. `transcribe` (T029 → T030 → write `transcript_segment` rows),
   3. `summarize_hook` (calls `prompt_assembler` → `llm_client` → `parse_one_liner`),

@@ -13,7 +13,6 @@ import yt_dlp
 from podsum.config import Settings
 from podsum.persistence.models import new_ulid
 
-
 MAX_FILE_BYTES = 1_000_000_000
 MAX_DURATION_SECONDS = 21_600
 CHUNK_SIZE = 1024 * 1024
@@ -51,8 +50,12 @@ class IngestedAudio:
     source_ref: str | None = None
 
 
-async def ingest_local_file(upload: UploadLike, settings: Settings) -> IngestedAudio:
-    episode_id = new_ulid()
+async def ingest_local_file(
+    upload: UploadLike,
+    settings: Settings,
+    episode_id: str | None = None,
+) -> IngestedAudio:
+    episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
     episode_dir.mkdir(parents=True, exist_ok=False)
     original_tmp = episode_dir / "audio.original.upload"
@@ -82,8 +85,12 @@ async def ingest_local_file(upload: UploadLike, settings: Settings) -> IngestedA
         raise
 
 
-async def ingest_direct_url(url: str, settings: Settings) -> IngestedAudio:
-    episode_id = new_ulid()
+async def ingest_direct_url(
+    url: str,
+    settings: Settings,
+    episode_id: str | None = None,
+) -> IngestedAudio:
+    episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
     episode_dir.mkdir(parents=True, exist_ok=False)
     original_tmp = episode_dir / "audio.original.download"
@@ -125,8 +132,12 @@ async def ingest_direct_url(url: str, settings: Settings) -> IngestedAudio:
         raise
 
 
-async def ingest_youtube(url: str, settings: Settings) -> IngestedAudio:
-    episode_id = new_ulid()
+async def ingest_youtube(
+    url: str,
+    settings: Settings,
+    episode_id: str | None = None,
+) -> IngestedAudio:
+    episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
     episode_dir.mkdir(parents=True, exist_ok=False)
 

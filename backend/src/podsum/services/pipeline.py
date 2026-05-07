@@ -1,17 +1,33 @@
 from __future__ import annotations
 
+import asyncio
 import inspect
+import json
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 from tenacity import AsyncRetrying, RetryError, stop_after_attempt
 
-from podsum.api.ws_progress import Broadcaster, broadcaster as default_broadcaster
-from podsum.persistence.models import Job
-from podsum.persistence.repo import JobRepo, SummaryArtifactRepo
-
+from podsum.api.ws_progress import Broadcaster
+from podsum.api.ws_progress import broadcaster as default_broadcaster
+from podsum.config import Settings
+from podsum.domain.prompt_assembler import PromptAssembler
+from podsum.domain.structured_parser import parse_one_liner, parse_three_act
+from podsum.domain.transcript_postprocess import normalize
+from podsum.persistence.models import Episode, Job, TranscriptSegment
+from podsum.persistence.repo import EpisodeRepo, JobRepo, SegmentRepo, SummaryArtifactRepo
+from podsum.services.asr_client import ASRClient, create_asr_client
+from podsum.services.ingest import (
+    IngestedAudio,
+    ingest_direct_url,
+    ingest_local_file,
+    ingest_youtube,
+)
+from podsum.services.llm_client import LLMClient, create_llm_client
 
 StageResult = dict[str, Any] | None
 StageRun = Callable[["PipelineContext"], StageResult | Awaitable[StageResult]]
@@ -145,6 +161,273 @@ class Pipeline:
         if state in {"done", "partial", "failed"}:
             return state
         return "processing"
+
+
+class _OneLinerPayload(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    hook: str
+
+
+class _ThreeActPayload(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    background: str
+    core_argument: str
+    conclusion: str
+
+
+class _PathUpload:
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.filename = path.name
+        self._handle: Any | None = None
+
+    async def read(self, size: int = -1) -> bytes:
+        if self._handle is None:
+            self._handle = self.path.open("rb")
+        return await asyncio.to_thread(self._handle.read, size)
+
+    def close(self) -> None:
+        if self._handle is not None:
+            self._handle.close()
+            self._handle = None
+
+
+def register_us1_stages(
+    pipeline: Pipeline,
+    settings: Settings,
+    *,
+    asr_client: ASRClient | None = None,
+    llm_client: LLMClient | None = None,
+    prompt_root: Path = Path("prompts"),
+) -> Pipeline:
+    asr_client = asr_client or create_asr_client(settings)
+    llm_client = llm_client or create_llm_client(settings)
+    prompt_assembler = PromptAssembler(prompt_root)
+
+    pipeline.register_stage(
+        "fetch",
+        required=True,
+        run=lambda context: _stage_fetch(context, settings),
+    )
+    pipeline.register_stage(
+        "transcribe",
+        required=True,
+        run=lambda context: _stage_transcribe(context, asr_client),
+    )
+    pipeline.register_stage(
+        "summarize_hook",
+        required=True,
+        run=lambda context: _stage_summarize_hook(context, llm_client, prompt_assembler),
+    )
+    pipeline.register_stage(
+        "summarize_three_act",
+        required=True,
+        run=lambda context: _stage_summarize_three_act(context, llm_client, prompt_assembler),
+    )
+    pipeline.register_stage("export", required=True, run=_stage_export)
+    return pipeline
+
+
+def create_us1_pipeline(
+    session: Session,
+    settings: Settings,
+    *,
+    broadcaster: Broadcaster = default_broadcaster,
+    asr_client: ASRClient | None = None,
+    llm_client: LLMClient | None = None,
+) -> Pipeline:
+    pipeline = Pipeline(session, broadcaster=broadcaster)
+    return register_us1_stages(
+        pipeline,
+        settings,
+        asr_client=asr_client,
+        llm_client=llm_client,
+    )
+
+
+async def _stage_fetch(context: PipelineContext, settings: Settings) -> StageResult:
+    episode = _get_episode(context)
+    audio_path = _normalized_audio_path(episode)
+    if audio_path.exists():
+        return {"audio_path": str(audio_path), "cached": True}
+
+    if episode.source_type == "direct_url":
+        ingested = await ingest_direct_url(episode.source_ref, settings, episode_id=episode.id)
+    elif episode.source_type == "youtube":
+        ingested = await ingest_youtube(episode.source_ref, settings, episode_id=episode.id)
+    elif episode.source_type == "local_file":
+        upload = _PathUpload(Path(episode.source_ref))
+        try:
+            ingested = await ingest_local_file(upload, settings, episode_id=episode.id)
+        finally:
+            upload.close()
+    else:
+        raise ValueError(f"unsupported source type: {episode.source_type}")
+
+    _apply_ingested_audio(episode, ingested)
+    context.session.add(episode)
+    context.session.flush()
+    return {"audio_path": str(ingested.normalized_path), "cached": False}
+
+
+async def _stage_transcribe(context: PipelineContext, asr_client: ASRClient) -> StageResult:
+    episode = _get_episode(context)
+    segment_repo = SegmentRepo(context.session)
+    existing_segments = segment_repo.list_for_episode(episode.id)
+    if existing_segments:
+        return {"segments": len(existing_segments), "cached": True}
+
+    audio_path = _normalized_audio_path(episode)
+    raw_segments = await asyncio.to_thread(asr_client.transcribe, audio_path, episode.language)
+    normalized_segments = normalize(raw_segments, episode.language)
+    db_segments = [
+        TranscriptSegment(
+            episode_id=episode.id,
+            idx=segment.idx,
+            start_ms=segment.start_ms,
+            end_ms=segment.end_ms,
+            text=segment.text,
+            language=segment.language,
+        )
+        for segment in normalized_segments
+    ]
+    segment_repo.replace_for_episode(episode.id, db_segments)
+    episode.language = _episode_language(db_segments)
+    _write_normalized_transcript(episode, db_segments)
+    context.session.add(episode)
+    context.session.flush()
+    return {"segments": len(db_segments), "cached": False}
+
+
+def _stage_summarize_hook(
+    context: PipelineContext,
+    llm_client: LLMClient,
+    prompt_assembler: PromptAssembler,
+) -> StageResult:
+    episode = _get_episode(context)
+    transcript = _transcript_text(context.session, episode.id)
+    prompt = prompt_assembler.render(
+        "one_liner",
+        "v1",
+        lang=episode.language or "mixed",
+        episode_title=episode.title or "",
+        transcript=transcript,
+    )
+    payload = llm_client.complete_json(prompt, _OneLinerPayload)
+    hook = parse_one_liner(payload, episode.title or "", episode.language or "mixed")
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.hook = hook
+    artifact.stage_status = {**dict(artifact.stage_status), "hook": "present"}
+    artifact.prompt_versions = {**dict(artifact.prompt_versions), "one_liner": "v1"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"hook": hook}
+
+
+def _stage_summarize_three_act(
+    context: PipelineContext,
+    llm_client: LLMClient,
+    prompt_assembler: PromptAssembler,
+) -> StageResult:
+    episode = _get_episode(context)
+    transcript = _transcript_text(context.session, episode.id)
+    prompt = prompt_assembler.render(
+        "three_act_summary",
+        "v1",
+        lang=episode.language or "mixed",
+        transcript=transcript,
+    )
+    payload = llm_client.complete_json(prompt, _ThreeActPayload)
+    three_act = parse_three_act(payload)
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.three_act = three_act.model_dump()
+    artifact.stage_status = {**dict(artifact.stage_status), "three_act": "present"}
+    artifact.prompt_versions = {**dict(artifact.prompt_versions), "three_act": "v1"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"three_act": artifact.three_act}
+
+
+def _stage_export(context: PipelineContext) -> StageResult:
+    from podsum.exporters import json_export, markdown
+
+    episode = _get_episode(context)
+    detail = _episode_detail(context.session, episode)
+    episode_dir = Path(episode.data_dir)
+
+    markdown_path = episode_dir / "summary.md"
+    markdown_path.write_text(markdown.render(detail), encoding="utf-8")
+
+    json_path = episode_dir / "summary.json"
+    json_path.write_text(
+        json.dumps(json_export.render(detail), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.markdown_path = str(markdown_path)
+    artifact.json_path = str(json_path)
+    context.session.add(artifact)
+    context.session.flush()
+    return {"markdown_path": str(markdown_path), "json_path": str(json_path)}
+
+
+def _get_episode(context: PipelineContext) -> Episode:
+    episode = EpisodeRepo(context.session).get(context.job.episode_id)
+    if episode is None:
+        raise ValueError(f"episode not found: {context.job.episode_id}")
+    return episode
+
+
+def _normalized_audio_path(episode: Episode) -> Path:
+    return Path(episode.data_dir) / "audio.normalized.mp3"
+
+
+def _apply_ingested_audio(episode: Episode, ingested: IngestedAudio) -> None:
+    episode.data_dir = str(ingested.normalized_path.parent)
+    episode.duration_seconds = ingested.duration_seconds
+    episode.title = ingested.title or episode.title
+    episode.podcast_name = ingested.podcast_name or episode.podcast_name
+    episode.source_ref = ingested.source_ref or episode.source_ref
+
+
+def _episode_language(segments: list[TranscriptSegment]) -> str | None:
+    languages = {segment.language for segment in segments if segment.language}
+    if not languages:
+        return None
+    return languages.pop() if len(languages) == 1 else "mixed"
+
+
+def _write_normalized_transcript(episode: Episode, segments: list[TranscriptSegment]) -> None:
+    path = Path(episode.data_dir) / "transcript.normalized.json"
+    payload = [
+        {
+            "idx": segment.idx,
+            "start_ms": segment.start_ms,
+            "end_ms": segment.end_ms,
+            "text": segment.text,
+            "language": segment.language,
+        }
+        for segment in segments
+    ]
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _transcript_text(session: Session, episode_id: str) -> str:
+    return "\n".join(segment.text for segment in SegmentRepo(session).list_for_episode(episode_id))
+
+
+def _episode_detail(session: Session, episode: Episode) -> dict[str, Any]:
+    artifact = SummaryArtifactRepo(session).get_or_create(episode.id)
+    return {
+        "episode": episode,
+        "segments": SegmentRepo(session).list_for_episode(episode.id),
+        "artifact": artifact,
+    }
 
 
 def recover_incomplete_jobs(
