@@ -168,7 +168,7 @@ description: "Task list for 001-podcast-summary implementation"
 
 - [X] T074 [P] Coverage gate: confirm `make test` fails when domain coverage < 80% (Constitution III). Add a CI workflow at `.github/workflows/ci.yml` running `make lint && make test && make test-frontend && make verify-quotes` (verify-quotes against a seeded fixture DB).
 - [X] T075 [P] Quickstart smoke-test script `scripts/smoke_test.sh` automating the 9-step walkthrough in `quickstart.md`. Used in CI nightly, not on every PR (because it hits cloud APIs — gated behind a `RUN_SMOKE=1` env flag).
-- [ ] T076 [P] `detail.md` (Chinese): fill in 实现日志 / 设计取舍 / 踩坑记录 / 性能数据（M2 上 60 分钟样本的实际秒数）/ 评估结果（5 集中英文测试集的 SC-001..SC-005 数字）.
+- [X] T076 [P] `detail.md` (Chinese): fill in 实现日志 / 设计取舍 / 踩坑记录 / 性能数据（M2 上 60 分钟样本的实际秒数）/ 评估结果（5 集中英文测试集的 SC-001..SC-005 数字）.
 - [ ] T077 [P] `report.md` (Chinese): final 精修 — 项目概览、用户与场景、核心实现摘要（要点级，不抄 plan.md）、评估结果与图表、未来工作。Cross-link to `detail.md` for深度细节。
 - [ ] T078 [P] README final pass: confirm `make install && cp .env.example .env && make run` brings up a working demo on a clean checkout. Note any assumed homebrew packages.
 - [ ] T079 Manual evaluation — assemble the 5-episode mixed Chinese/English test set referenced by SC-001/SC-002/SC-005, run end-to-end through the deployed app, record scores in `detail.md`. Required to declare the feature done.
