@@ -443,16 +443,14 @@ Soft suggestions (the user can override freely):
 
 ## 11. Hand-off checklist (when the user finishes mockups)
 
-When the user delivers visual mockups, the implementer should verify before starting frontend tasks:
+Mockups live in `specs/001-podcast-summary/design/`. See that directory's `README.md` for naming conventions and the canonical filenames the implementer expects in `selected/`. Before starting Phase-3 frontend tasks (T045–T047), verify:
 
-- [ ] All 2 routes have at least one mockup (list + detail)
-- [ ] Both states of HookCard shown (present + missing)
-- [ ] At least one ChapterCard shown both expanded and collapsed
-- [ ] At least one QuoteChip shown
-- [ ] StickyAudioBar visible in the detail mockup
-- [ ] EmptyState mockup provided
-- [ ] At least one error / partial state shown (e.g. `MissingStagePlaceholder` or `failed` row)
-- [ ] ConfirmDeleteDialog drafted
-- [ ] Color choices honor the §8 hard constraints (HookCard most prominent; player always visible; quote affordance clear; status not color-only)
+- [ ] `design/selected/list-page.png` — default list page
+- [ ] `design/selected/empty-state.png` — list page empty state
+- [ ] `design/selected/detail-page.png` — detail page with all stages present
+- [ ] `design/selected/audio-bar.png` — sticky audio player close-up
+- [ ] `design/selected/quote-chip.png` — quote chip close-up
+- [ ] At least one mockup in `design/states/` shows a `MissingStagePlaceholder` or `failed` row (FR-026)
+- [ ] All `selected/` mockups honor the §8 hard constraints (HookCard most prominent; player always visible; quote affordance clear; status not color-only)
 
-If any of these are missing, ask the user before starting Phase-3 frontend tasks (T045–T047).
+If any of the required items above are missing, do **not** start the frontend tasks — flag back to the user and wait.
