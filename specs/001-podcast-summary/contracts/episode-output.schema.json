@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://podsum.local/schemas/episode-output.schema.json",
+  "title": "EpisodeOutput",
+  "description": "Authoritative machine-readable shape of one processed episode. Matches the file at data/<id>/summary.json (FR-015) and the body of GET /api/episodes/{id}.",
+  "type": "object",
+  "required": [
+    "id",
+    "source_type",
+    "source_ref",
+    "language",
+    "status",
+    "stage_status",
+    "prompt_versions",
+    "chapters",
+    "entities"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "description": "ULID" },
+    "title": { "type": ["string", "null"] },
+    "podcast_name": { "type": ["string", "null"] },
+    "guests": { "type": ["array", "null"], "items": { "type": "string" } },
+    "source_type": { "type": "string", "enum": ["local_file", "direct_url", "youtube"] },
+    "source_ref": { "type": "string" },
+    "duration_seconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 21600 },
+    "language": { "type": ["string", "null"], "enum": ["zh", "en", "mixed", null] },
+    "status": { "type": "string", "enum": ["pending", "processing", "done", "partial", "failed"] },
+    "stage_status": {
+      "type": "object",
+      "required": ["hook", "three_act", "chapters", "entities", "tts"],
+      "additionalProperties": false,
+      "properties": {
+        "hook":      { "$ref": "#/$defs/StageStatus" },
+        "three_act": { "$ref": "#/$defs/StageStatus" },
+        "chapters":  { "$ref": "#/$defs/StageStatus" },
+        "entities":  { "$ref": "#/$defs/StageStatus" },
+        "tts":       { "$ref": "#/$defs/StageStatus" }
+      }
+    },
+    "prompt_versions": {
+      "type": "object",
+      "description": "Constitution V: the version of every prompt used to produce this output.",
+      "required": ["one_liner", "three_act", "chapter_outline", "entity_extraction"],
+      "additionalProperties": false,
+      "properties": {
+        "one_liner":         { "type": "string", "pattern": "^v[0-9]+$" },
+        "three_act":         { "type": "string", "pattern": "^v[0-9]+$" },
+        "chapter_outline":   { "type": "string", "pattern": "^v[0-9]+$" },
+        "entity_extraction": { "type": "string", "pattern": "^v[0-9]+$" }
+      }
+    },
+    "hook": {
+      "type": ["string", "null"],
+      "description": "One-line hook (≤ 50 chars after Unicode-aware counting). null if stage_status.hook != 'present'."
+    },
+    "three_act": {
+      "type": ["object", "null"],
+      "required": ["background", "core_argument", "conclusion"],
+      "additionalProperties": false,
+      "properties": {
+        "background":    { "type": "string" },
+        "core_argument": { "type": "string" },
+        "conclusion":    { "type": "string" }
+      }
+    },
+    "chapters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Chapter" }
+    },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Entity" }
+    },
+    "artifact_paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "markdown": { "type": ["string", "null"] },
+        "json":     { "type": ["string", "null"] },
+        "tts":      { "type": ["string", "null"] }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "StageStatus": {
+      "type": "string",
+      "enum": ["pending", "present", "missing", "failed_after_retries"]
+    },
+    "Chapter": {
+      "type": "object",
+      "required": ["idx", "title", "start_ms", "end_ms", "key_points", "quotes"],
+      "additionalProperties": false,
+      "properties": {
+        "idx":        { "type": "integer", "minimum": 0 },
+        "title":      { "type": "string", "minLength": 1 },
+        "start_ms":   { "type": "integer", "minimum": 0 },
+        "end_ms":     { "type": "integer", "minimum": 1 },
+        "key_points": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "quotes":     { "type": "array", "items": { "$ref": "#/$defs/Quote" } }
+      }
+    },
+    "Quote": {
+      "type": "object",
+      "description": "Always verified verbatim against the transcript before serialization (FR-012, SC-004).",
+      "required": ["text", "start_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "text":     { "type": "string", "minLength": 1 },
+        "start_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Entity": {
+      "type": "object",
+      "required": ["name", "kind", "count"],
+      "additionalProperties": false,
+      "properties": {
+        "name":  { "type": "string", "minLength": 1 },
+        "kind":  { "type": "string", "enum": ["person", "book", "product"] },
+        "count": { "type": "integer", "minimum": 1 },
+        "sample_timestamps_ms": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 },
+          "maxItems": 5
+        }
+      }
+    }
+  }
+}

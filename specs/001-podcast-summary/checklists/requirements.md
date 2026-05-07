@@ -31,5 +31,6 @@
 
 ## Notes
 
-- All checklist items pass. Spec is ready for `/speckit-plan` (or `/speckit-clarify` if a deeper structured pass is desired).
-- Resolved Q1 (2026-05-07): v1 is cloud-only; local-only execution deferred to a future version (option C).
+- All checklist items pass. Spec is ready for `/speckit-plan`.
+- Resolved during /speckit-specify (2026-05-07): v1 is cloud-only; local-only execution deferred to a future version.
+- Resolved during /speckit-clarify (2026-05-07): single-user local web (loopback only); resume durability across restarts; 6h / 1GB hard input cap; indefinite retention with manual delete; partial-degraded output for non-required stages.

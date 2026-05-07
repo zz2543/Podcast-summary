@@ -5,6 +5,16 @@
 **Status**: Draft
 **Input**: User description: "Podcast Summary System — accept local audio / direct audio URL / YouTube link, transcribe, and produce a structured Chinese-or-English summary (one-line hook, three-act summary, chapter outline with key points and verbatim quotes, named-entity list) plus Markdown / JSON outputs and a TTS-rendered audio digest, exposed through a polished web UI."
 
+## Clarifications
+
+### Session 2026-05-07
+
+- Q: Deployment & user model — single-user local web vs. multi-user hosted? → A: Single-user local web app (loopback only, no auth, single shared local datastore).
+- Q: Resume durability — process-lifetime only vs. across restarts? → A: Persist transcript segments AND job state across process/server restarts.
+- Q: Hard input length / size limit per episode? → A: 6 hours / 1 GB hard cap; submissions exceeding either MUST be rejected before transcription.
+- Q: Retention & deletion policy for processed episodes? → A: Retain indefinitely; UI provides per-episode manual delete that purges audio cache, transcript, Markdown/JSON, and TTS digest together. No automatic expiry.
+- Q: Output policy when later pipeline stages keep failing after retries? → A: Partial degraded output — failed stages are marked missing in UI/JSON; succeeded stages remain visible and downloadable. Hook + three-act + chapter outline are required for an episode to be marked "done"; TTS is optional.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Triage New Episodes Overnight (Priority: P1)
@@ -75,7 +85,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 - **Direct audio URL returns non-audio content** (HTML page, paywall, redirect loop): System validates content type and rejects the job before transcription with an actionable error.
 - **Mixed Chinese/English podcast** (e.g., tech shows): Transcript and summary preserve the original mixed text; no forced translation in either direction.
 - **Very short audio (< 2 minutes)**: System still produces all required outputs; the chapter outline may legitimately contain a single chapter.
-- **Very long audio (> 3 hours)**: System processes successfully or, if it cannot meet the performance budget, fails fast with a clear length-related error rather than running indefinitely.
+- **Very long audio**: A hard cap of **6 hours duration** AND **1 GB file size** applies; submissions exceeding either limit are rejected at ingestion with a clear length/size error rather than starting transcription. The 10-minute performance SLA (FR-019 / SC-006) only applies to the 60-minute reference case; episodes longer than 60 minutes process on a best-effort basis.
 - **Quote that the LLM "almost" matches but is not verbatim**: Programmatic verification rejects it; the system either drops the quote or regenerates rather than displaying a fabricated one.
 - **Network drop mid-transcription**: On retry, already-transcribed segments are reused (no duplicated ASR cost or wall time).
 - **Audio with long silences or non-speech segments**: The chapter splitter does not produce zero-length or absurdly short chapters from silence alone.
@@ -87,15 +97,19 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 
 **Input ingestion**
 
-- **FR-001**: System MUST accept local audio file uploads in mp3, m4a, and wav formats via the web UI.
+- **FR-001**: System MUST accept local audio file uploads in mp3, m4a, and wav formats via the web UI, subject to the input limits in FR-024.
 - **FR-002**: System MUST accept a direct audio URL and resolve it by (a) issuing an HTTP HEAD/GET, (b) verifying the response Content-Type is an audio MIME, and (c) rejecting non-audio responses with an actionable error before any transcription work begins.
 - **FR-003**: System MUST accept a YouTube video URL, extract its audio track, and proceed with the audio-only pipeline; non-resolvable / restricted videos MUST fail fast with a clear reason.
 - **FR-004**: System MUST treat every submission as a discrete *job* with a stable identifier so progress, retries, and outputs can be referenced unambiguously.
 
+**Input limits**
+
+- **FR-024**: System MUST enforce a hard input cap of **6 hours of audio duration** AND **1 GB of file/transferred size** per episode. Submissions exceeding either threshold MUST be rejected at the ingestion stage with an actionable error and MUST NOT consume any ASR/LLM/TTS API budget.
+
 **Transcription & resumability**
 
 - **FR-005**: System MUST transcribe submitted audio with word- or segment-level timestamps sufficient to back the ±10-second quote-jump requirement.
-- **FR-006**: System MUST preserve already-transcribed segments across retries so a failed job, when retried, does not re-transcribe content that already succeeded.
+- **FR-006**: System MUST preserve already-transcribed segments AND job state (queue position, current stage, per-stage progress markers) across process/server restarts. After an unclean shutdown, restarting the server MUST recover the same set of jobs in their previous states; in-progress jobs MUST resume from the latest persisted checkpoint without re-running already-completed stages (in particular, ASR work already done MUST NOT be repeated).
 - **FR-007**: System MUST detect the source language (Chinese, English, or mixed) and preserve the original language in all downstream outputs without translating.
 
 **Summarization outputs (per episode)**
@@ -115,17 +129,34 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 
 **Web UI**
 
-- **FR-017**: The web UI MUST allow submitting any supported input type, viewing per-job progress, browsing finished episodes, opening a detail view, jumping the player to a quote timestamp, and downloading Markdown / JSON / audio-digest artifacts. The visual design will be authored externally by the user from a written description and is therefore out of scope for this spec to dictate.
+- **FR-017**: The web UI MUST allow submitting any supported input type, viewing per-job progress, browsing finished episodes, opening a detail view, jumping the player to a quote timestamp, downloading Markdown / JSON / audio-digest artifacts, and **deleting an episode** (see FR-025). The visual design will be authored externally by the user from a written description and is therefore out of scope for this spec to dictate.
+
+**Partial-failure & degraded output**
+
+- **FR-026**: After a configurable number of automatic retries, the system MUST adopt **partial-degraded output** semantics rather than fail the whole episode:
+  - **Required stages** for an episode to reach status "done": hook, three-act summary, chapter outline (with at least one chapter). If any of these cannot be produced after retries, the episode MUST be marked "failed" and any partially-generated artifacts MUST be retained for inspection but MUST NOT be presented as a finished summary.
+  - **Optional stages** (TTS audio digest, individual chapter quotes, entity extraction): persistent failure of any of these MUST mark only that artifact as "missing" / "unavailable" in both the UI and the JSON output, while all successful artifacts remain visible and downloadable.
+  - The JSON output MUST encode the status of each artifact explicitly (e.g., `present` / `missing` / `failed_after_retries`) so downstream tooling can detect partial output.
+  - Quote-verbatim verification (FR-012) MUST still apply to every quote that *is* shown, regardless of which other stages succeeded or failed.
+
+**Retention & deletion**
+
+- **FR-025**: System MUST retain processed episodes and all of their artifacts indefinitely (no automatic expiry, archival, or cleanup). The UI MUST expose a per-episode delete action that, when invoked, atomically removes the cached audio, transcript segments, chapter/quote/entity data, generated Markdown, generated JSON, and any generated TTS digest for that episode; after deletion the episode MUST no longer appear in any listing.
 
 **Batching & performance**
 
 - **FR-018**: System MUST support batch submission and process jobs in parallel up to a user-configurable concurrency limit; jobs above the limit MUST be queued and started as slots free up.
 - **FR-019**: For a 60-minute episode on the reference hardware (Apple M2 MacBook), end-to-end processing (audio acquisition through structured outputs) MUST complete in ≤ 10 minutes. v1 is **cloud-only**: ASR, summarization, and TTS are all served by cloud APIs. A fully local execution mode is **explicitly out of scope for v1** and may be revisited in a later version.
 
+**Deployment & user model**
+
+- **FR-022**: System MUST run as a single-user local web application: the server MUST bind to loopback (127.0.0.1) by default and MUST NOT expose its UI or API to non-loopback interfaces in v1. There is no login system, no per-user data isolation, and no multi-tenant concept; all jobs and artifacts live in one shared local datastore for the single operator on the machine.
+
 **Non-goals (binding)**
 
 - **FR-020**: System MUST NOT perform speaker diarization in v1; speaker attribution is limited to "host vs. guest" inferred from prompt context only.
 - **FR-021**: System MUST NOT perform audio denoising or pre-processing in v1.
+- **FR-023**: System MUST NOT implement authentication, authorization, multi-user accounts, or network-exposed deployment in v1.
 
 ### Key Entities
 
@@ -147,7 +178,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 - **SC-004**: **100%** of displayed quotes pass the verbatim-substring check against the transcript (no fabricated quotes ever shown).
 - **SC-005**: Audio-digest narration is rated "fluent and natural" (no obvious mispronunciation, awkward prosody, or robotic dropouts) by a human reviewer on **≥ 80%** of evaluation episodes per language (Chinese and English evaluated separately).
 - **SC-006**: A 60-minute episode completes end-to-end processing in **≤ 10 minutes** on the reference Apple M2 MacBook configuration.
-- **SC-007**: When a job is retried after a mid-pipeline failure, wall-clock time spent in the ASR stage on the retry is **≤ 20%** of the cost of a from-scratch run, demonstrating effective resume.
+- **SC-007**: When a job is retried after a mid-pipeline failure **or after a server restart**, wall-clock time spent in the ASR stage on the retry is **≤ 20%** of the cost of a from-scratch run, demonstrating effective resume across both same-process retries and cold restarts.
 
 ## Assumptions
 
