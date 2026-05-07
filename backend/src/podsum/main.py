@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from podsum.api._logging import configure_logging
 from podsum.api import episodes, jobs, ws_progress
 from podsum.config import Settings, get_settings
 
@@ -15,6 +16,7 @@ VERSION = "0.1.0"
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if getattr(app.state, "settings", None) is None:
         app.state.settings = get_settings()
+    configure_logging(app.state.settings.LOG_LEVEL)
     yield
 
 
