@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Protocol
 
 import httpx
+import yt_dlp
 
 from podsum.config import Settings
 from podsum.persistence.models import new_ulid
@@ -45,6 +46,9 @@ class IngestedAudio:
     duration_seconds: int
     file_size_bytes: int
     detected_ext: str
+    title: str | None = None
+    podcast_name: str | None = None
+    source_ref: str | None = None
 
 
 async def ingest_local_file(upload: UploadLike, settings: Settings) -> IngestedAudio:
@@ -119,6 +123,80 @@ async def ingest_direct_url(url: str, settings: Settings) -> IngestedAudio:
     except Exception:
         shutil.rmtree(episode_dir, ignore_errors=True)
         raise
+
+
+async def ingest_youtube(url: str, settings: Settings) -> IngestedAudio:
+    episode_id = new_ulid()
+    episode_dir = settings.DATA_DIR / episode_id
+    episode_dir.mkdir(parents=True, exist_ok=False)
+
+    try:
+        info, original_path = await asyncio.to_thread(_download_youtube_audio, url, episode_dir)
+        duration = info.get("duration")
+        duration_seconds = int(round(float(duration))) if duration is not None else await _probe_duration_seconds(original_path)
+        if duration_seconds > MAX_DURATION_SECONDS:
+            raise PayloadTooLarge("audio duration exceeds 6 hour limit")
+
+        file_size = original_path.stat().st_size
+        if file_size > MAX_FILE_BYTES:
+            raise PayloadTooLarge("audio file exceeds 1 GB limit")
+
+        normalized_path = episode_dir / "audio.normalized.mp3"
+        await _run_ffmpeg_normalize(original_path, normalized_path)
+        return IngestedAudio(
+            episode_id=episode_id,
+            original_path=original_path,
+            normalized_path=normalized_path,
+            duration_seconds=duration_seconds,
+            file_size_bytes=file_size,
+            detected_ext=original_path.suffix.lstrip(".") or "mp3",
+            title=info.get("title"),
+            podcast_name=info.get("channel") or info.get("uploader"),
+            source_ref=info.get("webpage_url") or url,
+        )
+    except yt_dlp.utils.DownloadError as exc:
+        shutil.rmtree(episode_dir, ignore_errors=True)
+        raise UnsupportedMedia(_youtube_error_message(exc)) from exc
+    except Exception:
+        shutil.rmtree(episode_dir, ignore_errors=True)
+        raise
+
+
+def _download_youtube_audio(url: str, episode_dir: Path) -> tuple[dict[str, object], Path]:
+    output_template = str(episode_dir / "audio.original.%(ext)s")
+    options: dict[str, object] = {
+        "format": "bestaudio/best",
+        "outtmpl": output_template,
+        "noplaylist": True,
+        "quiet": True,
+        "no_warnings": True,
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "192",
+            }
+        ],
+    }
+    with yt_dlp.YoutubeDL(options) as ydl:
+        info = ydl.extract_info(url, download=True)
+
+    mp3_path = episode_dir / "audio.original.mp3"
+    if mp3_path.exists():
+        return info, mp3_path
+
+    candidates = sorted(episode_dir.glob("audio.original.*"))
+    if not candidates:
+        raise UnsupportedMedia("YouTube audio extraction produced no file")
+    return info, candidates[0]
+
+
+def _youtube_error_message(exc: Exception) -> str:
+    message = str(exc)
+    lower = message.lower()
+    if any(token in lower for token in ("age", "region", "drm", "private", "login")):
+        return "YouTube link is restricted or requires login"
+    return "YouTube link could not be resolved"
 
 
 async def _write_upload(upload: UploadLike, out_path: Path) -> int:
