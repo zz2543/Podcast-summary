@@ -39,6 +39,10 @@ SOURCE_TYPE_FORM = Form(default=None, alias="source_type")
 UPLOAD_FILE_FIELD = File(default=None)
 
 
+class BatchConflict(ValueError):
+    pass
+
+
 @router.post("")
 async def create_episode(
     request: Request,
@@ -86,6 +90,50 @@ async def list_episodes(
     del cursor
     items = EpisodeRepo(session).list_recent(limit=min(max(limit, 1), 200), status=status)
     return {"items": [_episode_summary(session, episode) for episode in items], "next_cursor": None}
+
+
+@router.post("/batch")
+async def create_episode_batch(
+    request: Request,
+    session: Session = SESSION_DEP,
+) -> JSONResponse:
+    ingested_items: list[tuple[str, str, IngestedAudio]] = []
+    try:
+        ingested_items = await _ingest_batch_request(request)
+        _check_batch_conflicts(session, ingested_items)
+    except PayloadTooLarge as exc:
+        _cleanup_ingested(ingested_items)
+        return _api_error(413, "payload_too_large", str(exc))
+    except UnsupportedMedia as exc:
+        _cleanup_ingested(ingested_items)
+        return _api_error(415, "unsupported_media", str(exc))
+    except BatchConflict as exc:
+        _cleanup_ingested(ingested_items)
+        return _api_error(409, "conflict", str(exc))
+    except (IngestError, ValueError) as exc:
+        _cleanup_ingested(ingested_items)
+        return _api_error(400, "bad_input", str(exc))
+
+    rows: list[tuple[Episode, Job]] = []
+    for source_type, source_ref, ingested in ingested_items:
+        episode = _episode_from_ingest(source_type, source_ref, ingested)
+        job = Job(episode_id=episode.id, state="queued", attempt=1)
+        rows.append((episode, job))
+        session.add_all([episode, job])
+    session.commit()
+    for episode, job in rows:
+        session.refresh(episode)
+        session.refresh(job)
+        _enqueue_job(request, job)
+    return JSONResponse(
+        status_code=201,
+        content={
+            "items": [
+                {"episode": _episode_summary(session, episode), "job": _job_payload(job)}
+                for episode, job in rows
+            ]
+        },
+    )
 
 
 @router.get("/{episode_id}")
@@ -238,6 +286,58 @@ async def _ingest_request(
     if source_type == "youtube":
         return source_type, source_ref, await ingest_youtube(source_ref, settings)
     raise ValueError("source_type must be local_file, direct_url, or youtube")
+
+
+async def _ingest_batch_request(request: Request) -> list[tuple[str, str, IngestedAudio]]:
+    settings = request.app.state.settings
+    content_type = request.headers.get("content-type", "")
+    if content_type.startswith("multipart/form-data"):
+        form = await request.form()
+        uploads = [item for item in [*form.getlist("files"), *form.getlist("file")] if isinstance(item, UploadFile)]
+        if not uploads:
+            raise ValueError("multipart batch requires at least one file")
+        return [
+            ("local_file", upload.filename or "audio", await ingest_local_file(upload, settings))
+            for upload in uploads
+        ]
+
+    payload = await request.json()
+    items = payload.get("items") if isinstance(payload, dict) else None
+    if not isinstance(items, list) or not items:
+        raise ValueError("batch payload must contain a non-empty items list")
+    ingested: list[tuple[str, str, IngestedAudio]] = []
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError("each batch item must be an object")
+        source_type = item.get("source_type")
+        source_ref = item.get("source_ref")
+        if not isinstance(source_ref, str) or not source_ref.strip():
+            raise ValueError("source_ref is required for URL batch items")
+        if source_type == "direct_url":
+            ingested.append((source_type, source_ref, await ingest_direct_url(source_ref, settings)))
+        elif source_type == "youtube":
+            ingested.append((source_type, source_ref, await ingest_youtube(source_ref, settings)))
+        else:
+            raise ValueError("batch source_type must be direct_url or youtube for JSON requests")
+    return ingested
+
+
+def _check_batch_conflicts(
+    session: Session,
+    ingested_items: list[tuple[str, str, IngestedAudio]],
+) -> None:
+    seen: set[tuple[str, str]] = set()
+    for source_type, source_ref, _ in ingested_items:
+        key = (source_type, source_ref)
+        if source_type in {"direct_url", "youtube"}:
+            if key in seen or _existing_link(session, source_type, source_ref):
+                raise BatchConflict("episode already exists for this source")
+            seen.add(key)
+
+
+def _cleanup_ingested(ingested_items: list[tuple[str, str, IngestedAudio]]) -> None:
+    for _, _, ingested in ingested_items:
+        shutil.rmtree(ingested.normalized_path.parent, ignore_errors=True)
 
 
 def _episode_from_ingest(source_type: str, source_ref: str, ingested: IngestedAudio) -> Episode:
