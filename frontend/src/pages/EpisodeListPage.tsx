@@ -15,6 +15,7 @@ import {
   retryEpisode,
   useJobs
 } from "../api/client";
+import { AppHeader } from "../components/AppHeader";
 
 type SubmitMode = "local_file" | "direct_url" | "youtube";
 type FilterStatus = "all" | EpisodeStatus;
@@ -235,48 +236,6 @@ export function EpisodeListPage() {
         </button>
       ) : null}
     </div>
-  );
-}
-
-function AppHeader({
-  connected,
-  reconnecting,
-  queueCounts,
-  onQueueClick
-}: {
-  connected: boolean;
-  reconnecting: boolean;
-  queueCounts: { processing: number; queued: number };
-  onQueueClick: () => void;
-}) {
-  return (
-    <header className="app-header">
-      <button className="brand" type="button" onClick={() => (window.location.href = "/")}>
-        <span className="brand-mark" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
-        </span>
-        <span>Podcast Summary</span>
-      </button>
-      <div className="header-actions">
-        <span
-          className={`connection-dot ${connected ? "connection-dot--connected" : reconnecting ? "connection-dot--warn" : ""}`}
-          title={connected ? "Realtime connected" : "Realtime reconnecting"}
-        />
-        {queueCounts.processing + queueCounts.queued > 0 ? (
-          <button className="queue-badge" type="button" onClick={onQueueClick}>
-            <span aria-hidden="true">∞</span>
-            Queue
-            <strong>{queueCounts.processing}</strong>
-            <span>running</span>
-            <strong>{queueCounts.queued}</strong>
-            <span>waiting</span>
-          </button>
-        ) : null}
-      </div>
-    </header>
   );
 }
 
