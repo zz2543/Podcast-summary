@@ -111,7 +111,7 @@ description: "Task list for 001-podcast-summary implementation"
 
 **Independent test**: From any US1-processed episode, click any quote timestamp → player seeks within ±10 s; run `make verify-quotes` → 100% of stored quotes pass verbatim check; entity panel shows counts > 0.
 
-- [ ] T048 [US2] Implement `backend/src/podsum/domain/chapter_segmenter.py::segment(transcript_segments, target_minutes=10) -> list[ChapterSpan]` — splits the transcript on natural boundaries (long pauses ≥ 1.5 s, topic-shift cues from heuristics + LLM hint). Pure function; emits start_ms / end_ms / text-window. Falls back to even time-buckets if no good signals (covers very-short audio edge case from spec).
+- [X] T048 [US2] Implement `backend/src/podsum/domain/chapter_segmenter.py::segment(transcript_segments, target_minutes=10) -> list[ChapterSpan]` — splits the transcript on natural boundaries (long pauses ≥ 1.5 s, topic-shift cues from heuristics + LLM hint). Pure function; emits start_ms / end_ms / text-window. Falls back to even time-buckets if no good signals (covers very-short audio edge case from spec).
 - [ ] T049 [P] [US2] [unit-test] `backend/tests/unit/test_chapter_segmenter.py` — ≥ 1 chapter for short audio, no zero-length chapters in audio with long silences, ordering preserved, monotonic timestamps.
 - [ ] T050 [US2] Extend `backend/src/podsum/domain/structured_parser.py` with `parse_chapter_payload(raw_json) -> list[ChapterDraft]` (each chapter: title, key_points: list[str], candidate_quotes: list[{text, start_ms}]). Reject empty key_points, reject quotes without timestamps.
 - [ ] T051 [P] [US2] [unit-test] `backend/tests/unit/test_structured_parser_us2.py` — empty key_points, missing timestamp, valid case, extra fields ignored.
