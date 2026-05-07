@@ -25,10 +25,24 @@ def test_parse_one_liner_rejects_over_50_code_points() -> None:
         parse_one_liner({"hook": "中" * 51}, episode_title="标题", lang="zh")
 
 
+def test_parse_one_liner_rejects_over_50_english_code_points() -> None:
+    with pytest.raises(RetriableValidationError, match="50"):
+        parse_one_liner({"hook": "a" * 51}, episode_title="title", lang="en")
+
+
 def test_parse_one_liner_rejects_title_repeat() -> None:
     with pytest.raises(RetriableValidationError, match="similar"):
         parse_one_liner(
             '{"hook": "AI Coding Interview Prep"}',
+            episode_title="AI coding interview prep",
+            lang="en",
+        )
+
+
+def test_parse_one_liner_rejects_near_title_paraphrase() -> None:
+    with pytest.raises(RetriableValidationError, match="similar"):
+        parse_one_liner(
+            {"hook": "AI coding interview guide"},
             episode_title="AI coding interview prep",
             lang="en",
         )
@@ -58,6 +72,16 @@ def test_parse_three_act_rejects_extra_keys() -> None:
                 "core_argument": "B",
                 "conclusion": "C",
                 "extra": "D",
+            }
+        )
+
+
+def test_parse_three_act_rejects_missing_key() -> None:
+    with pytest.raises(RetriableValidationError):
+        parse_three_act(
+            {
+                "background": "A",
+                "core_argument": "B",
             }
         )
 
