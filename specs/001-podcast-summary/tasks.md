@@ -93,7 +93,7 @@ description: "Task list for 001-podcast-summary implementation"
   - `DELETE /api/episodes/{id}` (FR-025: atomic DB CASCADE + `shutil.rmtree(data/<id>/)`).
   - `POST /api/episodes/{id}/retry` (FR-006, returns `Job`).
   - File-streaming endpoints: `GET /api/episodes/{id}/files/markdown`, `…/files/json`, `…/files/audio` with HTTP `Range` support for the audio.
-- [ ] T041 [US1] Implement `backend/src/podsum/api/jobs.py` if needed for poll-style `GET /api/jobs/{id}` (used by the smoke test); WebSocket is the primary channel.
+- [X] T041 [US1] Implement `backend/src/podsum/api/jobs.py` if needed for poll-style `GET /api/jobs/{id}` (used by the smoke test); WebSocket is the primary channel.
 - [ ] T042 [US1] Wire WS broadcasts: emit `job_update` from `pipeline.py` after every state transition and every `stage_progress` update; emit `stage_status_update` whenever `summary_artifact.stage_status[*]` changes.
 - [ ] T043 [P] [US1] [integration-test] `backend/tests/integration/test_us1_end_to_end.py` — uses respx to mock OpenAI ASR + Anthropic LLM, drives one upload through to `done`, asserts hook ≤ 50 chars, three-act non-empty, JSON validates against schema, Markdown contains hook line.
 - [ ] T044 [P] [US1] [integration-test] `backend/tests/integration/test_us1_resume.py` — submit, kill mid-transcribe (use a mock that hangs forever on first call, returns immediately on second), restart `create_app`, assert ASR call count remains 1 (verifies SC-007 resume guarantee).
