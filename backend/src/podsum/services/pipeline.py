@@ -10,7 +10,7 @@ from tenacity import AsyncRetrying, RetryError, stop_after_attempt
 
 from podsum.api.ws_progress import Broadcaster, broadcaster as default_broadcaster
 from podsum.persistence.models import Job
-from podsum.persistence.repo import SummaryArtifactRepo
+from podsum.persistence.repo import JobRepo, SummaryArtifactRepo
 
 
 StageResult = dict[str, Any] | None
@@ -145,3 +145,18 @@ class Pipeline:
         if state in {"done", "partial", "failed"}:
             return state
         return "processing"
+
+
+def recover_incomplete_jobs(
+    session: Session,
+    enqueue: Callable[[Job], None] | None = None,
+) -> list[Job]:
+    jobs = JobRepo(session).active()
+    for job in jobs:
+        job.state = "queued"
+        session.add(job)
+    session.flush()
+    if enqueue is not None:
+        for job in jobs:
+            enqueue(job)
+    return jobs

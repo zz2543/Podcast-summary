@@ -34,10 +34,10 @@ target-version = ["py311"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "--cov=src/podsum/domain --cov-fail-under=80"
+addopts = "--cov=backend/src/podsum/domain --cov-fail-under=80"
 
 [tool.coverage.run]
-source = ["src/podsum/domain"]
+source = ["backend/src/podsum/domain"]
 branch = true
 
 [tool.coverage.report]

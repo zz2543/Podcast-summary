@@ -4,10 +4,13 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from podsum.api._logging import configure_logging
 from podsum.api import episodes, jobs, ws_progress
 from podsum.config import Settings, get_settings
+from podsum.services.pipeline import recover_incomplete_jobs
 
 VERSION = "0.1.0"
 
@@ -17,7 +20,22 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if getattr(app.state, "settings", None) is None:
         app.state.settings = get_settings()
     configure_logging(app.state.settings.LOG_LEVEL)
-    yield
+    app.state.engine = create_engine(app.state.settings.database_url)
+    app.state.session_factory = sessionmaker(bind=app.state.engine)
+    db_path = app.state.settings.DB_PATH
+    recovered_jobs = []
+    if db_path.exists():
+        with app.state.session_factory() as session:
+            recovered_jobs = recover_incomplete_jobs(
+                session,
+                getattr(app.state, "enqueue_job", None),
+            )
+            session.commit()
+    app.state.recovered_jobs = recovered_jobs
+    try:
+        yield
+    finally:
+        app.state.engine.dispose()
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
