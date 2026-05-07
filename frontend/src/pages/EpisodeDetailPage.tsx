@@ -13,6 +13,7 @@ import {
 } from "../api/client";
 import { AppHeader } from "../components/AppHeader";
 import { ChapterOutline } from "../components/ChapterOutline";
+import { EntityPanel } from "../components/EntityPanel";
 
 const STAGE_COPY: Record<string, string> = {
   hook: "one-line hook",
@@ -118,7 +119,12 @@ export function EpisodeDetailPage({ episodeId }: { episodeId: string }) {
                   <ChapterStub status={episode.stage_status.chapters} onRetry={onRetry} />
                 )}
               </div>
-              <EntityStub status={episode.stage_status.entities} onRetry={onRetry} />
+              <EntityPanel
+                entities={episode.entities}
+                status={episode.stage_status.entities}
+                audioRef={audioRef}
+                onRetry={onRetry}
+              />
             </section>
             <ArtifactBar episode={episode} onRetry={onRetry} onDelete={onDelete} />
           </>
@@ -207,29 +213,6 @@ function ChapterStub({ status, onRetry }: { status: StageStatus; onRetry: () => 
       </header>
       <p>Chapter cards, quote timestamps, and jump-to-audio controls are reserved for the deep-dive stage.</p>
     </section>
-  );
-}
-
-function EntityStub({ status, onRetry }: { status: StageStatus; onRetry: () => Promise<void> }) {
-  return (
-    <aside className="entity-panel">
-      <h2>Key Information</h2>
-      <dl>
-        <div>
-          <dt>Chapters</dt>
-          <dd>{status === "present" ? "Ready" : "Not generated yet"}</dd>
-        </div>
-        <div>
-          <dt>Entities</dt>
-          <dd>US2 panel stub</dd>
-        </div>
-      </dl>
-      {status !== "present" ? (
-        <button className="text-button" type="button" onClick={() => void onRetry()}>
-          Retry this stage
-        </button>
-      ) : null}
-    </aside>
   );
 }
 
