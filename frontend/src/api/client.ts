@@ -123,6 +123,10 @@ export interface CreateEpisodeResponse {
   job: Job;
 }
 
+export interface CreateEpisodeBatchResponse {
+  items: CreateEpisodeResponse[];
+}
+
 export type DigestResponse = Job | { tts_path: string; status: "present" };
 
 export interface EpisodeListResponse {
@@ -164,6 +168,33 @@ export async function createEpisode(input: CreateEpisodeInput): Promise<CreateEp
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input)
+  });
+}
+
+export function createEpisodeBatch(inputs: CreateEpisodeInput[]): Promise<CreateEpisodeBatchResponse> {
+  if (inputs.length === 0) {
+    return Promise.resolve({ items: [] });
+  }
+  if (inputs.every((input) => input.source_type === "local_file")) {
+    const form = new FormData();
+    for (const input of inputs) {
+      if (input.source_type === "local_file") form.append("files", input.file);
+    }
+    return apiFetch<CreateEpisodeBatchResponse>("/api/episodes/batch", {
+      method: "POST",
+      body: form
+    });
+  }
+  const items = inputs.map((input) => {
+    if (input.source_type === "local_file") {
+      throw new Error("Batch requests cannot mix files and URLs.");
+    }
+    return { source_type: input.source_type, source_ref: input.source_ref };
+  });
+  return apiFetch<CreateEpisodeBatchResponse>("/api/episodes/batch", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ items })
   });
 }
 

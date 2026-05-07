@@ -9,6 +9,7 @@ import {
   Job,
   SourceType,
   createEpisode,
+  createEpisodeBatch,
   deleteEpisode,
   getEpisode,
   listEpisodes,
@@ -124,7 +125,12 @@ export function EpisodeListPage() {
 
   const submitInputs = async (inputs: CreateEpisodeInput[]) => {
     for (const input of inputs) {
-      await createEpisode(input);
+      if (inputs.length === 1) {
+        await createEpisode(input);
+      }
+    }
+    if (inputs.length > 1) {
+      await createEpisodeBatch(inputs);
     }
     setToast(inputs.length === 1 ? "Episode added to the queue" : `${inputs.length} episodes added to the queue`);
     await loadEpisodes(filter);
