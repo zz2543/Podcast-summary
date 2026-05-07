@@ -72,7 +72,8 @@ class Pipeline:
         optional_failed = False
         for stage in self._stages:
             await self._set_state(job, self._state_for_stage(stage.name))
-            self._record_progress(job, stage.name, {"status": "running"})
+            await self._record_progress(job, stage.name, {"status": "running"})
+            stage_status_before = self._stage_status(job.episode_id)
 
             context = PipelineContext(
                 session=self.session,
@@ -83,7 +84,7 @@ class Pipeline:
             try:
                 result = await self._run_with_retries(stage, context)
             except Exception as exc:
-                self._record_progress(
+                await self._record_progress(
                     job,
                     stage.name,
                     {"status": "failed_after_retries", "error": str(exc)},
@@ -98,9 +99,15 @@ class Pipeline:
                     "failed_after_retries",
                 )
                 self.session.flush()
+                await self.broadcaster.publish_stage_status(
+                    episode_id=job.episode_id,
+                    stage=stage.name,
+                    status="failed_after_retries",
+                )
                 continue
 
-            self._record_progress(job, stage.name, {"status": "done", "result": result or {}})
+            await self._record_progress(job, stage.name, {"status": "done", "result": result or {}})
+            await self._publish_stage_status_changes(job.episode_id, stage_status_before)
 
         await self._set_state(job, "partial" if optional_failed else "done")
         return job
@@ -120,18 +127,22 @@ class Pipeline:
             raise exc.last_attempt.exception() from exc
         return None
 
-    def _record_progress(self, job: Job, stage: str, payload: dict[str, Any]) -> None:
+    async def _record_progress(self, job: Job, stage: str, payload: dict[str, Any]) -> None:
         progress = dict(job.stage_progress or {})
         progress[stage] = payload
         job.stage_progress = progress
         self.session.add(job)
         self.session.flush()
+        await self._publish_job_update(job)
 
     async def _set_state(self, job: Job, state: str, *, error: str | None = None) -> None:
         job.state = state
         job.error = error
         self.session.add(job)
         self.session.flush()
+        await self._publish_job_update(job)
+
+    async def _publish_job_update(self, job: Job) -> None:
         await self.broadcaster.publish_job_update(
             {
                 "id": job.id,
@@ -143,8 +154,26 @@ class Pipeline:
                 "started_at": job.started_at.isoformat() if job.started_at else None,
                 "finished_at": job.finished_at.isoformat() if job.finished_at else None,
             },
-            episode_status=self._episode_status_for_job(state),
+            episode_status=self._episode_status_for_job(job.state),
         )
+
+    def _stage_status(self, episode_id: str) -> dict[str, str]:
+        artifact = SummaryArtifactRepo(self.session).get(episode_id)
+        return dict(artifact.stage_status) if artifact is not None else {}
+
+    async def _publish_stage_status_changes(
+        self,
+        episode_id: str,
+        previous: dict[str, str],
+    ) -> None:
+        current = self._stage_status(episode_id)
+        for stage, status in current.items():
+            if previous.get(stage) != status:
+                await self.broadcaster.publish_stage_status(
+                    episode_id=episode_id,
+                    stage=stage,
+                    status=status,
+                )
 
     @staticmethod
     def _state_for_stage(stage_name: str) -> str:
