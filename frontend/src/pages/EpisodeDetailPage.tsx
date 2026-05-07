@@ -8,6 +8,7 @@ import {
   deleteEpisode,
   episodeFileUrl,
   getEpisode,
+  requestDigest,
   retryEpisode,
   useJobs
 } from "../api/client";
@@ -95,6 +96,16 @@ export function EpisodeDetailPage({ episodeId }: { episodeId: string }) {
     }
   };
 
+  const onDigest = async () => {
+    try {
+      const response = await requestDigest(episodeId);
+      setToast("status" in response ? "Audio digest is ready" : "Audio digest generation started");
+      await loadEpisode();
+    } catch (digestError) {
+      setToast(errorMessage(digestError));
+    }
+  };
+
   return (
     <div className="app-shell detail-shell">
       <AppHeader
@@ -126,7 +137,7 @@ export function EpisodeDetailPage({ episodeId }: { episodeId: string }) {
                 onRetry={onRetry}
               />
             </section>
-            <ArtifactBar episode={episode} onRetry={onRetry} onDelete={onDelete} />
+            <ArtifactBar episode={episode} onRetry={onRetry} onDelete={onDelete} onDigest={onDigest} />
           </>
         ) : null}
       </main>
@@ -219,12 +230,16 @@ function ChapterStub({ status, onRetry }: { status: StageStatus; onRetry: () => 
 function ArtifactBar({
   episode,
   onRetry,
-  onDelete
+  onDelete,
+  onDigest
 }: {
   episode: EpisodeDetail;
   onRetry: () => Promise<void>;
   onDelete: () => Promise<void>;
+  onDigest: () => Promise<void>;
 }) {
+  const digestReady = episode.stage_status.tts === "present" && episode.artifact_paths?.tts;
+  const digestFailed = episode.stage_status.tts === "failed_after_retries";
   return (
     <section className="artifact-bar" aria-label="Episode files and actions">
       <a className="secondary-button artifact-button" href={episodeFileUrl(episode.id, "markdown")} download>
@@ -236,12 +251,29 @@ function ArtifactBar({
       <a className="secondary-button artifact-button" href={episodeFileUrl(episode.id, "audio")} download>
         ↓ Download Audio
       </a>
+      <button
+        className="secondary-button artifact-button"
+        type="button"
+        onClick={() => void onDigest()}
+      >
+        {digestReady ? "Regenerate Audio Digest" : digestFailed ? "Retry Audio Digest" : "Generate Audio Digest"}
+      </button>
       <button className="secondary-button artifact-button" type="button" onClick={() => void onRetry()} disabled={!["failed", "partial"].includes(episode.status)}>
         ↻ Reprocess
       </button>
       <button className="secondary-button artifact-button artifact-button--danger" type="button" onClick={() => void onDelete()}>
         ⌫ Delete Episode
       </button>
+      {digestReady ? (
+        <div className="digest-player">
+          <audio controls src={episodeFileUrl(episode.id, "digest")} preload="metadata" />
+          <a href={episodeFileUrl(episode.id, "digest")} download>
+            Download digest
+          </a>
+        </div>
+      ) : digestFailed ? (
+        <p className="digest-failure">Audio digest generation failed after retries. Use Retry Audio Digest to run it again.</p>
+      ) : null}
     </section>
   );
 }

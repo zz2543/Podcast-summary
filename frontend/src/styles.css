@@ -1098,6 +1098,32 @@ button:disabled {
   color: #c22c44;
 }
 
+.digest-player {
+  flex: 1 0 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.digest-player audio {
+  width: 100%;
+}
+
+.digest-player a {
+  color: #5b45f5;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.digest-failure {
+  flex: 1 0 100%;
+  margin: 0;
+  color: #b45309;
+  font-weight: 700;
+}
+
 .missing-stage {
   display: grid;
   gap: 8px;

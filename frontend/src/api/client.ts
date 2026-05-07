@@ -123,6 +123,8 @@ export interface CreateEpisodeResponse {
   job: Job;
 }
 
+export type DigestResponse = Job | { tts_path: string; status: "present" };
+
 export interface EpisodeListResponse {
   items: EpisodeSummary[];
   next_cursor: string | null;
@@ -188,6 +190,12 @@ export async function deleteEpisode(id: string): Promise<void> {
 
 export function retryEpisode(id: string): Promise<Job> {
   return apiFetch<Job>(`/api/episodes/${encodeURIComponent(id)}/retry`, { method: "POST" });
+}
+
+export function requestDigest(id: string): Promise<DigestResponse> {
+  return apiFetch<DigestResponse>(`/api/episodes/${encodeURIComponent(id)}/digest`, {
+    method: "POST"
+  });
 }
 
 export function getJob(id: string): Promise<Job> {
