@@ -82,19 +82,26 @@ class DoubaoASR:
     ) -> list[TranscriptSegment]:
         for attempt in Retrying(stop=stop_after_attempt(self.retry_attempts), reraise=True):
             with attempt:
-                if audio_url:
-                    raw_response = self._request_file_url(audio_path, audio_url, language_hint)
-                else:
-                    raw_response = self._request_flash_file(audio_path, language_hint)
+                raw_response = self._request_file_submit(audio_path, language_hint, audio_url=audio_url)
         self._persist_raw_response(audio_path, raw_response)
         return parse_segments(raw_response, language_hint=language_hint)
 
-    def _request_file_url(
+    def _request_file_submit(
         self,
         audio_path: Path,
-        audio_url: str,
         language_hint: str | None,
+        *,
+        audio_url: str | None = None,
     ) -> dict[str, Any]:
+        if audio_url:
+            payload = _doubao_file_payload(audio_path, language_hint, audio_url=audio_url)
+            mode = "file_url"
+        else:
+            payload = _doubao_file_payload(
+                audio_path, language_hint, audio_data=_base64_file(audio_path)
+            )
+            mode = "file_data"
+
         task_id = str(uuid.uuid4())
         submit_headers = self._auc_headers(
             task_id=task_id,
@@ -104,7 +111,7 @@ class DoubaoASR:
         submit_response = self.client.post(
             self.settings.DOUBAO_ASR_SUBMIT_URL,
             headers=submit_headers,
-            json=_doubao_file_payload(audio_path, language_hint, audio_url=audio_url),
+            json=payload,
         )
         self._raise_for_auc_failure(submit_response, action="submit")
         log_id = submit_response.headers.get("X-Tt-Logid")
@@ -112,7 +119,7 @@ class DoubaoASR:
         result = self._poll_file_result(task_id, log_id)
         return {
             "provider": "doubao",
-            "mode": "file_url",
+            "mode": mode,
             "task_id": task_id,
             "resource_id": self.settings.DOUBAO_ASR_RESOURCE_ID,
             "result": result,

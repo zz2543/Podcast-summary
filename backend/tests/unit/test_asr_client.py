@@ -35,11 +35,17 @@ def settings_for(*, asr_provider: str = "doubao") -> Settings:
 
 
 class FakeDoubaoASR(DoubaoASR):
-    def _request_flash_file(self, audio_path: Path, language_hint: str | None) -> dict[str, Any]:
-        _ = audio_path, language_hint
+    def _request_file_submit(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        *,
+        audio_url: str | None = None,
+    ) -> dict[str, Any]:
+        _ = audio_path, language_hint, audio_url
         return {
             "provider": "doubao",
-            "mode": "flash_file",
+            "mode": "file_data",
             "result": {
                 "utterances": [
                     {
@@ -132,7 +138,7 @@ def test_doubao_file_asr_uses_submit_query_for_public_audio_url(tmp_path: Path) 
     assert "codec" not in submit["json"]["audio"]
 
 
-def test_doubao_file_asr_uses_flash_base64_for_local_audio(tmp_path: Path) -> None:
+def test_doubao_file_asr_uses_base64_submit_for_local_audio(tmp_path: Path) -> None:
     audio_path = tmp_path / "audio.normalized.mp3"
     audio_path.write_bytes(b"fake")
     client = FakeDoubaoHTTPClient()
@@ -141,8 +147,8 @@ def test_doubao_file_asr_uses_flash_base64_for_local_audio(tmp_path: Path) -> No
 
     assert segments[0].text == "完整长音频识别"
     call = client.calls[0]
-    assert call["url"].endswith("/recognize/flash")
-    assert call["headers"]["X-Api-Resource-Id"] == "volc.bigasr.auc_turbo"
+    assert call["url"].endswith("/submit")
+    assert call["headers"]["X-Api-Resource-Id"] == "volc.seedasr.auc"
     assert call["json"]["audio"]["data"] == "ZmFrZQ=="
     assert "url" not in call["json"]["audio"]
     assert "codec" not in call["json"]["audio"]

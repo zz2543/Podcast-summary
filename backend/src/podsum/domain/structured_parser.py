@@ -76,8 +76,6 @@ def parse_one_liner(raw_json: Any, episode_title: str, lang: str) -> str:
     hook = _clean_text(value)
     if not hook:
         raise RetriableValidationError("one-liner hook must not be empty")
-    if len(hook) > 50:
-        raise RetriableValidationError("one-liner hook must be no more than 50 code points")
     if _similarity_ratio(hook, episode_title) > 0.6:
         raise RetriableValidationError("one-liner hook is too similar to episode title")
     _ = lang

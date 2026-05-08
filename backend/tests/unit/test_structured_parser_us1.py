@@ -20,14 +20,16 @@ def test_parse_one_liner_accepts_valid_hook() -> None:
     )
 
 
-def test_parse_one_liner_rejects_over_50_code_points() -> None:
-    with pytest.raises(RetriableValidationError, match="50"):
-        parse_one_liner({"hook": "中" * 51}, episode_title="标题", lang="zh")
+def test_parse_one_liner_accepts_long_chinese_hook_without_truncation() -> None:
+    hook = parse_one_liner({"hook": "中" * 51}, episode_title="标题", lang="zh")
+
+    assert hook == "中" * 51
 
 
-def test_parse_one_liner_rejects_over_50_english_code_points() -> None:
-    with pytest.raises(RetriableValidationError, match="50"):
-        parse_one_liner({"hook": "a" * 51}, episode_title="title", lang="en")
+def test_parse_one_liner_accepts_long_english_hook_without_truncation() -> None:
+    hook = parse_one_liner({"hook": "a" * 51}, episode_title="title", lang="en")
+
+    assert hook == "a" * 51
 
 
 def test_parse_one_liner_rejects_title_repeat() -> None:
