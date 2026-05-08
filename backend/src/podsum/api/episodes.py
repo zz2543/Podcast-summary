@@ -13,7 +13,13 @@ from sqlalchemy.orm import Session
 
 from podsum.exporters.json_export import render as render_json
 from podsum.persistence.models import Episode, Job, SummaryArtifact
-from podsum.persistence.repo import EpisodeRepo, JobRepo, SummaryArtifactRepo
+from podsum.persistence.repo import (
+    ChapterRepo,
+    EntityRepo,
+    EpisodeRepo,
+    JobRepo,
+    SummaryArtifactRepo,
+)
 from podsum.services.ingest import (
     IngestedAudio,
     IngestError,
@@ -389,8 +395,8 @@ def _episode_detail(session: Session, episode: Episode) -> dict[str, Any]:
     return {
         "episode": episode,
         "artifact": SummaryArtifactRepo(session).get(episode.id) or _empty_artifact(episode.id),
-        "chapters": [],
-        "entities": [],
+        "chapters": ChapterRepo(session).list_for_episode(episode.id),
+        "entities": EntityRepo(session).list_for_episode(episode.id),
     }
 
 
