@@ -46,6 +46,13 @@ class Settings(BaseSettings):
     DOUBAO_ASR_APP_ID: str | None = None
     DOUBAO_ASR_ACCESS_TOKEN: SecretStr | None = None
     DOUBAO_ASR_CLUSTER: str = "volcengine_streaming_common"
+    DOUBAO_ASR_RESOURCE_ID: str = "volc.seedasr.auc"
+    DOUBAO_ASR_SUBMIT_URL: str = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/submit"
+    DOUBAO_ASR_QUERY_URL: str = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/query"
+    DOUBAO_ASR_FLASH_RESOURCE_ID: str = "volc.bigasr.auc_turbo"
+    DOUBAO_ASR_FLASH_URL: str = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash"
+    DOUBAO_ASR_POLL_INTERVAL_SECONDS: float = Field(default=3.0, ge=0.2, le=30.0)
+    DOUBAO_ASR_TIMEOUT_SECONDS: float = Field(default=1800.0, ge=30.0, le=21600.0)
 
     DEEPSEEK_API_KEY: SecretStr | None = None
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
@@ -90,7 +97,11 @@ class Settings(BaseSettings):
                     ("VOLC_SECRET_ACCESS_KEY", self.VOLC_SECRET_ACCESS_KEY),
                     ("DOUBAO_ASR_APP_ID", self.DOUBAO_ASR_APP_ID),
                     ("DOUBAO_ASR_ACCESS_TOKEN", self.DOUBAO_ASR_ACCESS_TOKEN),
-                    ("DOUBAO_ASR_CLUSTER", self.DOUBAO_ASR_CLUSTER),
+                    ("DOUBAO_ASR_RESOURCE_ID", self.DOUBAO_ASR_RESOURCE_ID),
+                    ("DOUBAO_ASR_SUBMIT_URL", self.DOUBAO_ASR_SUBMIT_URL),
+                    ("DOUBAO_ASR_QUERY_URL", self.DOUBAO_ASR_QUERY_URL),
+                    ("DOUBAO_ASR_FLASH_RESOURCE_ID", self.DOUBAO_ASR_FLASH_RESOURCE_ID),
+                    ("DOUBAO_ASR_FLASH_URL", self.DOUBAO_ASR_FLASH_URL),
                 )
                 if not _present(value)
             )

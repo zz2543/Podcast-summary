@@ -51,6 +51,7 @@ make verify-quotes   # verify stored quotes against transcripts
 ## Caveats
 
 - v1 is cloud-only for actual processing. ASR, LLM summarization, and TTS require network access and provider keys.
+- The default Doubao ASR path requires the Volcengine app to enable recording-file ASR 2.0 (`DOUBAO_ASR_RESOURCE_ID=volc.seedasr.auc`). Public direct-audio URLs use submit/query polling. Local uploads use the flash file endpoint (`DOUBAO_ASR_FLASH_RESOURCE_ID=volc.bigasr.auc_turbo`), so enable that capability too if you upload files from the browser.
 - The server binds to `127.0.0.1`; this is not a multi-user or public deployment.
 - Inputs over 6 hours or 1 GB must be rejected before cloud processing.
 - YouTube extraction can fail for age-gated, region-locked, or DRM-restricted content.

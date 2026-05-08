@@ -19,7 +19,13 @@ class ResumeASRClient:
     def __init__(self) -> None:
         self.call_count = 1
 
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[TranscriptSegment]:
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[TranscriptSegment]:
+        _ = audio_path, language_hint, audio_url
         self.call_count += 1
         raise AssertionError("resume should reuse persisted transcript segments")
 

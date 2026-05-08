@@ -10,7 +10,7 @@ A single-user, locally hosted web application that ingests one of {local audio f
 ## Technical Context
 
 **Language/Version**: Python 3.11+ (backend, per Constitution II); TypeScript 5.x for the SPA frontend (justified in Complexity Tracking).
-**Primary Dependencies (backend)**: FastAPI (HTTP + WebSocket progress streaming), SQLAlchemy 2.x + Alembic (persistence), pydantic 2.x (schemas / JSON output), httpx (async HTTP for cloud APIs and direct-audio fetch), yt-dlp (YouTube audio extraction), tenacity (retry policies), python-dotenv (`.env` loading per Constitution IV). The cloud stack is consolidated on **two providers**: **火山引擎 (volcengine)** for both ASR (豆包语音识别大模型) and TTS (豆包语音合成), and **DeepSeek** for LLM. The `openai` Python SDK is retained as the HTTP transport for DeepSeek's OpenAI-compatible endpoint (no OpenAI account required).
+**Primary Dependencies (backend)**: FastAPI (HTTP + WebSocket progress streaming), SQLAlchemy 2.x + Alembic (persistence), pydantic 2.x (schemas / JSON output), httpx (async HTTP for cloud APIs, Doubao recording-file ASR submit/query, and direct-audio fetch), yt-dlp (YouTube audio extraction), tenacity (retry policies), python-dotenv (`.env` loading per Constitution IV). The cloud stack is consolidated on **two providers**: **火山引擎 (volcengine)** for both ASR (豆包录音文件识别模型 2.0 by default) and TTS (豆包语音合成), and **DeepSeek** for LLM. The `openai` Python SDK is retained as the HTTP transport for DeepSeek's OpenAI-compatible endpoint (no OpenAI account required).
 **Primary Dependencies (frontend)**: Vite + React + TypeScript + a minimal CSS layer (Tailwind or plain CSS) — the visual design is authored externally per FR-017, so the frontend stack is chosen for flexibility, not opinionated visuals.
 **Storage**: SQLite (single-user local, embedded, ACID, sufficient for the spec's durability requirement) for jobs/episodes/segments/chapters/quotes/entities + a `data/` directory tree on disk for audio cache, transcript JSON, generated Markdown, generated JSON, and TTS audio.
 **Testing**: pytest + pytest-asyncio + pytest-cov (coverage gate ≥ 80% on domain logic per Constitution III); httpx ASGI client for FastAPI integration tests; respx for outbound HTTP mocking; Vitest for the few frontend unit tests (route guards, quote-jump math).
@@ -69,10 +69,10 @@ Per Constitution rule 10. Detailed alternatives & rationale live in `research.md
 | tenacity | Retry policies for cloud API calls | Apache-2.0 | Active |
 | yt-dlp | YouTube audio extraction | Unlicense | Very active (frequent releases tracking YouTube changes) |
 | openai | HTTP transport for DeepSeek LLM via OpenAI-compatible endpoint (custom `base_url`); no OpenAI account needed | Apache-2.0 | Active (official SDK) |
-| volcengine-python-sdk | ASR client (豆包语音识别大模型) **and** TTS client (豆包语音合成), both via 火山引擎 | Apache-2.0 | Active (official SDK from ByteDance) |
+| volcengine-python-sdk | Shared Volcengine credential wiring for speech services; TTS uses the speech SDK path while ASR defaults to HTTP AUC submit/query | Apache-2.0 | Active (official SDK from ByteDance) |
 | dashscope | Optional fallback for LLM (Qwen) and TTS (Qwen-TTS / CosyVoice) via Alibaba DashScope | Apache-2.0 | Active (official SDK from Alibaba) |
 | python-multipart | File uploads | Apache-2.0 | Active |
-| python-socks[asyncio] | SOCKS proxy support for WebSocket ASR connections when macOS or Linux system proxy is enabled | Apache-2.0 | Active; maintained helper library used by Python async network stacks |
+| python-socks[asyncio] | SOCKS proxy support for async WebSocket/HTTP speech connections when macOS or Linux system proxy is enabled | Apache-2.0 | Active; maintained helper library used by Python async network stacks |
 | pytest, pytest-asyncio, pytest-cov | Testing | MIT | Active |
 | respx | httpx mock for tests | BSD-3 | Active |
 

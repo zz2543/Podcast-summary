@@ -15,8 +15,13 @@ from podsum.persistence.models import Base, Episode, Job
 
 
 class SlowASR:
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[dict[str, Any]]:
-        _ = audio_path, language_hint
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[dict[str, Any]]:
+        _ = audio_path, language_hint, audio_url
         time.sleep(0.2)
         return [{"idx": 0, "start_ms": 0, "end_ms": 1_000, "text": "hello world", "language": "en"}]
 

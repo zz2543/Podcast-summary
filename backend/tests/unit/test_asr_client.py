@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+import httpx
+
 from podsum.config import Settings
 from podsum.services.asr_client import (
     DoubaoASR,
@@ -33,9 +35,11 @@ def settings_for(*, asr_provider: str = "doubao") -> Settings:
 
 
 class FakeDoubaoASR(DoubaoASR):
-    async def _request_raw(self, audio_path: Path, language_hint: str | None) -> dict[str, Any]:
+    def _request_flash_file(self, audio_path: Path, language_hint: str | None) -> dict[str, Any]:
+        _ = audio_path, language_hint
         return {
             "provider": "doubao",
+            "mode": "flash_file",
             "result": {
                 "utterances": [
                     {
@@ -55,6 +59,45 @@ class FakeDoubaoASR(DoubaoASR):
         }
 
 
+class FakeDoubaoHTTPClient:
+    def __init__(self) -> None:
+        self.calls: list[dict[str, Any]] = []
+
+    def post(
+        self,
+        url: str,
+        *,
+        headers: dict[str, str],
+        json: dict[str, Any],
+    ) -> httpx.Response:
+        self.calls.append({"url": url, "headers": headers, "json": json})
+        request = httpx.Request("POST", url)
+        if url.endswith("/submit"):
+            return httpx.Response(
+                200,
+                headers={"X-Api-Status-Code": "20000000", "X-Tt-Logid": "log-1"},
+                json={},
+                request=request,
+            )
+        return httpx.Response(
+            200,
+            headers={"X-Api-Status-Code": "20000000"},
+            json={
+                "result": {
+                    "utterances": [
+                        {
+                            "start_time": 1000,
+                            "end_time": 2500,
+                            "text": "完整长音频识别",
+                            "additions": {"lid_lang": "speech_mand"},
+                        }
+                    ]
+                }
+            },
+            request=request,
+        )
+
+
 def test_doubao_transcribe_persists_raw_response(tmp_path: Path) -> None:
     audio_path = tmp_path / "01ARZ3NDEKTSV4RRFFQ69G5FAV" / "audio.normalized.mp3"
     audio_path.parent.mkdir()
@@ -68,6 +111,41 @@ def test_doubao_transcribe_persists_raw_response(tmp_path: Path) -> None:
     ]
     raw = json.loads((audio_path.parent / "transcript.raw.json").read_text(encoding="utf-8"))
     assert raw["provider"] == "doubao"
+
+
+def test_doubao_file_asr_uses_submit_query_for_public_audio_url(tmp_path: Path) -> None:
+    audio_path = tmp_path / "audio.normalized.mp3"
+    audio_path.write_bytes(b"fake")
+    client = FakeDoubaoHTTPClient()
+
+    segments = DoubaoASR(settings_for(), retry_attempts=1, client=client).transcribe(
+        audio_path,
+        "zh",
+        "https://example.test/audio.mp3",
+    )
+
+    assert segments[0].text == "完整长音频识别"
+    submit = client.calls[0]
+    assert submit["headers"]["X-Api-Resource-Id"] == "volc.seedasr.auc"
+    assert submit["json"]["audio"]["url"] == "https://example.test/audio.mp3"
+    assert "data" not in submit["json"]["audio"]
+    assert "codec" not in submit["json"]["audio"]
+
+
+def test_doubao_file_asr_uses_flash_base64_for_local_audio(tmp_path: Path) -> None:
+    audio_path = tmp_path / "audio.normalized.mp3"
+    audio_path.write_bytes(b"fake")
+    client = FakeDoubaoHTTPClient()
+
+    segments = DoubaoASR(settings_for(), retry_attempts=1, client=client).transcribe(audio_path, "zh")
+
+    assert segments[0].text == "完整长音频识别"
+    call = client.calls[0]
+    assert call["url"].endswith("/recognize/flash")
+    assert call["headers"]["X-Api-Resource-Id"] == "volc.bigasr.auc_turbo"
+    assert call["json"]["audio"]["data"] == "ZmFrZQ=="
+    assert "url" not in call["json"]["audio"]
+    assert "codec" not in call["json"]["audio"]
 
 
 def test_parse_segments_accepts_openai_second_offsets() -> None:

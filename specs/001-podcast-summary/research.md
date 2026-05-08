@@ -10,14 +10,15 @@ Each section follows the format mandated by the project: **Decision / Rationale 
 
 ## R1. Cloud ASR provider
 
-**Decision**: Default provider is **豆包语音识别大模型 (Doubao ASR)** via 火山引擎 (volcengine), using the `volcengine-python-sdk`. Adapter interface keeps **OpenAI Whisper (`whisper-1`)** and **Alibaba Paraformer / Qwen-Audio (DashScope)** as registered alternatives.
+**Decision**: Default provider is **豆包录音文件识别模型 2.0 (Doubao AUC file ASR)** via 火山引擎 (volcengine). Long/public audio URLs use the recording-file submit/query API (`/api/v3/auc/bigmodel/submit` + `/query`, resource `volc.seedasr.auc`); local loopback uploads use the flash file endpoint with base64 audio because Volcengine cannot fetch `127.0.0.1` files. Adapter interface keeps **OpenAI Whisper (`whisper-1`)** and **Alibaba Paraformer / Qwen-Audio (DashScope)** as registered alternatives. Legacy Doubao streaming ASR is no longer the default because it is designed for real-time paced audio, not instant-upload podcast files.
 
 **Rationale**:
 - **Vendor consolidation**: TTS (R3) is already on 火山引擎. Putting ASR on the same vendor means **one fewer account, one fewer billing surface, one set of `VOLC_*` credentials** — directly simplifies Constitution IV's `.env` story and the README "one-click run" promise.
 - 豆包 ASR 大模型 is Chinese-native, with strong code-switched zh/en support — matches FR-007 (preserve original language, no translation) without forcing a per-language model split.
 - Provides segment-level timestamps directly, comfortably under the ±10 s SC-003 budget for quote jumps.
+- Recording-file ASR matches the product's input model: users submit complete podcast files or URLs, then wait for a batch-style transcript. This avoids the failure mode where a long MP3 is pushed into a real-time streaming endpoint faster than playback time and only the first seconds are recognized.
 - Pricing on 火山引擎 is approximately ¥0.5 / minute on the standard tier — comparable order of magnitude to Whisper, well within course-project budget.
-- Same `volcengine-python-sdk` used by the TTS adapter (R3); the streaming WebSocket protocol is shared between ASR and TTS so the team learns one auth/retry pattern.
+- File-mode HTTP APIs make retries and polling explicit and easier to checkpoint than a long-lived WebSocket session.
 
 **Alternatives considered**:
 - **OpenAI Whisper (`whisper-1`)**: most battle-tested for code-switched podcast audio; segment timestamps within ±2 s typical. Rejected as default purely on the vendor-consolidation argument above. Kept as a registered alternative (`ASR_PROVIDER=openai_whisper`) for users who already have an OpenAI account or prefer Whisper's well-known behaviour on noisy English audio.

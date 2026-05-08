@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import gzip
 import json
+import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Protocol
 
+import httpx
 from tenacity import AsyncRetrying, Retrying, stop_after_attempt
 
 from podsum.config import ASRProvider, Settings
@@ -15,7 +18,12 @@ from podsum.persistence.models import TranscriptSegment
 
 
 class ASRClient(Protocol):
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[TranscriptSegment]:
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[TranscriptSegment]:
         raise NotImplementedError
 
 
@@ -23,7 +31,13 @@ class UnimplementedASRClient:
     def __init__(self, provider: str) -> None:
         self.provider = provider
 
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[TranscriptSegment]:
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[TranscriptSegment]:
+        _ = audio_url
         raise NotImplementedError(f"ASR provider is not implemented yet: {self.provider}")
 
 
@@ -32,18 +46,163 @@ class ASRResponseError(RuntimeError):
 
 
 class DoubaoASR:
+    """Doubao recording-file ASR.
+
+    The default path uses AUC submit/query for public audio URLs. Local uploads cannot be
+    fetched by Volcengine from loopback storage, so they use the flash file endpoint with
+    base64 audio data. The legacy streaming WebSocket implementation remains below only as
+    an explicit fallback helper; it is no longer the default for long podcast files.
+    """
+
     endpoint = "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel_nostream"
     resource_id = "volc.bigasr.sauc.duration"
     chunk_size_bytes = 64 * 1024
     final_timeout_seconds = 60.0
+    success_status = "20000000"
+    pending_statuses = {"20000001", "20000002"}
+    flash_size_limit_bytes = 100 * 1024 * 1024
 
-    def __init__(self, settings: Settings, *, retry_attempts: int = 3) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        retry_attempts: int = 3,
+        client: httpx.Client | None = None,
+    ) -> None:
         self.settings = settings
         self.retry_attempts = retry_attempts
+        self.client = client or httpx.Client(timeout=120.0)
         self.sdk_api = _build_volcengine_speech_api(settings)
 
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[TranscriptSegment]:
-        return _run_async_blocking(self.transcribe_async(audio_path, language_hint))
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[TranscriptSegment]:
+        for attempt in Retrying(stop=stop_after_attempt(self.retry_attempts), reraise=True):
+            with attempt:
+                if audio_url:
+                    raw_response = self._request_file_url(audio_path, audio_url, language_hint)
+                else:
+                    raw_response = self._request_flash_file(audio_path, language_hint)
+        self._persist_raw_response(audio_path, raw_response)
+        return parse_segments(raw_response, language_hint=language_hint)
+
+    def _request_file_url(
+        self,
+        audio_path: Path,
+        audio_url: str,
+        language_hint: str | None,
+    ) -> dict[str, Any]:
+        task_id = str(uuid.uuid4())
+        submit_headers = self._auc_headers(
+            task_id=task_id,
+            resource_id=self.settings.DOUBAO_ASR_RESOURCE_ID,
+            sequence="-1",
+        )
+        submit_response = self.client.post(
+            self.settings.DOUBAO_ASR_SUBMIT_URL,
+            headers=submit_headers,
+            json=_doubao_file_payload(audio_path, language_hint, audio_url=audio_url),
+        )
+        self._raise_for_auc_failure(submit_response, action="submit")
+        log_id = submit_response.headers.get("X-Tt-Logid")
+
+        result = self._poll_file_result(task_id, log_id)
+        return {
+            "provider": "doubao",
+            "mode": "file_url",
+            "task_id": task_id,
+            "resource_id": self.settings.DOUBAO_ASR_RESOURCE_ID,
+            "result": result,
+        }
+
+    def _request_flash_file(self, audio_path: Path, language_hint: str | None) -> dict[str, Any]:
+        size = audio_path.stat().st_size
+        if size > self.flash_size_limit_bytes:
+            raise ASRResponseError(
+                "local audio exceeds Doubao flash ASR's 100 MB limit; provide a public "
+                "audio URL or configure object storage for AUC submit/query"
+            )
+
+        request_id = str(uuid.uuid4())
+        response = self.client.post(
+            self.settings.DOUBAO_ASR_FLASH_URL,
+            headers=self._auc_headers(
+                task_id=request_id,
+                resource_id=self.settings.DOUBAO_ASR_FLASH_RESOURCE_ID,
+                sequence="-1",
+            ),
+            json=_doubao_file_payload(audio_path, language_hint, audio_data=_base64_file(audio_path)),
+        )
+        self._raise_for_auc_failure(response, action="flash")
+        return {
+            "provider": "doubao",
+            "mode": "flash_file",
+            "task_id": request_id,
+            "resource_id": self.settings.DOUBAO_ASR_FLASH_RESOURCE_ID,
+            "result": _response_json(response),
+        }
+
+    def _poll_file_result(self, task_id: str, log_id: str | None) -> dict[str, Any]:
+        deadline = time.monotonic() + self.settings.DOUBAO_ASR_TIMEOUT_SECONDS
+        headers = self._auc_headers(
+            task_id=task_id,
+            resource_id=self.settings.DOUBAO_ASR_RESOURCE_ID,
+        )
+        if log_id:
+            headers["X-Tt-Logid"] = log_id
+
+        while True:
+            response = self.client.post(self.settings.DOUBAO_ASR_QUERY_URL, headers=headers, json={})
+            status = response.headers.get("X-Api-Status-Code", "")
+            if status == self.success_status:
+                return _response_json(response)
+            if status not in self.pending_statuses:
+                self._raise_for_auc_failure(response, action="query")
+            if time.monotonic() >= deadline:
+                raise TimeoutError("Doubao file ASR timed out while waiting for query result")
+            time.sleep(self.settings.DOUBAO_ASR_POLL_INTERVAL_SECONDS)
+
+    def _auc_headers(
+        self,
+        *,
+        task_id: str,
+        resource_id: str,
+        sequence: str | None = None,
+    ) -> dict[str, str]:
+        headers = {
+            "Content-Type": "application/json",
+            "X-Api-App-Key": self._required_value(
+                self.settings.DOUBAO_ASR_APP_ID,
+                "DOUBAO_ASR_APP_ID",
+            ),
+            "X-Api-Access-Key": self._required_value(
+                self.settings.DOUBAO_ASR_ACCESS_TOKEN,
+                "DOUBAO_ASR_ACCESS_TOKEN",
+            ),
+            "X-Api-Resource-Id": resource_id,
+            "X-Api-Request-Id": task_id,
+        }
+        if sequence is not None:
+            headers["X-Api-Sequence"] = sequence
+        return headers
+
+    def _raise_for_auc_failure(self, response: httpx.Response, *, action: str) -> None:
+        response.raise_for_status()
+        status = response.headers.get("X-Api-Status-Code")
+        if status == self.success_status:
+            return
+        if status is None:
+            payload = _response_json(response)
+            body_code = payload.get("code") or payload.get("status_code")
+            if body_code in {None, 0, "0", self.success_status}:
+                return
+            message = payload.get("message") or payload.get("msg") or ""
+            raise ASRResponseError(f"Doubao file ASR {action} failed: {body_code} {message}".strip())
+        message = response.headers.get("X-Api-Message", "")
+        raise ASRResponseError(f"Doubao file ASR {action} failed: {status} {message}".strip())
 
     async def transcribe_async(
         self,
@@ -174,7 +333,13 @@ class WhisperASR:
         self.retry_attempts = retry_attempts
         self.client = OpenAI(api_key=_secret_value(settings.OPENAI_API_KEY))
 
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[TranscriptSegment]:
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[TranscriptSegment]:
+        _ = audio_url
         for attempt in Retrying(stop=stop_after_attempt(self.retry_attempts), reraise=True):
             with attempt:
                 with audio_path.open("rb") as audio_file:
@@ -199,7 +364,13 @@ class QwenASR:
         self.retry_attempts = retry_attempts
         self.transcription_api = QwenTranscription
 
-    def transcribe(self, audio_path: Path, language_hint: str | None) -> list[TranscriptSegment]:
+    def transcribe(
+        self,
+        audio_path: Path,
+        language_hint: str | None,
+        audio_url: str | None = None,
+    ) -> list[TranscriptSegment]:
+        _ = audio_url
         for attempt in Retrying(stop=stop_after_attempt(self.retry_attempts), reraise=True):
             with attempt:
                 response = self.transcription_api.call(
@@ -290,19 +461,18 @@ def _build_volcengine_speech_api(settings: Settings) -> Any:
     return SPEECHSAASPRODApi(ApiClient(configuration))
 
 
-def _doubao_init_payload(audio_path: Path, language_hint: str | None) -> dict[str, Any]:
-    language = _doubao_language(language_hint)
-    audio_format = "mp3" if audio_path.suffix.lower() == ".mp3" else audio_path.suffix.lower().lstrip(".")
-    audio: dict[str, Any] = {
-        "format": audio_format,
-        "codec": "raw",
-        "rate": 16000,
-        "bits": 16,
-        "channel": 1,
-    }
-    if language is not None:
-        audio["language"] = language
-
+def _doubao_file_payload(
+    audio_path: Path,
+    language_hint: str | None,
+    *,
+    audio_url: str | None = None,
+    audio_data: str | None = None,
+) -> dict[str, Any]:
+    audio = _doubao_audio_descriptor(audio_path, language_hint)
+    if audio_url is not None:
+        audio["url"] = audio_url
+    if audio_data is not None:
+        audio["data"] = audio_data
     return {
         "user": {"uid": "podsum"},
         "audio": audio,
@@ -316,6 +486,47 @@ def _doubao_init_payload(audio_path: Path, language_hint: str | None) -> dict[st
             "result_type": "full",
         },
     }
+
+
+def _doubao_init_payload(audio_path: Path, language_hint: str | None) -> dict[str, Any]:
+    audio = _doubao_audio_descriptor(audio_path, language_hint)
+    return {
+        "user": {"uid": "podsum"},
+        "audio": audio,
+        "request": {
+            "model_name": "bigmodel",
+            "enable_itn": True,
+            "enable_punc": True,
+            "enable_ddc": False,
+            "show_utterances": True,
+            "enable_lid": True,
+            "result_type": "full",
+        },
+    }
+
+
+def _doubao_audio_descriptor(audio_path: Path, language_hint: str | None) -> dict[str, Any]:
+    language = _doubao_language(language_hint)
+    audio_format = "mp3" if audio_path.suffix.lower() == ".mp3" else audio_path.suffix.lower().lstrip(".")
+    audio: dict[str, Any] = {"format": audio_format}
+    if audio_format in {"pcm", "raw"}:
+        audio.update({"codec": "raw", "rate": 16000, "bits": 16, "channel": 1})
+    if language is not None:
+        audio["language"] = language
+    return audio
+
+
+def _base64_file(path: Path) -> str:
+    return base64.b64encode(path.read_bytes()).decode("ascii")
+
+
+def _response_json(response: httpx.Response) -> dict[str, Any]:
+    if not response.content:
+        return {}
+    payload = response.json()
+    if not isinstance(payload, dict):
+        raise ASRResponseError("Doubao ASR response body was not a JSON object")
+    return payload
 
 
 class _MessageType:

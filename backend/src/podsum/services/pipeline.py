@@ -387,7 +387,12 @@ async def _stage_transcribe(context: PipelineContext, asr_client: ASRClient) -> 
         return {"segments": len(existing_segments), "cached": True}
 
     audio_path = _normalized_audio_path(episode)
-    raw_segments = await asyncio.to_thread(asr_client.transcribe, audio_path, episode.language)
+    raw_segments = await asyncio.to_thread(
+        asr_client.transcribe,
+        audio_path,
+        episode.language,
+        _public_audio_url(episode),
+    )
     normalized_segments = normalize(raw_segments, episode.language)
     db_segments = [
         TranscriptSegment(
@@ -631,6 +636,12 @@ def _get_episode(context: PipelineContext) -> Episode:
 
 def _normalized_audio_path(episode: Episode) -> Path:
     return Path(episode.data_dir) / "audio.normalized.mp3"
+
+
+def _public_audio_url(episode: Episode) -> str | None:
+    if episode.source_type == "direct_url" and episode.source_ref.startswith(("http://", "https://")):
+        return episode.source_ref
+    return None
 
 
 def _apply_ingested_audio(episode: Episode, ingested: IngestedAudio) -> None:
