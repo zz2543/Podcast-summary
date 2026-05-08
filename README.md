@@ -59,4 +59,5 @@ make verify-quotes   # verify stored quotes against transcripts
 
 - `unsupported_media`: confirm the file is mp3, m4a, or wav, or that a direct URL returns `audio/*`.
 - `upstream_failed`: check the provider key in `.env` and retry.
+- SOCKS proxy enabled on macOS/Linux: run `make install` after pulling this version so the backend installs `python-socks[asyncio]`; restart `make run` if a server was already running.
 - SQLite lock errors: lower `MAX_CONCURRENCY` in `.env`.

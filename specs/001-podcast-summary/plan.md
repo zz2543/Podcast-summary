@@ -72,6 +72,7 @@ Per Constitution rule 10. Detailed alternatives & rationale live in `research.md
 | volcengine-python-sdk | ASR client (豆包语音识别大模型) **and** TTS client (豆包语音合成), both via 火山引擎 | Apache-2.0 | Active (official SDK from ByteDance) |
 | dashscope | Optional fallback for LLM (Qwen) and TTS (Qwen-TTS / CosyVoice) via Alibaba DashScope | Apache-2.0 | Active (official SDK from Alibaba) |
 | python-multipart | File uploads | Apache-2.0 | Active |
+| python-socks[asyncio] | SOCKS proxy support for WebSocket ASR connections when macOS or Linux system proxy is enabled | Apache-2.0 | Active; maintained helper library used by Python async network stacks |
 | pytest, pytest-asyncio, pytest-cov | Testing | MIT | Active |
 | respx | httpx mock for tests | BSD-3 | Active |
 
