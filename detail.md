@@ -11,6 +11,8 @@
 - 2026-05-07：完成 US3：Doubao/Qwen TTS adapter、音频摘要脚本、懒触发 TTS pipeline、digest API、失败降级测试与前端音频摘要控件。
 - 2026-05-07：完成 US4：SQLite 持久队列 + `asyncio.Queue` + `Semaphore(MAX_CONCURRENCY)`，batch API，前端 batch 提交，以及并发上限集成测试。
 - 2026-05-07：完成交叉验证：CI workflow、coverage gate、RUN_SMOKE 门控的 smoke 脚本。
+- 2026-05-12：根据用户确认，T079 的 5 集人工评估不作为本次交付门槛；保留自动化验证与生产模式构建验证作为收口标准。
+- 2026-05-12：完成 T080 生产模式验证：`make build` 成功，`make serve` 由 FastAPI 单独服务 SPA；`/`、`/episodes/test-id`、`/api/health`、`/assets/index-*.js` 均返回 200。
 
 ## 设计取舍
 
@@ -32,10 +34,12 @@
 ## 性能数据
 
 - 当前已验证的是自动化测试耗时，不代表云端真实吞吐：
-  - `make test`：60 个 backend tests 通过，domain coverage 88.03%。
+  - `make test`：63 个 backend tests 通过，domain coverage 87.98%。
   - `make lint`：ruff + TypeScript lint 通过。
   - `make test-frontend`：Vitest 无测试文件，按 `--passWithNoTests` 通过。
   - `make verify-quotes`：seeded fixture 结果 `PASS 1 / FAIL 0`。
+  - `make build`：Vite 生产构建通过，生成 `frontend/dist/index.html`、JS、CSS。
+  - `make serve`：FastAPI 生产模式单独服务构建后的 SPA，根路径、详情页 fallback、API health 与静态 JS 均验证通过。
 - 待实测：Apple M2 上 60 分钟真实播客样本的 ASR、LLM、TTS 分阶段耗时。
 
 ## 评估结果
@@ -45,7 +49,6 @@
   - SC-004 quote verifier：`scripts/verify_quotes.py` 可离线复查所有 `verified=True` quote；fixture 当前 100% 通过。
   - SC-007 resume：`test_us1_resume.py` 验证重启恢复后复用已持久化 transcript，避免重复 ASR。
   - FR-018 concurrency：`test_us4_concurrency.py` 验证 `MAX_CONCURRENCY=2` 时 `transcribing` job 数量从未超过 2。
-- 待人工/真实云评估：
-  - 5 集中英文测试集的 SC-001、SC-002、SC-005 正式分数。
-  - 中文 fixture 的同语言摘要质量。
-  - 真实 TTS 音频摘要的可听性与覆盖度。
+- 人工/真实云评估：
+  - T079 的 5 集中英文人工评分已由用户明确跳过，本次不再补正式分数。
+  - 后续若需要面向课程/展示补证据，可另行跑 SC-001、SC-002、SC-005 与 60 分钟性能样本。

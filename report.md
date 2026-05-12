@@ -32,21 +32,22 @@
 
 ## 评估结果与图表
 
-当前已完成自动化验证，真实 5 集中英文评估仍是 T079 的待执行项，未在本报告中伪造分数。
+当前已完成自动化验证。真实 5 集中英文人工评估已按用户 2026-05-12 的确认从本次交付门槛中移除，因此本报告不伪造人工分数。
 
 | 验证项 | 结果 | 含义 |
 | --- | --- | --- |
-| Backend tests | 60 passed | 覆盖 domain、pipeline、API、并发、digest 等关键路径。 |
-| Domain coverage | 88.03% | 高于 constitution 要求的 80% coverage gate。 |
+| Backend tests | 63 passed | 覆盖 domain、pipeline、API、并发、digest 等关键路径。 |
+| Domain coverage | 87.98% | 高于 constitution 要求的 80% coverage gate。 |
 | Backend lint | passed | `ruff` 通过。 |
 | Frontend check | passed | `tsc --noEmit` 与 Vitest 空测试通过。 |
 | Quote verifier fixture | PASS 1 / FAIL 0 | `make verify-quotes` 可复查 DB 中 quote。 |
 | Range endpoint | 206 verified | 支持音频局部加载，服务 quote 跳转体验。 |
 | Concurrency | max 2 transcribing jobs | `MAX_CONCURRENCY=2` 时并发上限生效。 |
+| Production serve | passed | `make build && make serve` 可由 FastAPI 单独服务 SPA、API 与静态资源。 |
 
 ```text
 Domain coverage
-88.03% | ##############################------ | target 80%
+87.98% | ##############################------ | target 80%
 
 Quote verification fixture
 PASS   | # | 1
@@ -54,6 +55,12 @@ FAIL   |   | 0
 
 MAX_CONCURRENCY=2
 observed transcribing jobs <= 2
+
+Production serve
+/                 200 text/html
+/episodes/test-id 200 text/html
+/api/health       200 application/json
+/assets/*.js      200 text/javascript
 ```
 
 已覆盖的成功指标：
@@ -63,7 +70,7 @@ observed transcribing jobs <= 2
 - SC-007：重启恢复复用已完成 transcript，避免重复 ASR。
 - FR-018：批量任务遵守配置并发上限，单个失败不阻塞队列继续。
 
-待补充的真实评估：
+本次不执行的人工评估：
 
 - SC-001：5 集真实播客的章节/要点人工准确率。
 - SC-002：中文与英文内容的同语言摘要质量。
@@ -72,7 +79,7 @@ observed transcribing jobs <= 2
 
 ## 未来工作
 
-- 补齐 T079 的 5 集中英文真实评估集，并把人工评分写回 [detail.md](detail.md) 与本报告。
+- 如后续需要课程展示级证据，再补 5 集中英文真实评估集，并把人工评分写回 [detail.md](detail.md) 与本报告。
 - 增加前端 Vitest/Playwright 覆盖，特别是 batch submission、quote seek、digest retry 等交互。
 - 为 Doubao ASR/TTS 增加真实云端 smoke fixture 与失败样例库，降低 provider API 变化带来的回归风险。
 - 增加可配置 prompt version migration，让历史 episode 可明确知道由哪个 prompt 版本生成。

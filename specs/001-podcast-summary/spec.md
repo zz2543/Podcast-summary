@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-podcast-summary`
 **Created**: 2026-05-07
-**Status**: Draft
+**Status**: Implemented (manual evaluation waived)
 **Input**: User description: "Podcast Summary System — accept local audio / direct audio URL / YouTube link, transcribe, and produce a structured Chinese-or-English summary (one-line hook, three-act summary, chapter outline with key points and verbatim quotes, named-entity list) plus Markdown / JSON outputs and a TTS-rendered audio digest, exposed through a polished web UI."
 
 ## Clarifications
@@ -15,11 +15,16 @@
 - Q: Retention & deletion policy for processed episodes? → A: Retain indefinitely; UI provides per-episode manual delete that purges audio cache, transcript, Markdown/JSON, and TTS digest together. No automatic expiry.
 - Q: Output policy when later pipeline stages keep failing after retries? → A: Partial degraded output — failed stages are marked missing in UI/JSON; succeeded stages remain visible and downloadable. Hook + three-act + chapter outline are required for an episode to be marked "done"; TTS is optional.
 
+### Session 2026-05-12
+
+- Q: Should the one-line hook enforce a hard 50-character limit? → A: No. The hook should stay concise, but the system must not fail a job solely because the LLM returns a longer useful hook.
+- Q: Is the 5-episode manual evaluation required for this implementation handoff? → A: No. Manual evaluation is waived for this handoff; automated verification and production-mode serving remain required.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Triage New Episodes Overnight (Priority: P1)
 
-A subscriber drops 5 newly released podcast episodes into the system in the evening. By next morning, each episode has a one-line hook (≤ 50 characters) and a three-act summary (Background / Core Argument / Conclusion). The user reads the hooks first, then opens the full summary only for episodes worth a deeper look — saving roughly an hour per low-value episode.
+A subscriber drops 5 newly released podcast episodes into the system in the evening. By next morning, each episode has a concise one-line hook and a three-act summary (Background / Core Argument / Conclusion). The user reads the hooks first, then opens the full summary only for episodes worth a deeper look — saving roughly an hour per low-value episode.
 
 **Why this priority**: This is the core value proposition. Without fast, reliable triage output, the system has no reason to exist. It alone constitutes a viable MVP.
 
@@ -27,7 +32,7 @@ A subscriber drops 5 newly released podcast episodes into the system in the even
 
 **Acceptance Scenarios**:
 
-1. **Given** a 60-minute Chinese podcast MP3 uploaded, **When** processing finishes, **Then** the user sees a hook of ≤ 50 Chinese characters that is informationally distinct from (not a paraphrase of) the original episode title, plus a three-act Background/Core Argument/Conclusion summary in Chinese.
+1. **Given** a 60-minute Chinese podcast MP3 uploaded, **When** processing finishes, **Then** the user sees a concise hook that is informationally distinct from (not a paraphrase of) the original episode title, plus a three-act Background/Core Argument/Conclusion summary in Chinese.
 2. **Given** an English podcast direct-audio URL submitted, **When** processing finishes, **Then** all generated summary fields are in English (input language preserved, no translation).
 3. **Given** processing fails midway through transcription, **When** the user retries the same job, **Then** already-transcribed segments are reused and only the failed work is repeated.
 
@@ -115,7 +120,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 **Summarization outputs (per episode)**
 
 - **FR-008**: System MUST produce **metadata** for each episode: title, podcast name, guest(s) (if discoverable from the transcript or source metadata), duration, and original source link.
-- **FR-009**: System MUST produce a **one-line hook** of ≤ 50 characters (Chinese characters or English words counted appropriately) whose informational content differs from the original episode title — i.e., it tells the reader what the episode is *about*, not just what it is *called*.
+- **FR-009**: System MUST produce a concise **one-line hook** whose informational content differs from the original episode title — i.e., it tells the reader what the episode is *about*, not just what it is *called*. The system MUST NOT fail an otherwise useful summary solely because the hook exceeds a fixed character count.
 - **FR-010**: System MUST produce a **three-act summary** with explicit Background / Core Argument / Conclusion sections.
 - **FR-011**: System MUST produce a **chapter outline** by auto-segmenting the episode; each chapter MUST include a chapter title, start time, end time, an ordered list of key points faithful to the original sequence, and zero or more verbatim quotes each carrying a timestamp.
 - **FR-012**: Every quote shown to users MUST be verifiable as a verbatim substring of the transcript via an automated check; quotes failing the check MUST NOT be displayed.

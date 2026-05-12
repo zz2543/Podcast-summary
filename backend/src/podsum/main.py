@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -55,7 +58,32 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(episodes.router)
     app.include_router(jobs.router)
     app.include_router(ws_progress.router)
+    _mount_frontend_dist(app)
     return app
+
+
+def _mount_frontend_dist(app: FastAPI) -> None:
+    dist_dir = Path(__file__).resolve().parents[3] / "frontend" / "dist"
+    index_path = dist_dir / "index.html"
+    if not index_path.exists():
+        return
+
+    assets_dir = dist_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend-assets")
+
+    @app.get("/", include_in_schema=False)
+    async def frontend_index() -> FileResponse:
+        return FileResponse(index_path)
+
+    @app.get("/{path:path}", include_in_schema=False)
+    async def frontend_spa(path: str) -> FileResponse:
+        if path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="Not found")
+        candidate = (dist_dir / path).resolve()
+        if candidate.is_file() and dist_dir.resolve() in candidate.parents:
+            return FileResponse(candidate)
+        return FileResponse(index_path)
 
 
 app = create_app()
