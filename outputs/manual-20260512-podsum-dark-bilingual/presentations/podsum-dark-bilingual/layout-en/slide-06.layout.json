@@ -1,0 +1,1133 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/j22avk",
+    "id": "j22avk",
+    "slide": 6,
+    "layoutId": "c9157283-efe1-4f89-91fe-c2c054baeda7",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "633dc53d-f934-498b-b918-0e62023cbce1",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Inter"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "c9157283-efe1-4f89-91fe-c2c054baeda7",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "633dc53d-f934-498b-b918-0e62023cbce1",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "633dc53d-f934-498b-b918-0e62023cbce1",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/x4nap4r6",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "alt": "abstract blue glow background",
+      "contentType": "image/svg+xml",
+      "asset": {
+        "assetId": "a6734824-98ce-40bf-ba06-8fbff2ab7ed7",
+        "contentType": "image/svg+xml",
+        "byteLength": 888
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/z61032ls",
+      "id": "2",
+      "bbox": [
+        64,
+        36,
+        68,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Podsum",
+      "textPreview": "Podsum",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Podsum"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Podsum",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Podsum",
+              "fontSize": 12,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/al87ed8b",
+      "id": "3",
+      "bbox": [
+        150,
+        39,
+        34,
+        14
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h0fepkzu",
+      "id": "4",
+      "bbox": [
+        156,
+        41,
+        22,
+        8
+      ],
+      "geometry": "rect",
+      "text": "v2",
+      "textPreview": "v2",
+      "resolvedFontSize": 7,
+      "resolvedTextStyle": {
+        "fontSize": 7,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "v2"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "v2",
+          "runs": [
+            {
+              "index": 1,
+              "text": "v2",
+              "fontSize": 7,
+              "typeface": "Inter",
+              "color": "#06080C",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sfil0rqd",
+      "id": "5",
+      "bbox": [
+        540,
+        36,
+        200,
+        16
+      ],
+      "geometry": "rect",
+      "text": "Podcast Knowledge Workflow",
+      "textPreview": "Podcast Knowledge Workflow",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Podcast Knowledge Workflow"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Podcast Knowledge Workflow",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Podcast Knowledge Workflow",
+              "fontSize": 10,
+              "typeface": "Inter",
+              "color": "#B8C0CC",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zupwb2hw",
+      "id": "6",
+      "bbox": [
+        1158,
+        36,
+        60,
+        16
+      ],
+      "geometry": "rect",
+      "text": "2026",
+      "textPreview": "2026",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2026"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2026",
+          "runs": [
+            {
+              "index": 1,
+              "text": "2026",
+              "fontSize": 10,
+              "typeface": "Inter",
+              "color": "#B8C0CC",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/a9w3m94f",
+      "id": "7",
+      "bbox": [
+        610,
+        54,
+        60,
+        34
+      ],
+      "geometry": "rect",
+      "text": "6/9",
+      "textPreview": "6/9",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "6/9"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "6/9",
+          "runs": [
+            {
+              "index": 1,
+              "text": "6/9",
+              "fontSize": 26,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hwfyxobm",
+      "id": "8",
+      "bbox": [
+        74,
+        86,
+        880,
+        78
+      ],
+      "geometry": "rect",
+      "text": "Engineering highlights show the work behind the experience.",
+      "textPreview": "Engineering highlights show the work behind the experience.",
+      "resolvedFontSize": 42,
+      "resolvedTextStyle": {
+        "fontSize": 42,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Engineering highlights show the work"
+          },
+          {
+            "index": 2,
+            "text": "behind the experience."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Engineering highlights show the work behind the experience.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Engineering highlights show the work behind the experience.",
+              "fontSize": 42,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/obm58z25",
+      "id": "9",
+      "bbox": [
+        76,
+        230,
+        318,
+        126
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(0, 0, 0, 0.33725)",
+      "lineColor": "rgba(255, 255, 255, 0.6)",
+      "lineWidth": 1.25
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e1w7mp0b",
+      "id": "10",
+      "bbox": [
+        100,
+        256,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Pipeline state machine",
+      "textPreview": "Pipeline state machine",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "fontSize": 17,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Pipeline state machine"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Pipeline state machine",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Pipeline state machine",
+              "fontSize": 17,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7mp0bi9s",
+      "id": "11",
+      "bbox": [
+        100,
+        296,
+        246,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Job stages with retry, resume, and degradation semantics.",
+      "textPreview": "Job stages with retry, resume, and degradation semantics.",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Job stages with retry, resume, and"
+          },
+          {
+            "index": 2,
+            "text": "degradation semantics."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Job stages with retry, resume, and degradation semantics.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Job stages with retry, resume, and degradation semantics.",
+              "fontSize": 12.51,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/w7mp0bi9",
+      "id": "12",
+      "bbox": [
+        454,
+        230,
+        318,
+        126
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(0, 0, 0, 0.33725)",
+      "lineColor": "rgba(255, 255, 255, 0.6)",
+      "lineWidth": 1.25
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/psfil0rq",
+      "id": "13",
+      "bbox": [
+        478,
+        256,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "SQLite persistence",
+      "textPreview": "SQLite persistence",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "fontSize": 17,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SQLite persistence"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SQLite persistence",
+          "runs": [
+            {
+              "index": 1,
+              "text": "SQLite persistence",
+              "fontSize": 17,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/epkzupwb",
+      "id": "14",
+      "bbox": [
+        478,
+        296,
+        246,
+        38
+      ],
+      "geometry": "rect",
+      "text": "episode, job, transcript, chapter, quote, entity, artifact.",
+      "textPreview": "episode, job, transcript, chapter, quote, entity, artifact.",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "episode, job, transcript, chapter, quote,"
+          },
+          {
+            "index": 2,
+            "text": "entity, artifact."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "episode, job, transcript, chapter, quote, entity, artifact.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "episode, job, transcript, chapter, quote, entity, artifact.",
+              "fontSize": 12.51,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7adsji5s",
+      "id": "15",
+      "bbox": [
+        832,
+        230,
+        318,
+        126
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(0, 0, 0, 0.33725)",
+      "lineColor": "rgba(255, 255, 255, 0.6)",
+      "lineWidth": 1.25
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wval87ed",
+      "id": "16",
+      "bbox": [
+        856,
+        256,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Concurrency queue",
+      "textPreview": "Concurrency queue",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "fontSize": 17,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Concurrency queue"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Concurrency queue",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Concurrency queue",
+              "fontSize": 17,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pg3ex0nu",
+      "id": "17",
+      "bbox": [
+        856,
+        296,
+        246,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Batch tasks obey MAX_CONCURRENCY.",
+      "textPreview": "Batch tasks obey MAX_CONCURRENCY.",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Batch tasks obey MAX_CONCURRENCY."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Batch tasks obey MAX_CONCURRENCY.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Batch tasks obey MAX_CONCURRENCY.",
+              "fontSize": 12.51,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/eloj2t83",
+      "id": "18",
+      "bbox": [
+        76,
+        418,
+        318,
+        126
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(0, 0, 0, 0.33725)",
+      "lineColor": "rgba(255, 255, 255, 0.6)",
+      "lineWidth": 1.25
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/36hcrmhk",
+      "id": "19",
+      "bbox": [
+        100,
+        444,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Quote verification",
+      "textPreview": "Quote verification",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "fontSize": 17,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Quote verification"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Quote verification",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Quote verification",
+              "fontSize": 17,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zupwb2hw",
+      "id": "20",
+      "bbox": [
+        100,
+        484,
+        246,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Quotes must match the transcript verbatim before display.",
+      "textPreview": "Quotes must match the transcript verbatim before display.",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Quotes must match the transcript verbatim"
+          },
+          {
+            "index": 2,
+            "text": "before display."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Quotes must match the transcript verbatim before display.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Quotes must match the transcript verbatim before display.",
+              "fontSize": 12.51,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/a9w3m94f",
+      "id": "21",
+      "bbox": [
+        454,
+        418,
+        318,
+        126
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(0, 0, 0, 0.33725)",
+      "lineColor": "rgba(255, 255, 255, 0.6)",
+      "lineWidth": 1.25
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h0fepkzu",
+      "id": "22",
+      "bbox": [
+        478,
+        444,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Prompt versioning",
+      "textPreview": "Prompt versioning",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "fontSize": 17,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Prompt versioning"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Prompt versioning",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Prompt versioning",
+              "fontSize": 17,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sfil0rqd",
+      "id": "23",
+      "bbox": [
+        478,
+        484,
+        246,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Prompts live in prompts/ and are loaded by role/version.",
+      "textPreview": "Prompts live in prompts/ and are loaded by role/version.",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Prompts live in prompts/ and are loaded by"
+          },
+          {
+            "index": 2,
+            "text": "role/version."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Prompts live in prompts/ and are loaded by role/version.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Prompts live in prompts/ and are loaded by role/version.",
+              "fontSize": 12.51,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/z61032ls",
+      "id": "24",
+      "bbox": [
+        832,
+        418,
+        318,
+        126
+      ],
+      "geometry": "roundRect",
+      "fillColor": "rgba(0, 0, 0, 0.33725)",
+      "lineColor": "rgba(255, 255, 255, 0.6)",
+      "lineWidth": 1.25
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/al87ed8b",
+      "id": "25",
+      "bbox": [
+        856,
+        444,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Multi-format export",
+      "textPreview": "Multi-format export",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "fontSize": 17,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Multi-format export"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Multi-format export",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Multi-format export",
+              "fontSize": 17,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hcrmhk3q",
+      "id": "26",
+      "bbox": [
+        856,
+        484,
+        246,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Markdown, JSON, original audio, and TTS digest are downloadable.",
+      "textPreview": "Markdown, JSON, original audio, and TTS digest are downloadable.",
+      "resolvedFontSize": 12.51,
+      "resolvedTextStyle": {
+        "fontSize": 12.51,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Markdown, JSON, original audio, and TTS"
+          },
+          {
+            "index": 2,
+            "text": "digest are downloadable."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Markdown, JSON, original audio, and TTS digest are downloadable.",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Markdown, JSON, original audio, and TTS digest are downloadable.",
+              "fontSize": 12.51,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

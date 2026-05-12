@@ -54,4 +54,103 @@
     background: rgba(0, 0, 0, 0.15);
     border-radius: 4px;
   }
+
+  .ai-iridescent {
+    position: relative;
+    color: white;
+    background-image: linear-gradient(
+      110deg,
+      #ff6b9d 0%,
+      #c66fbc 18%,
+      #8b7dff 34%,
+      #5fa8ff 50%,
+      #4ed6bb 66%,
+      #ffc857 82%,
+      #ff6b9d 100%
+    );
+    background-size: 280% 100%;
+    animation: ai-shimmer 7s linear infinite;
+  }
+
+  .ai-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 14px;
+    width: 14px;
+    border-radius: 9999px;
+    background-image: conic-gradient(
+      from 0deg,
+      #ff6b9d,
+      #c66fbc,
+      #8b7dff,
+      #5fa8ff,
+      #4ed6bb,
+      #ffc857,
+      #ff6b9d
+    );
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+    cursor: pointer;
+  }
+  .ai-slider::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border: none;
+    border-radius: 9999px;
+    background-image: conic-gradient(
+      from 0deg,
+      #ff6b9d,
+      #c66fbc,
+      #8b7dff,
+      #5fa8ff,
+      #4ed6bb,
+      #ffc857,
+      #ff6b9d
+    );
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+    cursor: pointer;
+  }
+  .ai-slider::-webkit-slider-runnable-track,
+  .ai-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .ai-iridescent-ring::before {
+    content: "";
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background-image: linear-gradient(
+      110deg,
+      #ff6b9d,
+      #c66fbc,
+      #8b7dff,
+      #5fa8ff,
+      #4ed6bb,
+      #ffc857,
+      #ff6b9d
+    );
+    background-size: 280% 100%;
+    animation: ai-shimmer 7s linear infinite;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@keyframes ai-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 280% 50%;
+  }
 }

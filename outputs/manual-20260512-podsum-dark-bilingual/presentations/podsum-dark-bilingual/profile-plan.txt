@@ -1,0 +1,19 @@
+task mode: create
+primary deck-profile: product-platform
+secondary gates: engineering-platform for accurate implementation claims
+visual reference:
+- user-provided black presentation screenshots with blurred blue/cyan/pink light fields, bold white titles, thin white outline cards, and timeline compositions
+deliverables:
+- Chinese PPTX
+- English PPTX
+required proof objects:
+- pain and goal framing
+- product experience and motion story
+- core workflow with prompt and Obsidian integrated
+- five-layer feature breakdown
+- engineering highlights
+- pitfalls and tradeoffs
+- verification metrics
+known constraints:
+- PowerPoint export uses editable text and shapes plus SVG background images
+- no external logo/image assets are invented

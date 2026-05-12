@@ -1,0 +1,13 @@
+Source facts:
+- report.md and detail.md provide project scope and verification results.
+- prompts/three_act_summary.v1.md and prompts/chapter_outline.v1.md provide implemented prompt structure.
+- frontend-v2 source files provide product interaction references: HookHero, ChaptersTimeline, EpisodeDock, AppShell, global glass/iridescent style.
+- user message provides final deck outline and dark reference visual direction.
+
+Metrics used in both decks:
+- Backend tests: 63 passed.
+- Domain coverage: 87.98%.
+- Quote verifier: PASS 1 / FAIL 0.
+- Range endpoint: 206 verified.
+- MAX_CONCURRENCY=2 respected.
+- make build && make serve passed.

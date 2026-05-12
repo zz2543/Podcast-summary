@@ -1,0 +1,1064 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/umcb8v",
+    "id": "umcb8v",
+    "slide": 7,
+    "layoutId": "7c363df2-d752-4db6-a268-a99512d38f20",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "6c577910-9045-4421-8597-ca79ce89e4c0",
+    "masterLayoutName": "Master",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Inter"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "7c363df2-d752-4db6-a268-a99512d38f20",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "6c577910-9045-4421-8597-ca79ce89e4c0",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "6c577910-9045-4421-8597-ca79ce89e4c0",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/o7qpg3ex",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "alt": "abstract blue glow background",
+      "contentType": "image/svg+xml",
+      "asset": {
+        "assetId": "f055f021-b6ff-41b5-8eb6-effbf5feb932",
+        "contentType": "image/svg+xml",
+        "byteLength": 886
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u9knih4b",
+      "id": "2",
+      "bbox": [
+        64,
+        36,
+        68,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Podsum",
+      "textPreview": "Podsum",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Podsum"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Podsum",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Podsum",
+              "fontSize": 12,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/judg7ads",
+      "id": "3",
+      "bbox": [
+        150,
+        39,
+        34,
+        14
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/c7u54zid",
+      "id": "4",
+      "bbox": [
+        156,
+        41,
+        22,
+        8
+      ],
+      "geometry": "rect",
+      "text": "v2",
+      "textPreview": "v2",
+      "resolvedFontSize": 7,
+      "resolvedTextStyle": {
+        "fontSize": 7,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "v2"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "v2",
+          "runs": [
+            {
+              "index": 1,
+              "text": "v2",
+              "fontSize": 7,
+              "typeface": "Inter",
+              "color": "#06080C",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1orytsvu",
+      "id": "5",
+      "bbox": [
+        540,
+        36,
+        200,
+        16
+      ],
+      "geometry": "rect",
+      "text": "播客知识工作流",
+      "textPreview": "播客知识工作流",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "播客知识工作流"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "播客知识工作流",
+          "runs": [
+            {
+              "index": 1,
+              "text": "播客知识工作流",
+              "fontSize": 10,
+              "typeface": "Inter",
+              "color": "#B8C0CC",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u18jqh0f",
+      "id": "6",
+      "bbox": [
+        1158,
+        36,
+        60,
+        16
+      ],
+      "geometry": "rect",
+      "text": "2026",
+      "textPreview": "2026",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2026"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2026",
+          "runs": [
+            {
+              "index": 1,
+              "text": "2026",
+              "fontSize": 10,
+              "typeface": "Inter",
+              "color": "#B8C0CC",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jm1cfa9w",
+      "id": "7",
+      "bbox": [
+        610,
+        54,
+        60,
+        34
+      ],
+      "geometry": "rect",
+      "text": "7/9",
+      "textPreview": "7/9",
+      "resolvedFontSize": 26,
+      "resolvedTextStyle": {
+        "fontSize": 26,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "7/9"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "7/9",
+          "runs": [
+            {
+              "index": 1,
+              "text": "7/9",
+              "fontSize": 26,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cvixczed",
+      "id": "8",
+      "bbox": [
+        74,
+        90,
+        920,
+        88
+      ],
+      "geometry": "rect",
+      "text": "踩坑与取舍体现项目不是表面 demo，而是经过工程收敛。",
+      "textPreview": "踩坑与取舍体现项目不是表面 demo，而是经过工程收敛。",
+      "resolvedFontSize": 40,
+      "resolvedTextStyle": {
+        "fontSize": 40,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "踩坑与取舍体现项目不是表面"
+          },
+          {
+            "index": 2,
+            "text": "demo，而是经过工程收敛。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "踩坑与取舍体现项目不是表面 demo，而是经过工程收敛。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "踩坑与取舍体现项目不是表面 demo，而是经过工程收敛。",
+              "fontSize": 40,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5gbq1ory",
+      "id": "9",
+      "bbox": [
+        636,
+        220,
+        2,
+        372
+      ],
+      "geometry": "rect",
+      "fillColor": "rgba(255, 255, 255, 0.65882)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 1
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/18jqh0fe",
+      "id": "10",
+      "bbox": [
+        626,
+        250,
+        22,
+        22
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8nqxs72x",
+      "id": "11",
+      "bbox": [
+        650,
+        261,
+        92,
+        1.4
+      ],
+      "geometry": "rect",
+      "fillColor": "rgba(255, 255, 255, 0.65882)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 1
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/j2t83itg",
+      "id": "12",
+      "bbox": [
+        766,
+        242,
+        320,
+        24
+      ],
+      "geometry": "rect",
+      "text": "SQLite 并发写锁",
+      "textPreview": "SQLite 并发写锁",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "fontSize": 22,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SQLite 并发写锁"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SQLite 并发写锁",
+          "runs": [
+            {
+              "index": 1,
+              "text": "SQLite 并发写锁",
+              "fontSize": 22,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/qh0fepkz",
+      "id": "13",
+      "bbox": [
+        766,
+        276,
+        350,
+        30
+      ],
+      "geometry": "rect",
+      "text": "改成阶段 checkpoint 后立即 commit，避免长事务阻塞。",
+      "textPreview": "改成阶段 checkpoint 后立即 commit，避免长事务阻塞。",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "改成阶段 checkpoint 后立即 commit，避免长事务阻塞。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "改成阶段 checkpoint 后立即 commit，避免长事务阻塞。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "改成阶段 checkpoint 后立即 commit，避免长事务阻塞。",
+              "fontSize": 13,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1w7mp0bi",
+      "id": "14",
+      "bbox": [
+        626,
+        336,
+        22,
+        22
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8bat47y1",
+      "id": "15",
+      "bbox": [
+        650,
+        347,
+        92,
+        1.4
+      ],
+      "geometry": "rect",
+      "fillColor": "rgba(255, 255, 255, 0.65882)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 1
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jqh0fepk",
+      "id": "16",
+      "bbox": [
+        766,
+        328,
+        320,
+        24
+      ],
+      "geometry": "rect",
+      "text": "Quote 双层防御",
+      "textPreview": "Quote 双层防御",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "fontSize": 22,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Quote 双层防御"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Quote 双层防御",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Quote 双层防御",
+              "fontSize": 22,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/q5o7qpg3",
+      "id": "17",
+      "bbox": [
+        766,
+        362,
+        350,
+        30
+      ],
+      "geometry": "rect",
+      "text": "写入时校验，JSON 导出时再次过滤 verified quote。",
+      "textPreview": "写入时校验，JSON 导出时再次过滤 verified quote。",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "写入时校验，JSON 导出时再次过滤 verified quote。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "写入时校验，JSON 导出时再次过滤 verified quote。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "写入时校验，JSON 导出时再次过滤 verified quote。",
+              "fontSize": 13,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1kre1w7m",
+      "id": "18",
+      "bbox": [
+        626,
+        422,
+        22,
+        22
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/c3ylc7u5",
+      "id": "19",
+      "bbox": [
+        650,
+        433,
+        92,
+        1.4
+      ],
+      "geometry": "rect",
+      "fillColor": "rgba(255, 255, 255, 0.65882)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 1
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/orytsvu9",
+      "id": "20",
+      "bbox": [
+        766,
+        414,
+        320,
+        24
+      ],
+      "geometry": "rect",
+      "text": "Optional stage 降级",
+      "textPreview": "Optional stage 降级",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "fontSize": 22,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Optional stage 降级"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Optional stage 降级",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Optional stage 降级",
+              "fontSize": 22,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hcrmhk3q",
+      "id": "21",
+      "bbox": [
+        766,
+        448,
+        350,
+        30
+      ],
+      "geometry": "rect",
+      "text": "TTS/entity 失败不拖垮整个 episode。",
+      "textPreview": "TTS/entity 失败不拖垮整个 episode。",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "TTS/entity 失败不拖垮整个 episode。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "TTS/entity 失败不拖垮整个 episode。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "TTS/entity 失败不拖垮整个 episode。",
+              "fontSize": 13,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/al87ed8b",
+      "id": "22",
+      "bbox": [
+        626,
+        508,
+        22,
+        22
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/z61032ls",
+      "id": "23",
+      "bbox": [
+        650,
+        519,
+        92,
+        1.4
+      ],
+      "geometry": "rect",
+      "fillColor": "rgba(255, 255, 255, 0.65882)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 1
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sfil0rqd",
+      "id": "24",
+      "bbox": [
+        766,
+        500,
+        320,
+        24
+      ],
+      "geometry": "rect",
+      "text": "V1 范围控制",
+      "textPreview": "V1 范围控制",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "fontSize": 22,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "V1 范围控制"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "V1 范围控制",
+          "runs": [
+            {
+              "index": 1,
+              "text": "V1 范围控制",
+              "fontSize": 22,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h0fepkzu",
+      "id": "25",
+      "bbox": [
+        766,
+        534,
+        350,
+        30
+      ],
+      "geometry": "rect",
+      "text": "不做 diarization/auth/local model，保证主链路可交付。",
+      "textPreview": "不做 diarization/auth/local model，保证主链路可交付。",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "不做 diarization/auth/local model，保证主链路可交付。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "不做 diarization/auth/local model，保证主链路可交付。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "不做 diarization/auth/local model，保证主链路可交付。",
+              "fontSize": 13,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/a9w3m94f",
+      "id": "26",
+      "bbox": [
+        92,
+        396,
+        250,
+        52
+      ],
+      "geometry": "rect",
+      "text": "取舍",
+      "textPreview": "取舍",
+      "resolvedFontSize": 48,
+      "resolvedTextStyle": {
+        "fontSize": 48,
+        "typeface": "Inter",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "取舍"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "取舍",
+          "runs": [
+            {
+              "index": 1,
+              "text": "取舍",
+              "fontSize": 48,
+              "typeface": "Inter",
+              "color": "#F7FAFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zupwb2hw",
+      "id": "27",
+      "bbox": [
+        96,
+        468,
+        330,
+        44
+      ],
+      "geometry": "rect",
+      "text": "真实工程工作意味着修复失败，并控制边界。",
+      "textPreview": "真实工程工作意味着修复失败，并控制边界。",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "Inter",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "真实工程工作意味着修复失败，并控制边界。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "真实工程工作意味着修复失败，并控制边界。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "真实工程工作意味着修复失败，并控制边界。",
+              "fontSize": 15,
+              "typeface": "Inter",
+              "color": "#B8C0CC"
+            }
+          ]
+        }
+      ],
+      "fillColor": "rgba(0, 0, 0, 0)",
+      "lineColor": "rgba(0, 0, 0, 0)",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

@@ -1,0 +1,21 @@
+task mode: create
+primary deck-profile: product-platform
+secondary gates: engineering-platform for pipeline/verification accuracy
+required proof objects:
+- product workflow map from input to knowledge base
+- V2-inspired product interface mock
+- cognitive summary structure
+- engineering architecture and verification metrics
+source/asset requirements:
+- use repo-local frontend-v2 visual system as design reference
+- use repo-local report.md/detail.md/spec/tasks facts
+brand authenticity constraints:
+- do not invent external logos
+- use Podsum text mark and native editable shapes only
+profile-specific QA gates:
+- show product system, not just feature cards
+- connect each layer to user value
+- make workflow arrows semantically explicit
+known missing inputs:
+- no user-supplied final template deck
+- no live screenshot required; deck uses editable V2-inspired product mockups

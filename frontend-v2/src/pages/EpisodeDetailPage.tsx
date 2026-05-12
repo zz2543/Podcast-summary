@@ -17,7 +17,9 @@ import { ChaptersTimeline } from "@/components/ChaptersTimeline";
 import { EntityCloud } from "@/components/EntityCloud";
 import { EpisodeDock } from "@/components/EpisodeDock";
 import { AudioPlayer } from "@/components/AudioPlayer";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import { IridescentButton } from "@/components/ui/iridescent-button";
+import type { AudioControls } from "@/components/AudioPlayer";
+import { useRef } from "react";
 
 export default function EpisodeDetailPage() {
   const { episodeId } = useParams();
@@ -28,6 +30,8 @@ export default function EpisodeDetailPage() {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const { jobsById, episodeStatuses } = useJobStream();
+  const originalAudioRef = useRef<AudioControls>(null);
+  const audioSectionRef = useRef<HTMLElement>(null);
 
   const load = useCallback(async () => {
     if (!episodeId) return;
@@ -127,29 +131,59 @@ export default function EpisodeDetailPage() {
       <HookHero episode={episode} />
 
       <section className="flex flex-wrap items-center gap-3">
-        <HoverBorderGradient onClick={handleDigest} disabled={busy}>
-          <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.6} />
+        <IridescentButton onClick={handleDigest} disabled={busy}>
+          <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.8} />
           {digestReady
             ? "Regenerate audio digest"
             : digestFailed
             ? "Retry audio digest"
             : "Generate audio digest"}
-        </HoverBorderGradient>
+        </IridescentButton>
         {digestReady && episode.artifact_paths?.tts && (
-          <AudioPlayer src={episodeFileUrl(episode.id, "digest")} />
+          <AudioPlayer src={episodeFileUrl(episode.id, "digest")} variant="ai" />
         )}
       </section>
 
-      <section className="space-y-2">
-        <h2 className="font-display text-sm font-medium uppercase tracking-wider text-text-subtle">
-          Original audio
-        </h2>
-        <AudioPlayer src={episodeFileUrl(episode.id, "audio")} />
+      <section
+        ref={audioSectionRef}
+        className="sticky top-[60px] z-20 -mx-4 px-4 py-2 sm:-mx-6 sm:px-6"
+      >
+        <div
+          className="rounded-2xl"
+          style={{
+            background: "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(24px) saturate(200%)",
+            WebkitBackdropFilter: "blur(24px) saturate(200%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow:
+              "0 1px 0 rgba(255,255,255,0.8) inset, 0 8px 28px rgba(0,0,0,0.08)"
+          }}
+        >
+          <div className="flex items-center justify-between px-4 pt-2.5">
+            <span className="font-display text-xs font-medium uppercase tracking-wider text-text-subtle">
+              Original audio
+            </span>
+          </div>
+          <div className="p-2">
+            <AudioPlayer
+              src={episodeFileUrl(episode.id, "audio")}
+              ref={originalAudioRef}
+              transparent
+            />
+          </div>
+        </div>
       </section>
 
       <ThreeActPanel three_act={episode.three_act} />
 
-      <ChaptersTimeline chapters={episode.chapters} />
+      <ChaptersTimeline
+        chapters={episode.chapters}
+        onQuoteClick={(ms) => {
+          originalAudioRef.current?.seekTo(ms / 1000);
+          originalAudioRef.current?.play();
+          audioSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
+      />
 
       <EntityCloud entities={episode.entities} />
 

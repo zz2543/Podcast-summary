@@ -5,9 +5,9 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
-  ModalTrigger,
   useModalControls
 } from "@/components/ui/animated-modal";
+import { IridescentButton } from "@/components/ui/iridescent-button";
 import { Tabs } from "@/components/ui/tabs";
 import { FileUpload } from "@/components/ui/file-upload";
 import {
@@ -20,14 +20,21 @@ import {
 export function SubmitModal({ onSubmitted }: { onSubmitted: () => void }) {
   return (
     <Modal>
-      <ModalTrigger className="inline-flex items-center gap-1.5 rounded-full bg-text px-4 py-2 text-sm font-medium text-white shadow-card transition-transform hover:-translate-y-px hover:shadow-card-hover">
-        <Plus className="h-4 w-4" strokeWidth={2.2} />
-        New Episode
-      </ModalTrigger>
+      <SubmitTrigger />
       <ModalBody>
         <SubmitForm onSubmitted={onSubmitted} />
       </ModalBody>
     </Modal>
+  );
+}
+
+function SubmitTrigger() {
+  const { setOpen } = useModalControls();
+  return (
+    <IridescentButton onClick={() => setOpen(true)} size="sm">
+      <Plus className="mr-1 h-4 w-4" strokeWidth={2.4} />
+      GotIt
+    </IridescentButton>
   );
 }
 

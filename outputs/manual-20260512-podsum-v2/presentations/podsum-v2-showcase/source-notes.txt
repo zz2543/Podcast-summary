@@ -1,0 +1,15 @@
+Sources used:
+- frontend-v2/tailwind.config.ts: V2 palette, typography, radius, shadow, glass design tokens.
+- frontend-v2/src/globals.css: glass, iridescent, shimmer, and base UI language.
+- frontend-v2/src/pages/EpisodeListPage.tsx: library, filters, active jobs strip, bento cards.
+- frontend-v2/src/pages/EpisodeDetailPage.tsx: hook hero, digest action, sticky audio, chapters, entity cloud, dock.
+- prompts/three_act_summary.v1.md and prompts/chapter_outline.v1.md: exact implemented output structure.
+- report.md and detail.md: implementation scope and verification metrics.
+
+Metrics cited:
+- Backend tests: 63 passed.
+- Domain coverage: 87.98%.
+- Quote verifier fixture: PASS 1 / FAIL 0.
+- Range endpoint: 206 verified.
+- MAX_CONCURRENCY=2 respected.
+- make build && make serve production-mode verification passed.

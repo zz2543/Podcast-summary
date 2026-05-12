@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, delete, select
 from sqlalchemy.orm import Session
 
 from podsum.domain.quote_verifier import verify
@@ -110,6 +110,21 @@ class ChapterRepo:
 class QuoteRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
+
+    def delete_for_chapters(self, chapter_ids: list[int] | set[int]) -> int:
+        """Remove all stored quotes for the given chapters.
+
+        Used by the quote_verify stage on a re-run so that re-inserting verified
+        quotes does not collide with the existing rows on the
+        ``(chapter_id, idx)`` unique constraint.
+        """
+        ids = list(chapter_ids)
+        if not ids:
+            return 0
+        result = self.session.execute(
+            delete(Quote).where(Quote.chapter_id.in_(ids))
+        )
+        return result.rowcount or 0
 
     def insert_verified(
         self,

@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 ASRProvider = Literal["doubao", "openai_whisper", "deepgram", "qwen"]
 LLMProvider = Literal["deepseek", "qwen", "anthropic"]
 TTSProvider = Literal["doubao", "qwen"]
+DoubaoTTSMode = Literal["legacy", "bigmodel"]
 
 
 def _present(value: SecretStr | str | Path | int | None) -> bool:
@@ -65,6 +66,18 @@ class Settings(BaseSettings):
     DOUBAO_TTS_VOICE_TYPE_ZH: str = "BV700_streaming"
     DOUBAO_TTS_VOICE_TYPE_EN: str = "BV701_streaming"
     DOUBAO_TTS_CLUSTER: str = "volcano_tts"
+
+    # Doubao BigTTS 2.0 ("豆包语音合成模型2.0") integration. When set to "bigmodel"
+    # the synthesize call goes to the v3 endpoint with X-Api-* headers and the
+    # voice_type values must be the *_uranus_bigtts speakers from the BigTTS
+    # console listing. The legacy /api/v1/tts path is kept available for fallback.
+    DOUBAO_TTS_MODE: DoubaoTTSMode = "legacy"
+    DOUBAO_TTS_BIGMODEL_URL: str = (
+        "https://openspeech.bytedance.com/api/v3/tts/unidirectional"
+    )
+    DOUBAO_TTS_BIGMODEL_RESOURCE_ID: str = "volc.service_type.10029"
+    DOUBAO_TTS_BIGMODEL_SAMPLE_RATE: int = 24000
+    DOUBAO_TTS_BIGMODEL_FORMAT: str = "mp3"
     QWEN_TTS_MODEL: str = "cosyvoice-v2"
     QWEN_TTS_VOICE: str = "longxiaochun"
 

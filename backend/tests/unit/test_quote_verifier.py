@@ -40,8 +40,36 @@ def test_partial_substring_at_segment_boundary_passes() -> None:
         ],
     )
 
+    # Quote "learning every" begins inside the first segment ("keep learning")
+    # at character offset 5 of its 13-char text spanning 1000..4000 ms, so the
+    # interpolated start is 1000 + (5/13)*3000 ≈ 2153 ms.
     assert ok
-    assert start_ms == 1_000
+    assert start_ms is not None
+    assert 1_000 < start_ms < 4_000
+    assert abs(start_ms - 2_153) <= 1
+
+
+def test_quote_inside_long_merged_segment_is_interpolated() -> None:
+    """Reflects production bug: when ASR/postprocess yields one giant segment,
+    every quote used to collapse to the same start_ms. With interpolation,
+    quotes near the end of a long segment get a timestamp near its end."""
+    long_text = (
+        "alpha bravo charlie delta echo foxtrot golf hotel india juliet "
+        "kilo lima mike november oscar papa quebec romeo sierra tango "
+        "uniform victor whiskey xray yankee zulu "
+        "one two three four five six seven eight nine ten "
+        "eleven twelve thirteen fourteen fifteen sixteen seventeen "
+        "eighteen nineteen twenty"
+    )
+    segments = [{"start_ms": 0, "end_ms": 600_000, "text": long_text}]
+
+    _, ms_start = verify_against_segments("alpha bravo", segments)
+    _, ms_mid = verify_against_segments("oscar papa", segments)
+    _, ms_end = verify_against_segments("nineteen twenty", segments)
+
+    assert ms_start is not None and ms_mid is not None and ms_end is not None
+    assert ms_start < ms_mid < ms_end
+    assert ms_end > 500_000
 
 
 def test_verify_against_segments_returns_false_for_missing_quote() -> None:

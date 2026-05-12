@@ -1,9 +1,16 @@
 import { motion } from "framer-motion";
+import { Play } from "lucide-react";
 import type { Chapter } from "@/api/client";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { formatTimestamp } from "@/lib/time";
 
-export function ChaptersTimeline({ chapters }: { chapters: Chapter[] }) {
+export function ChaptersTimeline({
+  chapters,
+  onQuoteClick
+}: {
+  chapters: Chapter[];
+  onQuoteClick?: (ms: number) => void;
+}) {
   if (chapters.length === 0) return null;
   return (
     <section className="space-y-3">
@@ -40,17 +47,22 @@ export function ChaptersTimeline({ chapters }: { chapters: Chapter[] }) {
                 </ul>
               )}
               {chapter.quotes.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-col gap-2">
                   {chapter.quotes.map((q, j) => (
-                    <span
+                    <button
                       key={j}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-surface-elev px-2.5 py-1 text-xs text-text-muted"
+                      type="button"
+                      onClick={() => onQuoteClick?.(q.start_ms)}
+                      className="group/quote flex items-start gap-3 rounded-xl bg-surface-elev px-3 py-2.5 text-left text-sm text-text transition-all hover:bg-white hover:shadow-card"
                     >
-                      <span className="font-mono text-text-subtle">
+                      <span className="mt-0.5 inline-flex h-6 flex-shrink-0 items-center gap-1.5 rounded-full bg-white px-2 font-mono text-[11px] text-text-muted shadow-sm transition-colors group-hover/quote:bg-text group-hover/quote:text-white">
+                        <Play className="h-2.5 w-2.5 fill-current" strokeWidth={0} />
                         {formatTimestamp(q.start_ms)}
                       </span>
-                      <span className="max-w-[28ch] truncate">{q.text}</span>
-                    </span>
+                      <span className="flex-1 whitespace-pre-wrap leading-relaxed text-text">
+                        {q.text}
+                      </span>
+                    </button>
                   ))}
                 </div>
               )}

@@ -10,12 +10,8 @@ export default function AppShell() {
             to="/"
             className="font-display text-lg font-semibold tracking-tight text-text"
           >
-            Podsum
-            <span className="ml-1.5 text-xs font-normal text-text-subtle">v2</span>
+            GotIt
           </Link>
-          <span className="text-xs text-text-subtle">
-            Apple-style preview · alongside v1
-          </span>
         </div>
       </header>
       <main className="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6">

@@ -532,6 +532,10 @@ def _stage_quote_verify(context: PipelineContext) -> StageResult:
     quote_indexes_by_chapter: dict[int, int] = {}
     quote_repo = QuoteRepo(context.session)
     chapter_ids = {chapter.id for chapter in ChapterRepo(context.session).list_for_episode(episode.id)}
+    # Wipe any quotes left over from a prior run of this stage so the
+    # ``(chapter_id, idx)`` unique constraint does not fire when we re-insert.
+    quote_repo.delete_for_chapters(chapter_ids)
+    context.session.flush()
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue

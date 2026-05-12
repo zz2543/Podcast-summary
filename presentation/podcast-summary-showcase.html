@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Podcast Summary System Showcase</title>
+    <style>
+      :root {
+        --ink: #182034;
+        --muted: #667085;
+        --line: #dce3ee;
+        --paper: #f7f9fc;
+        --white: #ffffff;
+        --blue: #3157d5;
+        --teal: #0f9f95;
+        --coral: #f06449;
+        --gold: #d99c21;
+        --violet: #6b4eff;
+        --green: #16a36f;
+        --shadow: 0 24px 70px rgba(24, 32, 52, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-snap-type: y mandatory;
+        background: var(--paper);
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(247, 249, 252, 0.96)),
+          radial-gradient(circle at 14% 4%, rgba(49, 87, 213, 0.12), transparent 28rem),
+          radial-gradient(circle at 92% 52%, rgba(15, 159, 149, 0.11), transparent 28rem);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang SC", "Microsoft YaHei", sans-serif;
+        letter-spacing: 0;
+      }
+
+      .deck {
+        width: 100%;
+      }
+
+      .slide {
+        min-height: 100vh;
+        scroll-snap-align: start;
+        display: grid;
+        place-items: center;
+        padding: 36px;
+      }
+
+      .frame {
+        width: min(1440px, 100%);
+        aspect-ratio: 16 / 9;
+        min-height: 680px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(220, 227, 238, 0.9);
+        border-radius: 18px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.96)),
+          var(--white);
+        box-shadow: var(--shadow);
+        padding: 54px 64px;
+      }
+
+      .frame.dark {
+        color: #f7fbff;
+        border-color: rgba(255, 255, 255, 0.15);
+        background:
+          linear-gradient(135deg, rgba(12, 20, 36, 0.98), rgba(21, 33, 57, 0.96)),
+          #121a2b;
+      }
+
+      .slide-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        color: var(--teal);
+        font-size: 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .slide-kicker::before {
+        content: "";
+        width: 24px;
+        height: 3px;
+        border-radius: 999px;
+        background: currentColor;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 900px;
+        font-size: 76px;
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        max-width: 880px;
+        font-size: 50px;
+        line-height: 1.06;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        font-size: 23px;
+        line-height: 1.18;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 760px;
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 24px;
+        line-height: 1.45;
+      }
+
+      .dark .lead,
+      .dark .muted,
+      .dark .body-copy {
+        color: #c6d0df;
+      }
+
+      .body-copy {
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.58;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 42px;
+        align-items: center;
+        height: calc(100% - 8px);
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 28px;
+      }
+
+      .page-num {
+        display: inline-grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-weight: 800;
+      }
+
+      .dark .page-num {
+        border-color: rgba(255, 255, 255, 0.24);
+        color: #d8e0ec;
+      }
+
+      .title-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.78fr);
+        gap: 48px;
+        align-items: center;
+        height: 100%;
+      }
+
+      .hero-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.88);
+        color: #334155;
+        font-size: 15px;
+        font-weight: 750;
+      }
+
+      .dark .tag {
+        border-color: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.08);
+        color: #ecf4ff;
+      }
+
+      .hero-device {
+        position: relative;
+        min-height: 520px;
+        border: 1px solid rgba(220, 227, 238, 0.95);
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 26px 70px rgba(28, 38, 68, 0.16);
+        padding: 16px;
+        transform: rotate(1deg);
+      }
+
+      .hero-device::before {
+        content: "";
+        position: absolute;
+        inset: 12px 12px auto;
+        height: 34px;
+        border-radius: 10px;
+        background: #f1f5fb;
+      }
+
+      .device-dots {
+        position: absolute;
+        top: 24px;
+        left: 30px;
+        display: flex;
+        gap: 7px;
+        z-index: 2;
+      }
+
+      .device-dots span {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--coral);
+      }
+
+      .device-dots span:nth-child(2) {
+        background: var(--gold);
+      }
+
+      .device-dots span:nth-child(3) {
+        background: var(--green);
+      }
+
+      .device-screen {
+        position: absolute;
+        inset: 60px 16px 16px;
+        overflow: hidden;
+        border-radius: 14px;
+        background: #f8fafc;
+      }
+
+      .device-screen img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: left top;
+        filter: saturate(1.03) contrast(1.02);
+      }
+
+      .problem-card {
+        position: relative;
+        min-height: 196px;
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 18px 40px rgba(24, 32, 52, 0.08);
+      }
+
+      .problem-card strong {
+        display: block;
+        margin-bottom: 14px;
+        font-size: 48px;
+        line-height: 1;
+      }
+
+      .problem-card p {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.45;
+      }
+
+      .experience-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.72fr);
+        gap: 34px;
+        margin-top: 34px;
+        align-items: stretch;
+      }
+
+      .screenshot-panel {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 18px 52px rgba(24, 32, 52, 0.12);
+      }
+
+      .screenshot-panel img {
+        display: block;
+        width: 100%;
+        height: 492px;
+        object-fit: cover;
+        object-position: left top;
+      }
+
+      .motion-demo {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background:
+          linear-gradient(180deg, #ffffff, #f7fbff),
+          #fff;
+        box-shadow: 0 18px 52px rgba(24, 32, 52, 0.1);
+        padding: 24px;
+      }
+
+      .mini-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+      }
+
+      .mini-logo {
+        display: inline-flex;
+        gap: 4px;
+        align-items: flex-end;
+        height: 26px;
+      }
+
+      .mini-logo span {
+        width: 5px;
+        border-radius: 999px;
+        background: var(--blue);
+        animation: equalize 1.2s ease-in-out infinite;
+      }
+
+      .mini-logo span:nth-child(1) {
+        height: 12px;
+      }
+
+      .mini-logo span:nth-child(2) {
+        height: 23px;
+        animation-delay: 0.16s;
+      }
+
+      .mini-logo span:nth-child(3) {
+        height: 17px;
+        animation-delay: 0.32s;
+      }
+
+      .mini-logo span:nth-child(4) {
+        height: 25px;
+        animation-delay: 0.48s;
+      }
+
+      @keyframes equalize {
+        0%,
+        100% {
+          transform: scaleY(0.72);
+        }
+        50% {
+          transform: scaleY(1.12);
+        }
+      }
+
+      .queue-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: #eefcf8;
+        color: #087c72;
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      .queue-pill::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        animation: pulse-dot 1.3s ease-in-out infinite;
+      }
+
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 0.35;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.25);
+        }
+      }
+
+      .motion-card {
+        margin-bottom: 14px;
+        border: 1px solid #e5ebf4;
+        border-radius: 10px;
+        background: #fff;
+        padding: 16px;
+        transform: translateY(18px);
+        opacity: 0;
+        animation: card-in 9s ease-in-out infinite;
+      }
+
+      .motion-card:nth-of-type(2) {
+        animation-delay: 0.8s;
+      }
+
+      .motion-card:nth-of-type(3) {
+        animation-delay: 1.6s;
+      }
+
+      .motion-card:nth-of-type(4) {
+        animation-delay: 2.4s;
+      }
+
+      @keyframes card-in {
+        0% {
+          transform: translateY(18px);
+          opacity: 0;
+        }
+        10%,
+        72% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        86%,
+        100% {
+          transform: translateY(-8px);
+          opacity: 0;
+        }
+      }
+
+      .motion-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      .motion-card b {
+        display: block;
+        margin-top: 8px;
+        font-size: 18px;
+      }
+
+      .progress-track {
+        position: relative;
+        height: 8px;
+        margin-top: 14px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e9eef7;
+      }
+
+      .progress-track span {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 72%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--teal), var(--blue));
+        animation: progress-loop 2.8s ease-in-out infinite;
+      }
+
+      @keyframes progress-loop {
+        0% {
+          width: 8%;
+        }
+        45% {
+          width: 72%;
+        }
+        100% {
+          width: 96%;
+        }
+      }
+
+      .quote-chip-demo {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding: 8px 12px;
+        border: 1px solid #ffd8cf;
+        border-radius: 999px;
+        background: #fff6f3;
+        color: #b53c2c;
+        font-size: 13px;
+        font-weight: 800;
+        animation: chip-tap 2.4s ease-in-out infinite;
+      }
+
+      @keyframes chip-tap {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.04);
+          box-shadow: 0 10px 24px rgba(240, 100, 73, 0.18);
+        }
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 36px;
+      }
+
+      .step {
+        min-height: 148px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        position: relative;
+      }
+
+      .step::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -16px;
+        width: 16px;
+        height: 2px;
+        background: #cbd5e1;
+      }
+
+      .step:nth-child(4n)::after,
+      .step:last-child::after {
+        display: none;
+      }
+
+      .step small {
+        color: var(--teal);
+        font-weight: 900;
+      }
+
+      .step h3 {
+        margin: 8px 0 10px;
+      }
+
+      .step p {
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.45;
+      }
+
+      .layer-table {
+        display: grid;
+        gap: 14px;
+        margin-top: 32px;
+      }
+
+      .layer-row {
+        display: grid;
+        grid-template-columns: 190px minmax(0, 1fr) 260px;
+        gap: 18px;
+        align-items: center;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .layer-row strong {
+        color: var(--blue);
+        font-size: 19px;
+      }
+
+      .layer-row p {
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .layer-row span {
+        justify-self: end;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .cognition {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+        gap: 34px;
+        align-items: start;
+        margin-top: 32px;
+      }
+
+      .cognition-map {
+        display: grid;
+        gap: 14px;
+      }
+
+      .cog-node {
+        display: grid;
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .cog-node span {
+        display: inline-grid;
+        place-items: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: var(--blue);
+        font-weight: 900;
+      }
+
+      .cog-node p {
+        margin-top: 4px;
+        color: var(--muted);
+        line-height: 1.42;
+      }
+
+      .prompt-box {
+        border: 1px solid #cdd8ea;
+        border-radius: 14px;
+        background: #101828;
+        color: #f7fbff;
+        padding: 24px;
+        box-shadow: 0 24px 60px rgba(16, 24, 40, 0.24);
+      }
+
+      .prompt-box h3 {
+        color: #ffffff;
+      }
+
+      .prompt-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .prompt-token {
+        min-height: 82px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 14px;
+      }
+
+      .prompt-token b {
+        display: block;
+        margin-bottom: 8px;
+        color: #8ce3dc;
+      }
+
+      .prompt-token span {
+        color: #d8e3f1;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .knowledge-flow {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 18px;
+        margin-top: 38px;
+      }
+
+      .knowledge-card {
+        min-height: 210px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        padding: 22px;
+      }
+
+      .knowledge-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        margin-bottom: 18px;
+        border-radius: 14px;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 900;
+      }
+
+      .knowledge-card:nth-child(1) .knowledge-icon {
+        background: var(--blue);
+      }
+
+      .knowledge-card:nth-child(2) .knowledge-icon {
+        background: var(--teal);
+      }
+
+      .knowledge-card:nth-child(3) .knowledge-icon {
+        background: var(--coral);
+      }
+
+      .knowledge-card:nth-child(4) .knowledge-icon {
+        background: var(--ink);
+      }
+
+      .knowledge-card p {
+        margin-top: 10px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .dark-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 34px;
+      }
+
+      .dark-card {
+        min-height: 176px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 20px;
+      }
+
+      .dark-card b {
+        display: block;
+        margin-bottom: 12px;
+        color: #8ce3dc;
+        font-size: 18px;
+      }
+
+      .dark-card span {
+        color: #d7e1ef;
+        line-height: 1.45;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 34px;
+      }
+
+      .metric {
+        min-height: 176px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .metric strong {
+        display: block;
+        margin-bottom: 12px;
+        color: var(--blue);
+        font-size: 42px;
+        line-height: 1;
+      }
+
+      .metric span {
+        color: var(--muted);
+        line-height: 1.42;
+      }
+
+      .bar {
+        height: 10px;
+        margin-top: 20px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e7edf6;
+      }
+
+      .bar i {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--teal), var(--blue));
+      }
+
+      .closing {
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.72fr);
+        gap: 48px;
+        align-items: center;
+        height: 100%;
+      }
+
+      .closing-statement {
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      .closing-statement p {
+        color: #f7fbff;
+        font-size: 30px;
+        line-height: 1.28;
+        font-weight: 850;
+      }
+
+      .small-note {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      .dark .small-note {
+        color: #b9c6d8;
+      }
+
+      @media (max-width: 980px) {
+        html {
+          scroll-snap-type: none;
+        }
+
+        .slide {
+          min-height: auto;
+          padding: 16px;
+        }
+
+        .frame {
+          aspect-ratio: auto;
+          min-height: auto;
+          padding: 34px 24px;
+        }
+
+        h1 {
+          font-size: 44px;
+        }
+
+        h2 {
+          font-size: 34px;
+        }
+
+        .lead {
+          font-size: 19px;
+        }
+
+        .title-grid,
+        .grid-2,
+        .experience-layout,
+        .cognition,
+        .closing {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-device {
+          min-height: 420px;
+        }
+
+        .workflow,
+        .knowledge-flow,
+        .dark-grid,
+        .metrics,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+
+        .step::after {
+          display: none;
+        }
+
+        .layer-row {
+          grid-template-columns: 1fr;
+        }
+
+        .layer-row span {
+          justify-self: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="deck">
+      <section class="slide">
+        <div class="frame">
+          <div class="title-grid">
+            <div>
+              <div class="slide-kicker">Podcast Summary System</div>
+              <h1>从播客消费到知识沉淀的完整工作流网站</h1>
+              <p class="lead">
+                支持音频输入、云端转写、结构化总结、章节复盘、可信引用、音频摘要与 Markdown 导出，面向真实学习场景，而不是一次性的 AI 总结 demo。
+              </p>
+              <div class="hero-tags">
+                <span class="tag">ASR + LLM + TTS</span>
+                <span class="tag">可恢复 Pipeline</span>
+                <span class="tag">Quote 校验</span>
+                <span class="tag">Obsidian 工作流</span>
+              </div>
+            </div>
+            <div class="hero-device" aria-label="Product interface preview">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-screen">
+                <img src="../specs/001-podcast-summary/design/selected/前端设计图.png" alt="播客总结系统前端设计图" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Problem</div>
+              <h2>长播客的真正问题不是听不完，而是难筛选、难复盘、难沉淀。</h2>
+            </div>
+            <span class="page-num">01</span>
+          </div>
+          <p class="lead">
+            一个 60 到 90 分钟的播客往往包含大量信息。用户需要先判断是否值得深入，再定位重点片段，最后把内容沉淀到自己的知识库。
+          </p>
+          <div class="grid-3" style="margin-top: 40px">
+            <article class="problem-card">
+              <strong>1</strong>
+              <h3>快速理解</h3>
+              <p>用一句话 hook 与结构化摘要快速判断本集价值，减少无效收听时间。</p>
+            </article>
+            <article class="problem-card">
+              <strong>2</strong>
+              <h3>可信复盘</h3>
+              <p>通过章节、关键点、原文 quote 与时间戳，回到音频证据本身。</p>
+            </article>
+            <article class="problem-card">
+              <strong>3</strong>
+              <h3>知识沉淀</h3>
+              <p>导出 Markdown/JSON，让播客内容进入 Obsidian 等长期知识系统。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Product Experience</div>
+              <h2>产品体验不是静态结果页，而是有状态、有反馈、有动效的网站。</h2>
+            </div>
+            <span class="page-num">02</span>
+          </div>
+          <div class="experience-layout">
+            <div class="screenshot-panel">
+              <img src="../specs/001-podcast-summary/design/selected/前端设计图.png" alt="产品界面截图" />
+            </div>
+            <aside class="motion-demo" aria-label="Animated interaction demo">
+              <div class="mini-header">
+                <div class="mini-logo"><span></span><span></span><span></span><span></span></div>
+                <span class="queue-pill">Processing</span>
+              </div>
+              <article class="motion-card">
+                <div class="motion-row"><span>Upload accepted</span><span>MP3 · 68 min</span></div>
+                <b>Episode added to queue</b>
+                <div class="progress-track"><span></span></div>
+              </article>
+              <article class="motion-card">
+                <div class="motion-row"><span>ASR transcription</span><span>72%</span></div>
+                <b>Timestamped transcript ready</b>
+                <div class="progress-track"><span></span></div>
+              </article>
+              <article class="motion-card">
+                <div class="motion-row"><span>Chapter outline</span><span>Verified</span></div>
+                <b>Quote chips can jump to audio</b>
+                <div class="quote-chip-demo">▶ 14:32 verified quote</div>
+              </article>
+              <article class="motion-card">
+                <div class="motion-row"><span>Audio digest</span><span>Ready</span></div>
+                <b>Playable summary for commuting</b>
+                <div class="progress-track"><span></span></div>
+              </article>
+              <p class="small-note">
+                动效用于表达任务状态、章节展开、quote 点击和 digest 生成，不只是视觉装饰。
+              </p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Core Workflow</div>
+              <h2>核心流程覆盖输入、理解、验证、导出和复用。</h2>
+            </div>
+            <span class="page-num">03</span>
+          </div>
+          <div class="workflow">
+            <article class="step">
+              <small>01</small>
+              <h3>Podcast / YouTube / Audio URL</h3>
+              <p>支持本地音频、直接音频链接与 YouTube 链接，也支持批量提交。</p>
+            </article>
+            <article class="step">
+              <small>02</small>
+              <h3>Audio acquisition</h3>
+              <p>获取音频、校验格式、限制时长与大小，避免无效任务进入后续流程。</p>
+            </article>
+            <article class="step">
+              <small>03</small>
+              <h3>ASR transcript</h3>
+              <p>生成带时间戳的 transcript，为章节、quote 和音频跳转提供基础。</p>
+            </article>
+            <article class="step">
+              <small>04</small>
+              <h3>Prompt structured summary</h3>
+              <p>通过精心设计的提示词，把长文本转成符合阅读直觉的结构。</p>
+            </article>
+            <article class="step">
+              <small>05</small>
+              <h3>Quick browsing</h3>
+              <p>Background、Core Argument、Agreement、Conclusion 帮助快速判断价值。</p>
+            </article>
+            <article class="step">
+              <small>06</small>
+              <h3>Deep chapter review</h3>
+              <p>分章节要点、原文 quote、时间戳跳转和实体列表支持深入复盘。</p>
+            </article>
+            <article class="step">
+              <small>07</small>
+              <h3>Export and audio digest</h3>
+              <p>导出 Markdown、JSON，也可以按需生成 TTS 音频摘要。</p>
+            </article>
+            <article class="step">
+              <small>08</small>
+              <h3>Knowledge base</h3>
+              <p>结果进入 Obsidian / Notion / 个人知识库，完成长期沉淀。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Feature Breakdown</div>
+              <h2>功能不是堆砌，而是按用户完成任务的路径组织。</h2>
+            </div>
+            <span class="page-num">04</span>
+          </div>
+          <div class="layer-table">
+            <div class="layer-row">
+              <strong>输入层</strong>
+              <p>本地音频、音频 URL、YouTube、批量提交，覆盖用户真实来源。</p>
+              <span>Local file / URL / YouTube</span>
+            </div>
+            <div class="layer-row">
+              <strong>AI 处理层</strong>
+              <p>ASR 转写、LLM 总结、TTS 音频摘要，形成完整多模型链路。</p>
+              <span>ASR / LLM / TTS</span>
+            </div>
+            <div class="layer-row">
+              <strong>认知结构层</strong>
+              <p>快速浏览负责判断价值，章节复盘负责定位重点，quote 负责验证依据。</p>
+              <span>Browse → Review → Verify</span>
+            </div>
+            <div class="layer-row">
+              <strong>交互体验层</strong>
+              <p>动效、进度反馈、章节展开、quote 点击跳转，让等待和切换都有明确状态。</p>
+              <span>Motion / Progress / Seek</span>
+            </div>
+            <div class="layer-row">
+              <strong>知识沉淀层</strong>
+              <p>Markdown / JSON / Audio digest 多种输出，把播客变成可复用资料。</p>
+              <span>MD / JSON / Digest</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Prompt & Cognition</div>
+              <h2>提示词设计围绕人的理解流程，而不是简单要求模型“总结一下”。</h2>
+            </div>
+            <span class="page-num">05</span>
+          </div>
+          <div class="cognition">
+            <div class="cognition-map">
+              <article class="cog-node">
+                <span>1</span>
+                <div>
+                  <h3>Background</h3>
+                  <p>先交代背景，帮助用户知道这集在讨论什么问题。</p>
+                </div>
+              </article>
+              <article class="cog-node">
+                <span>2</span>
+                <div>
+                  <h3>Core Argument</h3>
+                  <p>提炼核心主张，让用户快速抓住节目真正想表达的内容。</p>
+                </div>
+              </article>
+              <article class="cog-node">
+                <span>3</span>
+                <div>
+                  <h3>Agreement / Takeaways</h3>
+                  <p>整理关键共识、判断或启发，形成可复述的观点。</p>
+                </div>
+              </article>
+              <article class="cog-node">
+                <span>4</span>
+                <div>
+                  <h3>Conclusion</h3>
+                  <p>给出收束判断，帮助用户决定是否继续深入。</p>
+                </div>
+              </article>
+            </div>
+            <div class="prompt-box">
+              <h3>两层阅读结构</h3>
+              <p class="body-copy" style="margin-top: 12px; color: #cbd8e8">
+                快速浏览回答“这期值不值得看”，分章节总结回答“重点在哪里”，quote 和时间戳回答“原文是不是这样说”。
+              </p>
+              <div class="prompt-grid">
+                <div class="prompt-token">
+                  <b>Quick Browse</b>
+                  <span>Hook + structured summary, used for triage and first-pass understanding.</span>
+                </div>
+                <div class="prompt-token">
+                  <b>Deep Review</b>
+                  <span>Chapter outline, key points, exact quotes, timestamps and entities.</span>
+                </div>
+                <div class="prompt-token">
+                  <b>Verifiable Output</b>
+                  <span>Candidate quote must match the transcript before it appears in UI or JSON.</span>
+                </div>
+                <div class="prompt-token">
+                  <b>Reusable Artifact</b>
+                  <span>Markdown and JSON exports keep the structure usable outside the website.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Knowledge Workflow</div>
+              <h2>导出不是附加功能，而是把播客接入个人知识管理流程。</h2>
+            </div>
+            <span class="page-num">06</span>
+          </div>
+          <p class="lead">
+            用户可以把生成的 Markdown 导入 Obsidian，把一次性听过的内容转化成可搜索、可引用、可复习的知识资产。
+          </p>
+          <div class="knowledge-flow">
+            <article class="knowledge-card">
+              <div class="knowledge-icon">P</div>
+              <h3>Podcast</h3>
+              <p>来自本地文件、音频 URL 或 YouTube 的原始长内容。</p>
+            </article>
+            <article class="knowledge-card">
+              <div class="knowledge-icon">S</div>
+              <h3>Structured Summary</h3>
+              <p>转写、快速浏览、章节复盘、实体列表和可信 quote。</p>
+            </article>
+            <article class="knowledge-card">
+              <div class="knowledge-icon">MD</div>
+              <h3>Markdown Export</h3>
+              <p>保留层级、标题、要点和引用，适合进入笔记软件。</p>
+            </article>
+            <article class="knowledge-card">
+              <div class="knowledge-icon">KB</div>
+              <h3>Knowledge Base</h3>
+              <p>在 Obsidian / Notion 中继续复习、引用、写作和联想。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame dark">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Engineering Workload</div>
+              <h2>这些体验背后对应的是完整工程系统，而不是一段 prompt。</h2>
+            </div>
+            <span class="page-num">07</span>
+          </div>
+          <div class="dark-grid">
+            <article class="dark-card">
+              <b>Pipeline 状态机</b>
+              <span>queued、fetching、transcribing、summarizing、tts、done、failed 等阶段可恢复。</span>
+            </article>
+            <article class="dark-card">
+              <b>SQLite 持久化</b>
+              <span>保存 episode、job、transcript、chapter、quote、entity 和 artifact。</span>
+            </article>
+            <article class="dark-card">
+              <b>并发队列</b>
+              <span>批量提交时用配置化 concurrency 控制并行任务，失败任务不阻塞其他任务。</span>
+            </article>
+            <article class="dark-card">
+              <b>Quote 防幻觉</b>
+              <span>LLM 只能提出候选，最终必须逐字命中 transcript 才能展示。</span>
+            </article>
+            <article class="dark-card">
+              <b>Prompt 版本化</b>
+              <span>提示词集中在 prompts/ 文件中，按 role/version 读取，便于迭代和追踪。</span>
+            </article>
+            <article class="dark-card">
+              <b>导出系统</b>
+              <span>Markdown、JSON、原音频和 digest 文件都有独立下载入口。</span>
+            </article>
+            <article class="dark-card">
+              <b>前后端闭环</b>
+              <span>FastAPI、WebSocket 进度、React 列表页、详情页、音频播放与跳转交互。</span>
+            </article>
+            <article class="dark-card">
+              <b>失败降级</b>
+              <span>TTS / entity 等 optional stage 失败时不拖垮核心摘要结果。</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame">
+          <div class="topline">
+            <div>
+              <div class="slide-kicker">Verification</div>
+              <h2>完成度用自动化验证和生产模式运行结果支撑。</h2>
+            </div>
+            <span class="page-num">08</span>
+          </div>
+          <div class="metrics">
+            <article class="metric">
+              <strong>63</strong>
+              <span>Backend tests passed，覆盖 domain、pipeline、API、并发和 digest 关键路径。</span>
+              <div class="bar"><i style="width: 100%"></i></div>
+            </article>
+            <article class="metric">
+              <strong>87.98%</strong>
+              <span>Domain coverage，高于项目要求的 80% coverage gate。</span>
+              <div class="bar"><i style="width: 88%"></i></div>
+            </article>
+            <article class="metric">
+              <strong>206</strong>
+              <span>Range endpoint verified，支持音频局部加载和 quote 跳转体验。</span>
+              <div class="bar"><i style="width: 90%"></i></div>
+            </article>
+            <article class="metric">
+              <strong>PASS</strong>
+              <span>Quote verifier fixture: PASS 1 / FAIL 0，引用可被离线复查。</span>
+              <div class="bar"><i style="width: 100%"></i></div>
+            </article>
+            <article class="metric">
+              <strong>≤ 2</strong>
+              <span>MAX_CONCURRENCY=2 时 transcribing job 从未超过配置上限。</span>
+              <div class="bar"><i style="width: 82%"></i></div>
+            </article>
+            <article class="metric">
+              <strong>Serve</strong>
+              <span>make build && make serve 验证 FastAPI 可独立服务生产 SPA。</span>
+              <div class="bar"><i style="width: 92%"></i></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="frame dark">
+          <div class="closing">
+            <div>
+              <div class="slide-kicker">Positioning</div>
+              <h2>它不是普通 AI 播客总结器，而是一个面向真实学习场景的播客知识工作流工具。</h2>
+              <p class="lead">
+                项目打通了音频输入、AI 理解、结构化复盘、可信引用、音频摘要和 Markdown 知识沉淀，让播客内容真正变成可以复用的学习资产。
+              </p>
+              <div class="hero-tags">
+                <span class="tag">Usable Website</span>
+                <span class="tag">Cognitive Structure</span>
+                <span class="tag">Engineering Proof</span>
+                <span class="tag">Knowledge Workflow</span>
+              </div>
+            </div>
+            <div class="closing-statement">
+              <p>
+                从“听完一集播客”到“得到可验证、可复盘、可沉淀的知识材料”。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

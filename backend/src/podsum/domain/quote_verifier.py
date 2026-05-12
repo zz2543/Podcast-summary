@@ -21,33 +21,43 @@ def verify_against_segments(candidate: str, segments: list[Any]) -> tuple[bool, 
     if not candidate_text:
         return False, None
 
-    transcript, start_offsets = _normalized_transcript_with_offsets(segments)
+    transcript, spans = _normalized_transcript_with_spans(segments)
     match_index = transcript.find(candidate_text)
     if match_index < 0:
         return False, None
 
-    for offset, start_ms in reversed(start_offsets):
-        if match_index >= offset:
-            return True, start_ms
-    return True, start_offsets[0][1] if start_offsets else None
+    for seg_start, seg_end, start_ms, end_ms in spans:
+        if seg_start <= match_index < seg_end:
+            seg_text_len = max(seg_end - seg_start, 1)
+            seg_duration = max(end_ms - start_ms, 0)
+            offset_in_seg = match_index - seg_start
+            interpolated = start_ms + int(offset_in_seg / seg_text_len * seg_duration)
+            return True, interpolated
+    return True, spans[0][2] if spans else None
 
 
-def _normalized_transcript_with_offsets(segments: list[Any]) -> tuple[str, list[tuple[int, int]]]:
+def _normalized_transcript_with_spans(
+    segments: list[Any],
+) -> tuple[str, list[tuple[int, int, int, int]]]:
+    """Return (joined_transcript, spans) where each span is
+    (char_offset_start, char_offset_end, start_ms, end_ms)."""
     pieces: list[str] = []
-    start_offsets: list[tuple[int, int]] = []
+    spans: list[tuple[int, int, int, int]] = []
     cursor = 0
     for segment in segments:
         text = _normalize(_field(segment, "text"))
         start_ms = _int_field(segment, "start_ms")
-        if not text or start_ms is None:
+        end_ms = _int_field(segment, "end_ms")
+        if not text or start_ms is None or end_ms is None:
             continue
         if pieces:
             pieces.append(" ")
             cursor += 1
-        start_offsets.append((cursor, start_ms))
+        seg_start_offset = cursor
         pieces.append(text)
         cursor += len(text)
-    return "".join(pieces), start_offsets
+        spans.append((seg_start_offset, cursor, start_ms, end_ms))
+    return "".join(pieces), spans
 
 
 def _field(segment: Any, name: str) -> str:

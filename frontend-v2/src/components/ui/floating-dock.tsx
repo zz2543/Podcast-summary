@@ -24,8 +24,16 @@ export function FloatingDock({
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
+      style={{
+        background: "rgba(255,255,255,0.42)",
+        backdropFilter: "blur(28px) saturate(200%)",
+        WebkitBackdropFilter: "blur(28px) saturate(200%)",
+        border: "1px solid rgba(255,255,255,0.5)",
+        boxShadow:
+          "0 1px 0 rgba(255,255,255,0.8) inset, 0 -1px 0 rgba(0,0,0,0.04) inset, 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)"
+      }}
       className={cn(
-        "fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-end gap-2 rounded-2xl px-3 py-2 glass-strong shadow-glass",
+        "fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-end gap-2 rounded-2xl px-3 py-2",
         className
       )}
     >
@@ -59,11 +67,19 @@ function DockButton({
       type="button"
       onClick={item.onClick}
       disabled={item.disabled}
-      style={{ width: size, height: size }}
+      style={{
+        width: size,
+        height: size,
+        background: "rgba(255,255,255,0.28)",
+        backdropFilter: "blur(16px) saturate(180%)",
+        WebkitBackdropFilter: "blur(16px) saturate(180%)",
+        border: "1px solid rgba(255,255,255,0.45)"
+      }}
       className={cn(
-        "group relative flex items-center justify-center rounded-xl bg-surface-elev text-text transition-colors",
-        "hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed",
-        item.variant === "danger" && "hover:bg-status-err/10 hover:text-status-err"
+        "group relative flex items-center justify-center rounded-xl text-text transition-colors",
+        "[&_svg]:stroke-[2] [&_svg]:text-text",
+        "hover:bg-white/80 disabled:opacity-40 disabled:cursor-not-allowed",
+        item.variant === "danger" && "hover:text-status-err [&:hover_svg]:text-status-err"
       )}
       title={item.label}
     >

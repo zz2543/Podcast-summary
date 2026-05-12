@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import uuid
 from pathlib import Path
 from typing import Any, Protocol
@@ -96,6 +97,188 @@ class DoubaoTTS:
         }
 
 
+class DoubaoBigTTS:
+    """豆包语音合成大模型2.0 (BigTTS / SeedTTS 2.0) via WebSocket bidirection.
+
+    Uses ``wss://openspeech.bytedance.com/api/v3/tts/bidirection`` with the
+    three ``X-Api-*`` auth headers. Speakers are the ``*_uranus_bigtts``
+    voices visible under "音色详情" in the BigTTS console listing.
+
+    Protocol is a binary framed message format (see
+    :mod:`podsum.services._doubao_bigtts_protocol`). The high-level flow is:
+
+        StartConnection  → ConnectionStarted
+        StartSession     → SessionStarted
+        TaskRequest      → (server streams AudioOnlyServer chunks)
+        FinishSession    → ... SessionFinished
+        FinishConnection → ConnectionFinished
+
+    The whole synthesized MP3 is built by concatenating ``AudioOnlyServer``
+    payloads. Synthesize is exposed as a sync method (the pipeline stage is
+    sync) but the WebSocket work happens in a fresh background event loop on
+    a daemon thread to avoid interfering with the FastAPI loop.
+    """
+
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        retry_attempts: int = 3,
+    ) -> None:
+        self.settings = settings
+        self.retry_attempts = retry_attempts
+
+    def synthesize(self, text: str, lang: str, out_path: Path) -> None:
+        import threading
+
+        result: dict[str, Any] = {}
+
+        def runner() -> None:
+            import asyncio
+
+            try:
+                result["audio"] = asyncio.run(self._synthesize_async(text, lang))
+            except BaseException as exc:  # noqa: BLE001 — propagate cross-thread
+                result["error"] = exc
+
+        thread = threading.Thread(target=runner, daemon=True)
+        thread.start()
+        thread.join()
+        if "error" in result:
+            raise result["error"]
+        audio = result["audio"]
+        if not isinstance(audio, bytes) or not audio:
+            raise TTSResponseError("Doubao BigTTS returned no audio bytes")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_bytes(audio)
+
+    async def _synthesize_async(self, text: str, lang: str) -> bytes:
+        import websockets
+
+        from podsum.services._doubao_bigtts_protocol import (
+            EventType,
+            MsgType,
+            finish_connection,
+            finish_session,
+            receive_message,
+            start_connection,
+            start_session,
+            task_request,
+            wait_for_event,
+        )
+
+        app_id = _required_value(self.settings.DOUBAO_TTS_APP_ID, "DOUBAO_TTS_APP_ID")
+        token = _required_secret(self.settings.DOUBAO_TTS_ACCESS_TOKEN, "DOUBAO_TTS_ACCESS_TOKEN")
+        # Old console auth: App-Id + Access-Key + Resource-Id. The previously
+        # circulated demo used "X-Api-App-Key" but the official docs name it
+        # "X-Api-App-Id"; the gateway accepts both, we use the doc name to be safe.
+        headers = {
+            "X-Api-App-Id": app_id,
+            "X-Api-Access-Key": token,
+            "X-Api-Resource-Id": self.settings.DOUBAO_TTS_BIGMODEL_RESOURCE_ID,
+            "X-Api-Connect-Id": str(uuid.uuid4()),
+        }
+
+        last_error: BaseException | None = None
+        for _ in range(self.retry_attempts):
+            try:
+                async with websockets.connect(
+                    self.settings.DOUBAO_TTS_BIGMODEL_URL,
+                    additional_headers=headers,
+                    max_size=64 * 1024 * 1024,
+                    open_timeout=30,
+                    close_timeout=10,
+                ) as websocket:
+                    await start_connection(websocket)
+                    await wait_for_event(
+                        websocket, MsgType.FullServerResponse, EventType.ConnectionStarted
+                    )
+
+                    session_id = str(uuid.uuid4())
+                    base_request = {
+                        "user": {"uid": "podsum"},
+                        "namespace": "BidirectionalTTS",
+                        "req_params": {
+                            "speaker": _voice_type(self.settings, lang),
+                            "audio_params": {
+                                "format": self.settings.DOUBAO_TTS_BIGMODEL_FORMAT,
+                                "sample_rate": self.settings.DOUBAO_TTS_BIGMODEL_SAMPLE_RATE,
+                            },
+                        },
+                    }
+                    start_payload = {
+                        **base_request,
+                        "event": int(EventType.StartSession),
+                    }
+                    await start_session(
+                        websocket,
+                        json.dumps(start_payload).encode("utf-8"),
+                        session_id,
+                    )
+                    await wait_for_event(
+                        websocket, MsgType.FullServerResponse, EventType.SessionStarted
+                    )
+
+                    task_payload = {
+                        **base_request,
+                        "event": int(EventType.TaskRequest),
+                        "req_params": {**base_request["req_params"], "text": text},
+                    }
+                    await task_request(
+                        websocket,
+                        json.dumps(task_payload).encode("utf-8"),
+                        session_id,
+                    )
+                    await finish_session(websocket, session_id)
+
+                    audio = bytearray()
+                    while True:
+                        msg = await receive_message(websocket)
+                        if msg.type == MsgType.AudioOnlyServer:
+                            audio.extend(msg.payload)
+                        elif msg.type == MsgType.FullServerResponse:
+                            if msg.event == EventType.SessionFinished:
+                                break
+                            if msg.event in (
+                                EventType.SessionFailed,
+                                EventType.ConnectionFailed,
+                            ):
+                                raise TTSResponseError(
+                                    f"Doubao BigTTS session failed: {msg.payload!r}"
+                                )
+                        elif msg.type == MsgType.Error:
+                            raise TTSResponseError(
+                                f"Doubao BigTTS error frame "
+                                f"(code={msg.error_code}): "
+                                f"{msg.payload.decode('utf-8', 'ignore')[:500]}"
+                            )
+
+                    try:
+                        await finish_connection(websocket)
+                        await wait_for_event(
+                            websocket,
+                            MsgType.FullServerResponse,
+                            EventType.ConnectionFinished,
+                        )
+                    except Exception:
+                        # Connection finalisation is best-effort — we already have audio.
+                        pass
+
+                    if not audio:
+                        raise TTSResponseError("Doubao BigTTS produced no audio chunks")
+                    return bytes(audio)
+            except TTSResponseError:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+
+        if last_error is not None:
+            raise TTSResponseError(
+                f"Doubao BigTTS WebSocket failed after retries: {last_error!r}"
+            ) from last_error
+        raise TTSResponseError("Doubao BigTTS WebSocket failed with no error captured")
+
+
 class QwenTTS:
     def __init__(
         self,
@@ -131,10 +314,86 @@ class QwenTTS:
 def create_tts_client(settings: Settings) -> TTSClient:
     provider: TTSProvider = settings.TTS_PROVIDER
     if provider == "doubao":
+        if settings.DOUBAO_TTS_MODE == "bigmodel":
+            return DoubaoBigTTS(settings)
         return DoubaoTTS(settings)
     if provider == "qwen":
         return QwenTTS(settings)
     return UnimplementedTTSClient(provider)
+
+
+def _bigtts_audio_bytes(response: httpx.Response) -> bytes:
+    """Extract MP3 bytes from a BigTTS 2.0 HTTP response.
+
+    The v3 endpoint can return audio in several shapes depending on whether
+    the server treats the request as one-shot or chunked stream. Handle the
+    three documented cases: raw audio body, JSON envelope with base64 ``data``,
+    or a sequence of newline-delimited JSON events each carrying a base64
+    ``audio`` chunk. If the response body looks like none of those, surface
+    the first 500 chars as an error so we can adjust without guesswork.
+    """
+    content_type = response.headers.get("content-type", "").lower()
+    body = response.content
+    if content_type.startswith("audio/") or _looks_like_mp3(body):
+        return body
+    text = response.text
+    # Try newline-delimited JSON events (SSE-ish streaming response).
+    chunks: list[bytes] = []
+    saw_event = False
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if line.startswith("data:"):
+            line = line[5:].strip()
+        if not line or line in {"[DONE]", "DONE"}:
+            continue
+        try:
+            event = _json_loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        saw_event = True
+        if event.get("code") not in (None, 0, 3000):
+            raise TTSResponseError(f"Doubao BigTTS event error: {event}")
+        audio_b64 = event.get("audio") or event.get("data")
+        if isinstance(audio_b64, str) and audio_b64:
+            try:
+                chunks.append(base64.b64decode(audio_b64))
+            except ValueError as exc:
+                raise TTSResponseError("Doubao BigTTS returned invalid base64") from exc
+    if chunks:
+        return b"".join(chunks)
+    if saw_event:
+        raise TTSResponseError("Doubao BigTTS event stream contained no audio chunks")
+    # Single JSON envelope fallback.
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise TTSResponseError(
+            f"Doubao BigTTS response not understood: {text[:500]}"
+        ) from exc
+    if isinstance(payload, dict):
+        if payload.get("code") not in (None, 0, 3000):
+            raise TTSResponseError(f"Doubao BigTTS failed: {payload}")
+        data = payload.get("data") or (payload.get("payload") or {}).get("audio")
+        if isinstance(data, str) and data:
+            try:
+                return base64.b64decode(data)
+            except ValueError as exc:
+                raise TTSResponseError("Doubao BigTTS returned invalid base64") from exc
+    raise TTSResponseError(f"Doubao BigTTS response missing audio: {text[:500]}")
+
+
+def _looks_like_mp3(data: bytes) -> bool:
+    if len(data) < 4:
+        return False
+    return data[:3] == b"ID3" or (data[0] == 0xFF and (data[1] & 0xE0) == 0xE0)
+
+
+def _json_loads(line: str) -> Any:
+    import json
+
+    return json.loads(line)
 
 
 def _doubao_audio_bytes(response: httpx.Response) -> bytes:
@@ -186,7 +445,13 @@ def _split_text_for_tts(text: str, *, max_bytes: int) -> list[str]:
 
 
 def _voice_type(settings: Settings, lang: str) -> str:
-    return settings.DOUBAO_TTS_VOICE_TYPE_ZH if lang == "zh" else settings.DOUBAO_TTS_VOICE_TYPE_EN
+    # Chinese-dominant or mixed-language content uses the ZH voice. Only
+    # explicit English ("en") routes to the EN voice. Passing the EN voice an
+    # all-Chinese script makes BigTTS silently drop it and return zero audio.
+    normalized = (lang or "").strip().lower()
+    if normalized == "en":
+        return settings.DOUBAO_TTS_VOICE_TYPE_EN
+    return settings.DOUBAO_TTS_VOICE_TYPE_ZH
 
 
 def _required_value(value: Any, name: str) -> str:
