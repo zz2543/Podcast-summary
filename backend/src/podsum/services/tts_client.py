@@ -45,23 +45,29 @@ class DoubaoTTS:
         self.sdk_api = _build_volcengine_speech_api(settings)
 
     def synthesize(self, text: str, lang: str, out_path: Path) -> None:
-        request = self._request_payload(text, lang)
         token = _required_secret(self.settings.DOUBAO_TTS_ACCESS_TOKEN, "DOUBAO_TTS_ACCESS_TOKEN")
-        for attempt in Retrying(
-            retry=retry_if_exception_type((httpx.HTTPError, TTSResponseError)),
-            stop=stop_after_attempt(self.retry_attempts),
-            reraise=True,
-        ):
-            with attempt:
-                response = self.client.post(
-                    self.endpoint,
-                    headers={"Authorization": f"Bearer {token}"},
-                    json=request,
-                )
-                response.raise_for_status()
-                audio = _doubao_audio_bytes(response)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                out_path.write_bytes(audio)
+        chunks = _split_text_for_tts(text, max_bytes=900)
+        audio_parts: list[bytes] = []
+        for chunk in chunks:
+            request = self._request_payload(chunk, lang)
+            for attempt in Retrying(
+                retry=retry_if_exception_type((httpx.HTTPError, TTSResponseError)),
+                stop=stop_after_attempt(self.retry_attempts),
+                reraise=True,
+            ):
+                with attempt:
+                    response = self.client.post(
+                        self.endpoint,
+                        headers={"Authorization": f"Bearer;{token}"},
+                        json=request,
+                    )
+                    if response.status_code >= 400:
+                        raise TTSResponseError(
+                            f"Doubao TTS HTTP {response.status_code}: {response.text[:500]}"
+                        )
+                    audio_parts.append(_doubao_audio_bytes(response))
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_bytes(b"".join(audio_parts))
 
     def _request_payload(self, text: str, lang: str) -> dict[str, Any]:
         return {
@@ -145,6 +151,38 @@ def _doubao_audio_bytes(response: httpx.Response) -> bytes:
         return base64.b64decode(data)
     except ValueError as exc:
         raise TTSResponseError("Doubao TTS returned invalid base64 audio data") from exc
+
+
+def _split_text_for_tts(text: str, *, max_bytes: int) -> list[str]:
+    chunks: list[str] = []
+    current = ""
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        candidate = f"{current}\n{line}" if current else line
+        if len(candidate.encode("utf-8")) > max_bytes and current:
+            chunks.append(current)
+            current = line
+        else:
+            current = candidate
+    if current:
+        chunks.append(current)
+    final: list[str] = []
+    for chunk in chunks:
+        if len(chunk.encode("utf-8")) <= max_bytes:
+            final.append(chunk)
+            continue
+        buf = ""
+        for ch in chunk:
+            if len((buf + ch).encode("utf-8")) > max_bytes:
+                final.append(buf)
+                buf = ch
+            else:
+                buf += ch
+        if buf:
+            final.append(buf)
+    return final
 
 
 def _voice_type(settings: Settings, lang: str) -> str:

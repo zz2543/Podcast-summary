@@ -1,0 +1,63 @@
+import { motion } from "framer-motion";
+import type { Chapter } from "@/api/client";
+import { TracingBeam } from "@/components/ui/tracing-beam";
+import { formatTimestamp } from "@/lib/time";
+
+export function ChaptersTimeline({ chapters }: { chapters: Chapter[] }) {
+  if (chapters.length === 0) return null;
+  return (
+    <section className="space-y-3">
+      <h2 className="font-display text-sm font-medium uppercase tracking-wider text-text-subtle">
+        Chapters · {chapters.length}
+      </h2>
+      <TracingBeam>
+        <div className="space-y-6 pl-2 md:pl-0">
+          {chapters.map((chapter, i) => (
+            <motion.article
+              key={chapter.idx}
+              initial={{ opacity: 0, y: 6 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, delay: i * 0.04 }}
+              className="rounded-2xl bg-surface p-5 shadow-card"
+            >
+              <header className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="font-display text-base font-semibold tracking-tight text-text">
+                  {chapter.idx + 1}. {chapter.title}
+                </h3>
+                <span className="font-mono text-xs text-text-muted">
+                  {formatTimestamp(chapter.start_ms)} – {formatTimestamp(chapter.end_ms)}
+                </span>
+              </header>
+              {chapter.key_points.length > 0 && (
+                <ul className="space-y-1.5 text-sm leading-relaxed text-text">
+                  {chapter.key_points.map((kp, j) => (
+                    <li key={j} className="flex gap-2">
+                      <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-text-subtle" />
+                      <span>{kp}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {chapter.quotes.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {chapter.quotes.map((q, j) => (
+                    <span
+                      key={j}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-surface-elev px-2.5 py-1 text-xs text-text-muted"
+                    >
+                      <span className="font-mono text-text-subtle">
+                        {formatTimestamp(q.start_ms)}
+                      </span>
+                      <span className="max-w-[28ch] truncate">{q.text}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </motion.article>
+          ))}
+        </div>
+      </TracingBeam>
+    </section>
+  );
+}
