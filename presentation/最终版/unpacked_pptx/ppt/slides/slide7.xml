@@ -1,0 +1,4664 @@
+<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld name="Slide 7">
+    <p:bg>
+      <p:bgPr>
+        <a:solidFill>
+          <a:srgbClr val="FFFFFF"/>
+        </a:solidFill>
+      </p:bgPr>
+    </p:bg>
+    <p:spTree>
+      <p:nvGrpSpPr>
+        <p:cNvPr id="1" name=""/>
+        <p:cNvGrpSpPr/>
+        <p:nvPr/>
+      </p:nvGrpSpPr>
+      <p:grpSpPr>
+        <a:xfrm>
+          <a:off x="0" y="0"/>
+          <a:ext cx="0" cy="0"/>
+          <a:chOff x="0" y="0"/>
+          <a:chExt cx="0" cy="0"/>
+        </a:xfrm>
+      </p:grpSpPr>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="2" name="Shape 0"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="728663"/>
+            <a:ext cx="16459200" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="14171C"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="3" name="Shape 1"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="4091211" y="323850"/>
+            <a:ext cx="9525" cy="214313"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="4" name="Text 2"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="323850"/>
+            <a:ext cx="3005701" cy="252413"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="ctr">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1275" b="1" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>GOTIT · PODCAST-SUMMARY</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1275" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="5" name="Text 3"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="4538886" y="338138"/>
+            <a:ext cx="286569" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>01</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="6" name="Text 4"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="4844504" y="328613"/>
+            <a:ext cx="419919" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Context</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="7" name="Text 5"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5999262" y="338138"/>
+            <a:ext cx="286569" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>02</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="8" name="Text 6"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="6304880" y="328613"/>
+            <a:ext cx="419919" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Process</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="9" name="Text 7"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7459712" y="338138"/>
+            <a:ext cx="286569" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>03</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="10" name="Text 8"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7765331" y="328613"/>
+            <a:ext cx="419919" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Scope</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="11" name="Text 9"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="8920088" y="338138"/>
+            <a:ext cx="286569" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>04</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="12" name="Text 10"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9225707" y="328613"/>
+            <a:ext cx="419919" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Frontend</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="13" name="Shape 11"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="10209088" y="266700"/>
+            <a:ext cx="1460376" cy="328613"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="EAF0FB"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="14" name="Text 12"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="10380538" y="338138"/>
+            <a:ext cx="707157" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>§ 05·1</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="15" name="Text 13"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11106745" y="328613"/>
+            <a:ext cx="924371" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" b="1" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Backend · 8 Stages</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="16" name="Text 14"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11840914" y="333375"/>
+            <a:ext cx="496863" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>05·2</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="17" name="Text 15"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="12356827" y="323850"/>
+            <a:ext cx="408831" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>API</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="18" name="Text 16"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13301365" y="338138"/>
+            <a:ext cx="286569" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>06</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="19" name="Text 17"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13606983" y="328613"/>
+            <a:ext cx="419919" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Demo</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="20" name="Text 18"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="14761741" y="333375"/>
+            <a:ext cx="286569" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>07</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="21" name="Text 19"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15067359" y="323850"/>
+            <a:ext cx="408831" cy="242888"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="8A93A1"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>BUG</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="22" name="Shape 20"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="16279341" y="316706"/>
+            <a:ext cx="9525" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="23" name="Text 21"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="16517466" y="316706"/>
+            <a:ext cx="932334" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" b="1" spc="153" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>06 / 10</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="24" name="Shape 22"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="1157288"/>
+            <a:ext cx="342900" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="1F3C7A"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="25" name="Text 23"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1390650" y="1066800"/>
+            <a:ext cx="2019300" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" b="1" spc="225" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>§ 05 · PART 1 / 2</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="26" name="Text 24"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3467100" y="1066800"/>
+            <a:ext cx="4473702" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" b="1" spc="225" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>BACKEND · 8-STAGE PIPELINE · CONTRACTS</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="27" name="Text 25"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15470460" y="1066800"/>
+            <a:ext cx="1979340" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1125" spc="158" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>SECTION V · OF VII</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1125" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="28" name="Text 26"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="1390650"/>
+            <a:ext cx="16952976" cy="1043880"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="110000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="3600" b="1" spc="-18" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>One URL, eight pipeline stages — the frontend receives a fully clickable summary.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="3600" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="29" name="Shape 27"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="30" name="Shape 28"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="31" name="Shape 29"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="1F3C7A"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="32" name="Text 30"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1085850" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L1 · DOWNLOAD</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="33" name="Text 31"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1085850" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>fetch</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="34" name="Text 32"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1085850" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>yt-dlp / ffmpeg · normalize audio</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="35" name="Shape 33"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1085850" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="36" name="Text 34"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1085850" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">15s </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>/ 1h</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="37" name="Shape 35"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2978944" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="38" name="Shape 36"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2978944" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="39" name="Shape 37"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2978944" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="1F3C7A"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="40" name="Text 38"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3150394" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L2 · ASR</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="41" name="Text 39"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3150394" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>transcribe</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="42" name="Text 40"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3150394" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Doubao Seed-ASR · fallback Whisper</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="43" name="Shape 41"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3150394" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="44" name="Text 42"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3150394" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">90s </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>/ 1h</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="45" name="Shape 43"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5043488" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="46" name="Shape 44"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5043488" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="47" name="Shape 45"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5043488" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="5B3A8F"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="48" name="Text 46"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5214938" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B3A8F"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L3 · LLM</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="49" name="Text 47"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5214938" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>hook</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="50" name="Text 48"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5214938" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>DeepSeek · one-sentence hook</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="51" name="Shape 49"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5214938" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="52" name="Text 50"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="5214938" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>5s</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="53" name="Shape 51"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7108031" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="54" name="Shape 52"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7108031" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="55" name="Shape 53"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7108031" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="5B3A8F"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="56" name="Text 54"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7279481" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B3A8F"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L4 · LLM</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="57" name="Text 55"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7279481" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>three-act</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="58" name="Text 56"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7279481" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>DeepSeek · three-act summary</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="59" name="Shape 57"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7279481" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="60" name="Text 58"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="7279481" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>12s</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="61" name="Shape 59"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9172575" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="62" name="Shape 60"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9172575" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="63" name="Shape 61"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9172575" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="5B3A8F"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="64" name="Text 62"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9344025" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B3A8F"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L5 · LLM</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="65" name="Text 63"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9344025" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>chapters</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="66" name="Text 64"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9344025" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>DeepSeek · chapter outline</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="67" name="Shape 65"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9344025" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="68" name="Text 66"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9344025" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>18s</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="69" name="Shape 67"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11237119" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="70" name="Shape 68"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11237119" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="71" name="Shape 69"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11237119" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="A02A1E"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="72" name="Text 70"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11408569" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="A02A1E"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L6 · SELF</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="73" name="Text 71"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11408569" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>quote-verify</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="74" name="Text 72"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11408569" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>In-house · char-position interpolation · ms timestamps</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="75" name="Shape 73"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11408569" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="76" name="Text 74"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11408569" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>200ms</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="77" name="Shape 75"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13301663" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="78" name="Shape 76"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13301663" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="79" name="Shape 77"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13301663" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="5B3A8F"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="80" name="Text 78"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13473113" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B3A8F"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L7 · LLM</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="81" name="Text 79"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13473113" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>entities</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="82" name="Text 80"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13473113" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>DeepSeek · persons / books / products</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="83" name="Shape 81"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13473113" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="84" name="Text 82"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="13473113" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>8s</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="85" name="Shape 83"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15366206" y="2777430"/>
+            <a:ext cx="2007394" cy="1758181"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="FFFFFF"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="86" name="Shape 84"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15366206" y="4526087"/>
+            <a:ext cx="2007394" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="87" name="Shape 85"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15366206" y="2777430"/>
+            <a:ext cx="2007394" cy="38100"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="A8770F"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="88" name="Text 86"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15537656" y="2967930"/>
+            <a:ext cx="1740694" cy="204787"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="A8770F"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>L8 · EXPORT</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="89" name="Text 87"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15537656" y="3210818"/>
+            <a:ext cx="1740694" cy="344760"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="115000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="2100" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>export</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="2100" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="90" name="Text 88"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15537656" y="3593678"/>
+            <a:ext cx="1740694" cy="479971"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="145000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>md · json output written to disk</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="91" name="Shape 89"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15537656" y="4130799"/>
+            <a:ext cx="1664494" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="92" name="Text 90"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="15537656" y="4216524"/>
+            <a:ext cx="1740694" cy="214312"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">≈ </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>2s</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="93" name="Text 91"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="4668962"/>
+            <a:ext cx="1117922" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" spc="84" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Download / ASR</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="94" name="Text 92"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2222822" y="4676105"/>
+            <a:ext cx="557808" cy="214313"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" spc="84" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>LLM</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="95" name="Text 93"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2971130" y="4668962"/>
+            <a:ext cx="573807" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" spc="84" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>In-house</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="96" name="Text 94"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="3735437" y="4668962"/>
+            <a:ext cx="573807" cy="228600"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1050" spc="84" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Export</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1050" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="97" name="Text 95"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="11908259" y="4649912"/>
+            <a:ext cx="5629301" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1275" i="1" spc="26" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="A02A1E"/>
+                </a:solidFill>
+                <a:latin typeface="EB Garamond" pitchFamily="34" charset="0"/>
+                <a:ea typeface="EB Garamond" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="EB Garamond" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>＋ TTS digest · button-triggered sub-pipeline · Doubao BigTTS 2.0 (wss) → see next slide</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1275" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="98" name="Shape 96"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="7964612"/>
+            <a:ext cx="16459200" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="99" name="Shape 97"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="5145212"/>
+            <a:ext cx="16459200" cy="19050"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="14171C"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="100" name="Shape 98"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9134475" y="5164262"/>
+            <a:ext cx="9525" cy="2800350"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="C9CCD2"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="101" name="Text 99"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1181100" y="5388099"/>
+            <a:ext cx="399083" cy="357188"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1950" i="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="EB Garamond" pitchFamily="34" charset="0"/>
+                <a:ea typeface="EB Garamond" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="EB Garamond" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>§ A</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1950" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="102" name="Text 100"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1599233" y="5373812"/>
+            <a:ext cx="2645223" cy="366713"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1800" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Engineering Decisions</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1800" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="103" name="Text 101"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1181100" y="5869112"/>
+            <a:ext cx="1314450" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Independent RETRY</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="104" name="Text 102"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2571750" y="5840537"/>
+            <a:ext cx="6484906" cy="295275"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">Each stage uses </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">tenacity </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>exponential backoff — single-stage failure does not re-run the whole job.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="105" name="Text 103"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1181100" y="6221537"/>
+            <a:ext cx="1314450" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Progress Persisted</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="106" name="Text 104"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2571750" y="6192962"/>
+            <a:ext cx="6484906" cy="295275"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">stage_progress </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>written to SQLite — resumes on process restart.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="107" name="Text 105"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1181100" y="6573962"/>
+            <a:ext cx="1314450" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Event Bus</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="108" name="Text 106"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2571750" y="6545387"/>
+            <a:ext cx="6484906" cy="295275"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">State changes broadcast via </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>WebSocket</a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>, frontend sees live progress.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="109" name="Text 107"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1181100" y="6926387"/>
+            <a:ext cx="1314450" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Single Process</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="110" name="Text 108"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2571750" y="6897812"/>
+            <a:ext cx="6484906" cy="295275"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>asyncio</a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>, no Celery / Redis — sufficient locally, extensible later.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="111" name="Text 109"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="1181100" y="7278812"/>
+            <a:ext cx="1314450" cy="266700"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Idempotent</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="112" name="Text 110"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="2571750" y="7250237"/>
+            <a:ext cx="6484906" cy="295275"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Each stage is deduped by (episode_id, stage) PK — reruns create no dirty data.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="113" name="Text 111"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9410700" y="5388099"/>
+            <a:ext cx="374824" cy="357188"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1950" i="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="1F3C7A"/>
+                </a:solidFill>
+                <a:latin typeface="EB Garamond" pitchFamily="34" charset="0"/>
+                <a:ea typeface="EB Garamond" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="EB Garamond" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>§ B</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1950" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="114" name="Text 112"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9804574" y="5373812"/>
+            <a:ext cx="2789932" cy="366713"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1800" b="1" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Serif SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Serif SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Serif SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Front ⇄ Back · Contract</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1800" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="115" name="Text 113"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9410700" y="5869112"/>
+            <a:ext cx="1314450" cy="280988"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>HTTP</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="116" name="Text 114"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="10801350" y="5840537"/>
+            <a:ext cx="6494717" cy="309563"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">/api/episodes/* </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>· manages episode lifecycle.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="117" name="Text 115"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9410700" y="6235824"/>
+            <a:ext cx="1314450" cy="280988"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>WEBSOCKET</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="118" name="Text 116"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="10801350" y="6207249"/>
+            <a:ext cx="6494717" cy="309563"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">/api/ws/jobs </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>· broadcasts stage events over a single long-lived connection.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="119" name="Text 117"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9410700" y="6602537"/>
+            <a:ext cx="1314450" cy="280988"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>SERVE</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="120" name="Text 118"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="10801350" y="6573962"/>
+            <a:ext cx="6494717" cy="309563"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t xml:space="preserve">make serve </a:t>
+            </a:r>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="Noto Sans SC" pitchFamily="34" charset="0"/>
+                <a:ea typeface="Noto Sans SC" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="Noto Sans SC" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>· FastAPI serves both the SPA and output files.</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="121" name="Text 119"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9410700" y="6969249"/>
+            <a:ext cx="1314450" cy="823913"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="975" b="1" spc="137" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>Contract Files</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="975" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="122" name="Text 120"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="10801350" y="6940674"/>
+            <a:ext cx="6494717" cy="852488"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:lnSpc>
+                <a:spcPct val="150000"/>
+              </a:lnSpc>
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1350" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="14171C"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>contracts/http-api.md contracts/job-events.md contracts/episode-output.schema.json</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1350" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="123" name="Shape 121"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="9605963"/>
+            <a:ext cx="16459200" cy="9525"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:solidFill>
+            <a:srgbClr val="14171C"/>
+          </a:solidFill>
+          <a:ln/>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="124" name="Text 122"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="914400" y="9777413"/>
+            <a:ext cx="4007538" cy="185738"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="900" spc="126" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>§ 05 · PART 1 — BACKEND · 8 STAGES + CONTRACTS</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="900" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="125" name="Text 123"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="9430866" y="9729788"/>
+            <a:ext cx="2806718" cy="252413"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1200" i="1" spc="24" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="2C313A"/>
+                </a:solidFill>
+                <a:latin typeface="EB Garamond" pitchFamily="34" charset="0"/>
+                <a:ea typeface="EB Garamond" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="EB Garamond" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>end-to-end ≈ 2 min 30 s for a 60 min episode</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="1200" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="126" name="Text 124"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="16781487" y="9777413"/>
+            <a:ext cx="668313" cy="185738"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect">
+            <a:avLst/>
+          </a:prstGeom>
+          <a:noFill/>
+          <a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" lIns="25400" tIns="25400" rIns="25400" bIns="25400" rtlCol="0" anchor="t">
+            <a:normAutofit/>
+          </a:bodyPr>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="l" indent="0" marL="0">
+              <a:buNone/>
+            </a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="900" spc="126" kern="0" dirty="0">
+                <a:solidFill>
+                  <a:srgbClr val="5B6471"/>
+                </a:solidFill>
+                <a:latin typeface="JetBrains Mono" pitchFamily="34" charset="0"/>
+                <a:ea typeface="JetBrains Mono" pitchFamily="34" charset="-122"/>
+                <a:cs typeface="JetBrains Mono" pitchFamily="34" charset="-120"/>
+              </a:rPr>
+              <a:t>06 / 10</a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" sz="900" dirty="0"/>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+    </p:spTree>
+  </p:cSld>
+  <p:clrMapOvr>
+    <a:masterClrMapping/>
+  </p:clrMapOvr>
+</p:sld>
