@@ -181,6 +181,8 @@ def _download_youtube_audio(url: str, episode_dir: Path) -> tuple[dict[str, obje
         "noplaylist": True,
         "quiet": True,
         "no_warnings": True,
+        "cookiesfrombrowser": ("chrome",),
+        "remote_components": "ejs:github",
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
@@ -205,7 +207,7 @@ def _download_youtube_audio(url: str, episode_dir: Path) -> tuple[dict[str, obje
 def _youtube_error_message(exc: Exception) -> str:
     message = str(exc)
     lower = message.lower()
-    if any(token in lower for token in ("age", "region", "drm", "private", "login")):
+    if any(token in lower for token in ("age", "region", "drm", "private", "login", "sign in")):
         return "YouTube link is restricted or requires login"
     return "YouTube link could not be resolved"
 

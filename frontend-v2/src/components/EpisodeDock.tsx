@@ -1,4 +1,4 @@
-import { Download, FileJson, FileText, Music, RotateCw, Trash2 } from "lucide-react";
+import { AlignLeft, Download, FileJson, FileText, MessageCircle, Music, RotateCw, Trash2 } from "lucide-react";
 import { FloatingDock, type DockItem } from "@/components/ui/floating-dock";
 import { episodeFileUrl, type EpisodeDetail } from "@/api/client";
 
@@ -6,11 +6,15 @@ export function EpisodeDock({
   episode,
   onRetry,
   onDelete,
+  onChatToggle,
+  chatOpen,
   busy
 }: {
   episode: EpisodeDetail;
   onRetry: () => void;
   onDelete: () => void;
+  onChatToggle: () => void;
+  chatOpen: boolean;
   busy: boolean;
 }) {
   const items: DockItem[] = [
@@ -36,6 +40,12 @@ export function EpisodeDock({
       disabled: !episode.artifact_paths?.json
     },
     {
+      id: "transcript",
+      icon: <AlignLeft className="h-5 w-5" strokeWidth={1.6} />,
+      label: "导出文稿",
+      onClick: () => window.open(episodeFileUrl(episode.id, "transcript"), "_blank")
+    },
+    {
       id: "audio",
       icon: <Music className="h-5 w-5" strokeWidth={1.6} />,
       label: "Original audio",
@@ -47,6 +57,13 @@ export function EpisodeDock({
       label: "Audio digest",
       onClick: () => window.open(episodeFileUrl(episode.id, "digest"), "_blank"),
       disabled: episode.stage_status.tts !== "present"
+    },
+    {
+      id: "chat",
+      icon: <MessageCircle className="h-5 w-5" strokeWidth={1.6} />,
+      label: chatOpen ? "关闭对话" : "与文稿对话",
+      onClick: onChatToggle,
+      variant: chatOpen ? "active" as "default" : "default"
     },
     {
       id: "delete",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import AsyncIterator
 from typing import Any, Protocol
 
 import httpx
@@ -25,6 +26,10 @@ class UnimplementedLLMClient:
 
     def complete_json(self, prompt: str, schema: type[BaseModel]) -> dict[str, Any]:
         raise NotImplementedError(f"LLM provider is not implemented yet: {self.provider}")
+
+    async def stream_chat(self, messages: list[dict]) -> AsyncIterator[str]:
+        raise NotImplementedError(f"LLM provider is not implemented yet: {self.provider}")
+        yield  # make this an async generator
 
 
 class DeepSeekLLM:
@@ -71,6 +76,23 @@ class DeepSeekLLM:
                 content = _openai_message_content(response)
         return _validate_json_payload(content, schema)
 
+    async def stream_chat(self, messages: list[dict]) -> AsyncIterator[str]:
+        from openai import AsyncOpenAI
+
+        async_client = AsyncOpenAI(
+            api_key=_secret_value(self.settings.DEEPSEEK_API_KEY),
+            base_url=self.settings.DEEPSEEK_BASE_URL,
+        )
+        stream = await async_client.chat.completions.create(
+            model=self.settings.DEEPSEEK_MODEL,
+            messages=messages,
+            stream=True,
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+
 
 class QwenLLM:
     def __init__(
@@ -102,6 +124,23 @@ class QwenLLM:
                 )
                 content = _qwen_message_content(response)
         return _validate_json_payload(content, schema)
+
+    async def stream_chat(self, messages: list[dict]) -> AsyncIterator[str]:
+        from openai import AsyncOpenAI
+
+        async_client = AsyncOpenAI(
+            api_key=_secret_value(self.settings.DASHSCOPE_API_KEY),
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        )
+        stream = await async_client.chat.completions.create(
+            model=self.settings.QWEN_LLM_MODEL,
+            messages=messages,
+            stream=True,
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
 
 
 class AnthropicLLM:
@@ -141,6 +180,44 @@ class AnthropicLLM:
                 response.raise_for_status()
                 content = _anthropic_message_content(response.json())
         return _validate_json_payload(content, schema)
+
+    async def stream_chat(self, messages: list[dict]) -> AsyncIterator[str]:
+        system_msgs = [m for m in messages if m.get("role") == "system"]
+        user_msgs = [m for m in messages if m.get("role") != "system"]
+        system_text = "\n\n".join(m["content"] for m in system_msgs) if system_msgs else None
+        payload: dict[str, Any] = {
+            "model": self.settings.ANTHROPIC_MODEL,
+            "max_tokens": 2048,
+            "stream": True,
+            "messages": user_msgs,
+        }
+        if system_text:
+            payload["system"] = system_text
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            async with client.stream(
+                "POST",
+                self.endpoint,
+                headers={
+                    "x-api-key": _secret_value(self.settings.ANTHROPIC_API_KEY),
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json=payload,
+            ) as response:
+                async for line in response.aiter_lines():
+                    if not line.startswith("data: "):
+                        continue
+                    data = line[6:]
+                    if data == "[DONE]":
+                        break
+                    try:
+                        event = json.loads(data)
+                    except json.JSONDecodeError:
+                        continue
+                    if event.get("type") == "content_block_delta":
+                        delta = event.get("delta", {}).get("text", "")
+                        if delta:
+                            yield delta
 
 
 def create_llm_client(settings: Settings) -> LLMClient:

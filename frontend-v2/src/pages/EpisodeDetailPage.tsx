@@ -17,6 +17,7 @@ import { ChaptersTimeline } from "@/components/ChaptersTimeline";
 import { EntityCloud } from "@/components/EntityCloud";
 import { EpisodeDock } from "@/components/EpisodeDock";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { ChatPanel } from "@/components/ChatPanel";
 import { IridescentButton } from "@/components/ui/iridescent-button";
 import type { AudioControls } from "@/components/AudioPlayer";
 import { useRef } from "react";
@@ -29,6 +30,7 @@ export default function EpisodeDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
   const { jobsById, episodeStatuses } = useJobStream();
   const originalAudioRef = useRef<AudioControls>(null);
   const audioSectionRef = useRef<HTMLElement>(null);
@@ -197,8 +199,18 @@ export default function EpisodeDetailPage() {
         episode={episode}
         onRetry={handleRetry}
         onDelete={handleDelete}
+        onChatToggle={() => setChatOpen((v) => !v)}
+        chatOpen={chatOpen}
         busy={busy}
       />
+
+      {(episode.status === "done" || episode.status === "partial") && (
+        <ChatPanel
+          episodeId={episode.id}
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+        />
+      )}
     </div>
   );
 }

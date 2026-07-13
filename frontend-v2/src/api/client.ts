@@ -229,7 +229,7 @@ export function getJob(id: string): Promise<Job> {
 
 export function episodeFileUrl(
   id: string,
-  kind: "markdown" | "json" | "audio" | "digest"
+  kind: "markdown" | "json" | "audio" | "digest" | "transcript"
 ): string {
   return `/api/episodes/${encodeURIComponent(id)}/files/${kind}`;
 }
@@ -249,6 +249,73 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
+}
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export function chatEpisode(
+  id: string,
+  message: string,
+  history: ChatMessage[]
+): { stream: ReadableStream<string>; abort: () => void } {
+  const controller = new AbortController();
+  const stream = new ReadableStream<string>({
+    async start(streamController) {
+      let response: Response;
+      try {
+        response = await fetch(`/api/episodes/${encodeURIComponent(id)}/chat`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ message, history }),
+          signal: controller.signal
+        });
+      } catch (err) {
+        streamController.error(err);
+        return;
+      }
+      if (!response.ok || !response.body) {
+        streamController.error(new Error(`Chat request failed: ${response.status}`));
+        return;
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const data = line.slice(6);
+            if (data === "[DONE]") {
+              streamController.close();
+              return;
+            }
+            try {
+              const parsed = JSON.parse(data) as { token?: string; error?: string };
+              if (parsed.error) {
+                streamController.error(new Error(parsed.error));
+                return;
+              }
+              if (parsed.token) streamController.enqueue(parsed.token);
+            } catch {
+              // skip malformed lines
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock();
+      }
+      streamController.close();
+    }
+  });
+  return { stream, abort: () => controller.abort() };
 }
 
 export function wsEndpoint(path: string): string {

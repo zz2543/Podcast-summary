@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import shutil
+from collections.abc import AsyncIterator
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -18,6 +20,7 @@ from podsum.persistence.repo import (
     EntityRepo,
     EpisodeRepo,
     JobRepo,
+    SegmentRepo,
     SummaryArtifactRepo,
 )
 from podsum.services.ingest import (
@@ -29,6 +32,7 @@ from podsum.services.ingest import (
     ingest_local_file,
     ingest_youtube,
 )
+from podsum.services.llm_client import create_llm_client
 from podsum.services.pipeline import create_tts_pipeline, create_us1_pipeline
 
 router = APIRouter(prefix="/api/episodes", tags=["episodes"])
@@ -267,6 +271,74 @@ async def get_audio_file(
     if episode is None:
         return _api_error(404, "not_found", "episode not found")
     return _file_response(str(Path(episode.data_dir) / "audio.normalized.mp3"), "audio/mpeg")
+
+
+@router.get("/{episode_id}/files/transcript")
+async def get_transcript_file(
+    episode_id: str,
+    session: Session = SESSION_DEP,
+) -> Response:
+    segments = SegmentRepo(session).list_for_episode(episode_id)
+    if not segments:
+        return _api_error(404, "not_found", "no transcript available")
+    text = "\n".join(seg.text for seg in segments)
+    return Response(
+        content=text,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="transcript.txt"'},
+    )
+
+
+@router.post("/{episode_id}/chat", response_model=None)
+async def chat_episode(
+    episode_id: str,
+    request: Request,
+    session: Session = SESSION_DEP,
+) -> StreamingResponse | JSONResponse:
+    episode = EpisodeRepo(session).get(episode_id)
+    if episode is None:
+        return _api_error(404, "not_found", "episode not found")
+
+    segments = SegmentRepo(session).list_for_episode(episode_id)
+    if not segments:
+        return _api_error(422, "no_transcript", "no transcript available for this episode")
+
+    body = await request.json()
+    message = str(body.get("message", "")).strip()
+    if not message:
+        return _api_error(400, "bad_input", "message is required")
+    history: list[dict] = body.get("history", [])
+
+    transcript = " ".join(seg.text for seg in segments)
+    if len(transcript) > 80_000:
+        transcript = transcript[:80_000] + "…"
+
+    system_content = (
+        "你是一个播客内容助手。以下是这期播客的转录文稿，请基于文稿内容回答用户的问题。\n\n"
+        f"播客标题：{episode.title or '未知'}\n\n"
+        f"转录文稿：\n{transcript}"
+    )
+    messages: list[dict] = [{"role": "system", "content": system_content}]
+    for msg in history:
+        if isinstance(msg, dict) and msg.get("role") in {"user", "assistant"}:
+            messages.append({"role": msg["role"], "content": str(msg.get("content", ""))})
+    messages.append({"role": "user", "content": message})
+
+    llm = getattr(request.app.state, "llm_client", None) or create_llm_client(request.app.state.settings)
+
+    async def event_stream() -> AsyncIterator[str]:
+        try:
+            async for token in llm.stream_chat(messages):
+                yield f"data: {json.dumps({'token': token}, ensure_ascii=False)}\n\n"
+        except Exception as exc:
+            yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 async def _ingest_request(
