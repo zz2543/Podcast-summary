@@ -28,14 +28,15 @@
     "status": { "type": "string", "enum": ["pending", "processing", "done", "partial", "failed"] },
     "stage_status": {
       "type": "object",
-      "required": ["hook", "three_act", "chapters", "entities", "tts"],
+      "required": ["hook", "three_act", "chapters", "entities", "usefulness", "tts"],
       "additionalProperties": false,
       "properties": {
-        "hook":      { "$ref": "#/$defs/StageStatus" },
-        "three_act": { "$ref": "#/$defs/StageStatus" },
-        "chapters":  { "$ref": "#/$defs/StageStatus" },
-        "entities":  { "$ref": "#/$defs/StageStatus" },
-        "tts":       { "$ref": "#/$defs/StageStatus" }
+        "hook":       { "$ref": "#/$defs/StageStatus" },
+        "three_act":  { "$ref": "#/$defs/StageStatus" },
+        "chapters":   { "$ref": "#/$defs/StageStatus" },
+        "entities":   { "$ref": "#/$defs/StageStatus" },
+        "usefulness": { "$ref": "#/$defs/StageStatus" },
+        "tts":        { "$ref": "#/$defs/StageStatus" }
       }
     },
     "prompt_versions": {
@@ -47,7 +48,22 @@
         "one_liner":         { "type": "string", "pattern": "^v[0-9]+$" },
         "three_act":         { "type": "string", "pattern": "^v[0-9]+$" },
         "chapter_outline":   { "type": "string", "pattern": "^v[0-9]+$" },
-        "entity_extraction": { "type": "string", "pattern": "^v[0-9]+$" }
+        "entity_extraction": { "type": "string", "pattern": "^v[0-9]+$" },
+        "usefulness_score":  { "type": "string", "pattern": "^v[0-9]+$" },
+        "summary_style":     { "type": "string", "pattern": "^v[0-9]+$" }
+      }
+    },
+    "summary_style": {
+      "type": "object",
+      "description": "Reader-chosen summary style captured at submission time. Absent in outputs produced before the style control existed.",
+      "required": ["preset"],
+      "additionalProperties": false,
+      "properties": {
+        "preset": {
+          "type": "string",
+          "enum": ["default", "study_notes", "business_insight", "debate", "quick_skim"]
+        },
+        "note": { "type": ["string", "null"], "maxLength": 200 }
       }
     },
     "hook": {
@@ -63,6 +79,13 @@
         "core_argument": { "type": "string" },
         "conclusion":    { "type": "string" }
       }
+    },
+    "usefulness": {
+      "description": "FR-027 usefulness rating. null (not an object of nulls) when stage_status.usefulness != 'present'.",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/Usefulness" }
+      ]
     },
     "chapters": {
       "type": "array",
@@ -85,6 +108,30 @@
     "updated_at": { "type": "string", "format": "date-time" }
   },
   "$defs": {
+    "Usefulness": {
+      "type": "object",
+      "description": "How useful the episode is to a listener deciding whether to spend time on it (FR-027).",
+      "required": ["score", "band", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Higher is more useful. Never clamped: an out-of-range model answer is retried, not squeezed into range."
+        },
+        "band": {
+          "type": "string",
+          "enum": ["must_listen", "worth_listening", "skimmable", "skippable"],
+          "description": "Derived from score by system code: 85-100 / 70-84 / 50-69 / 0-49."
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One sentence in the episode's source language (FR-007)."
+        }
+      }
+    },
     "StageStatus": {
       "type": "string",
       "enum": ["pending", "present", "missing", "failed_after_retries"]

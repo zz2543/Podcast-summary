@@ -23,13 +23,24 @@ Create a new episode and enqueue a job. Accepts either a JSON body (URL/YouTube)
 ```json
 {
   "source_type": "direct_url" | "youtube",
-  "source_ref": "https://example.com/ep01.mp3"
+  "source_ref": "https://example.com/ep01.mp3",
+  "summary_style": "default | study_notes | business_insight | debate | quick_skim",
+  "style_note": "optional, ≤ 200 chars"
 }
 ```
 
 **Body — variant B: file upload (`multipart/form-data`)**
 - `source_type=local_file`
 - `file`: the audio file (mp3 / m4a / wav)
+- `summary_style`, `style_note`: optional, same values as variant A
+
+**Summary style** (both variants, both optional). `summary_style` names a section of
+`prompts/summary_style.v1.md`; `style_note` is the reader's own instruction. They are
+stored on the episode and turned into the `style_directive` slot of the v2 summary
+prompts, which shapes tone, emphasis and depth only — output keys, language and
+factual grounding are unaffected. Omitting both (or sending `summary_style=default`
+with no note) produces exactly the pre-style prompt text. Both are validated before
+the audio is fetched.
 
 **201 Created**
 ```json
@@ -39,7 +50,7 @@ Create a new episode and enqueue a job. Accepts either a JSON body (URL/YouTube)
 }
 ```
 
-**400 `bad_input`** unsupported `source_type`, malformed URL.
+**400 `bad_input`** unsupported `source_type`, malformed URL, unknown `summary_style`, or `style_note` longer than 200 characters.
 **413 `payload_too_large`** file > 1 GB OR (after probe) duration > 6 h (FR-024).
 **415 `unsupported_media`** direct URL Content-Type not `audio/*` (FR-002), or YouTube link unresolvable (FR-003), or file extension not in {mp3, m4a, wav} (FR-001).
 **409 `conflict`** an active (non-deleted) episode already exists for the same `(source_type, source_ref)` of types `direct_url` / `youtube`.
@@ -58,7 +69,9 @@ List episodes (most recent first). Pagination via `?limit=` (default 50, max 200
 }
 ```
 
-Optional filters: `?status=pending|processing|done|partial|failed`.
+Optional filters: `?status=pending|processing|done|partial|failed`, `?band=must_listen|worth_listening|skimmable|skippable` (FR-027; episodes whose `stage_status.usefulness != "present"` are excluded when this filter is set), and `?min_score=<0-100>`.
+
+Optional sort: `?sort=created_at` (default, newest first) or `?sort=usefulness_score` (highest score first). Under `sort=usefulness_score`, unscored episodes sort last, ties broken by `created_at DESC`.
 
 ---
 
@@ -147,14 +160,22 @@ Stream the cached normalized audio for the in-page player (supports HTTP `Range`
     "three_act": "...",
     "chapters": "...",
     "entities": "...",
+    "usefulness": "...",
     "tts": "..."
+  },
+  "usefulness": {
+    "score": 78,
+    "band": "must_listen | worth_listening | skimmable | skippable",
+    "rationale": "string"
   },
   "created_at": "ISO-8601",
   "updated_at": "ISO-8601"
 }
 ```
 
-`EpisodeDetail` extends `EpisodeSummary` with `hook`, `three_act`, `chapters[]`, `entities[]`, and `artifact_paths` (markdown/json/tts), plus `prompt_versions`. Authoritative shape lives in `episode-output.schema.json`.
+`usefulness` is `null` (not an object with null fields) whenever `stage_status.usefulness != "present"` — the list view renders "未评分" in that case rather than a zero score.
+
+`EpisodeDetail` extends `EpisodeSummary` with `hook`, `three_act`, `chapters[]`, `entities[]`, and `artifact_paths` (markdown/json/tts), plus `prompt_versions` (which includes `usefulness_score`). Authoritative shape lives in `episode-output.schema.json`.
 
 `Job`:
 ```json

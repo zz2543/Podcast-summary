@@ -24,6 +24,14 @@ export function ChatPanel({ episodeId, open, onClose }: ChatPanelProps) {
     if (open) setTimeout(() => textareaRef.current?.focus(), 320);
   }, [open]);
 
+  // Auto-grow the composer: collapse first so shrinking works, then fit content.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
+  }, [input]);
+
   const send = async () => {
     const text = input.trim();
     if (!text || streaming) return;
@@ -218,8 +226,8 @@ export function ChatPanel({ episodeId, open, onClose }: ChatPanelProps) {
               onKeyDown={handleKeyDown}
               placeholder="输入问题… (Enter 发送)"
               disabled={streaming}
-              className="flex-1 resize-none bg-transparent text-sm text-text outline-none placeholder:text-text-subtle disabled:opacity-50"
-              style={{ maxHeight: "96px", overflowY: "auto" }}
+              className="flex-1 resize-none bg-transparent text-sm leading-6 text-text outline-none placeholder:text-text-subtle disabled:opacity-50"
+              style={{ maxHeight: "96px", overflowY: "auto", height: "24px" }}
             />
             <button
               onClick={send}

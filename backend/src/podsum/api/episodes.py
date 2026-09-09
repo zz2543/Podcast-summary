@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response, StreamingRes
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from podsum.domain import summary_style as style_rules
 from podsum.exporters.json_export import render as render_json
 from podsum.persistence.models import Episode, Job, SummaryArtifact
 from podsum.persistence.repo import (
@@ -28,9 +29,11 @@ from podsum.services.ingest import (
     IngestError,
     PayloadTooLarge,
     UnsupportedMedia,
+    extract_url,
     ingest_direct_url,
     ingest_local_file,
-    ingest_youtube,
+    ingest_video,
+    normalize_video_url,
 )
 from podsum.services.llm_client import create_llm_client
 from podsum.services.pipeline import create_tts_pipeline, create_us1_pipeline
@@ -46,6 +49,8 @@ def get_session(request: Request) -> Any:
 
 SESSION_DEP = Depends(get_session)
 SOURCE_TYPE_FORM = Form(default=None, alias="source_type")
+SUMMARY_STYLE_FORM = Form(default=None, alias="summary_style")
+STYLE_NOTE_FORM = Form(default=None, alias="style_note")
 UPLOAD_FILE_FIELD = File(default=None)
 
 
@@ -57,14 +62,18 @@ class BatchConflict(ValueError):
 async def create_episode(
     request: Request,
     source_type_form: str | None = SOURCE_TYPE_FORM,
+    summary_style_form: str | None = SUMMARY_STYLE_FORM,
+    style_note_form: str | None = STYLE_NOTE_FORM,
     file: UploadFile | None = UPLOAD_FILE_FIELD,
     session: Session = SESSION_DEP,
 ) -> JSONResponse:
     try:
-        source_type, source_ref, ingested = await _ingest_request(
+        source_type, source_ref, ingested, style = await _ingest_request(
             request,
             source_type_form,
             file,
+            summary_style_form,
+            style_note_form,
         )
     except PayloadTooLarge as exc:
         return _api_error(413, "payload_too_large", str(exc))
@@ -77,7 +86,7 @@ async def create_episode(
         shutil.rmtree(ingested.normalized_path.parent, ignore_errors=True)
         return _api_error(409, "conflict", "episode already exists for this source")
 
-    episode = _episode_from_ingest(source_type, source_ref, ingested)
+    episode = _episode_from_ingest(source_type, source_ref, ingested, style)
     job = Job(episode_id=episode.id, state="queued", attempt=1)
     session.add_all([episode, job])
     session.commit()
@@ -107,7 +116,7 @@ async def create_episode_batch(
     request: Request,
     session: Session = SESSION_DEP,
 ) -> JSONResponse:
-    ingested_items: list[tuple[str, str, IngestedAudio]] = []
+    ingested_items: list[tuple[str, str, IngestedAudio, style_rules.SummaryStyle]] = []
     try:
         ingested_items = await _ingest_batch_request(request)
         _check_batch_conflicts(session, ingested_items)
@@ -125,8 +134,8 @@ async def create_episode_batch(
         return _api_error(400, "bad_input", str(exc))
 
     rows: list[tuple[Episode, Job]] = []
-    for source_type, source_ref, ingested in ingested_items:
-        episode = _episode_from_ingest(source_type, source_ref, ingested)
+    for source_type, source_ref, ingested, style in ingested_items:
+        episode = _episode_from_ingest(source_type, source_ref, ingested, style)
         job = Job(episode_id=episode.id, state="queued", attempt=1)
         rows.append((episode, job))
         session.add_all([episode, job])
@@ -345,28 +354,40 @@ async def _ingest_request(
     request: Request,
     source_type_form: str | None,
     file: UploadFile | None,
-) -> tuple[str, str, IngestedAudio]:
+    summary_style_form: str | None,
+    style_note_form: str | None,
+) -> tuple[str, str, IngestedAudio, style_rules.SummaryStyle]:
     settings = request.app.state.settings
     content_type = request.headers.get("content-type", "")
     if content_type.startswith("multipart/form-data"):
         if source_type_form != "local_file" or file is None:
             raise ValueError("multipart upload requires source_type=local_file and file")
+        # Style is validated before the upload is normalised, so a bad preset
+        # fails fast instead of leaving a half-ingested directory behind.
+        style = style_rules.parse(summary_style_form, style_note_form)
         ingested = await ingest_local_file(file, settings)
-        return "local_file", file.filename or ingested.original_path.name, ingested
+        return "local_file", file.filename or ingested.original_path.name, ingested, style
 
     payload = await request.json()
     source_type = payload.get("source_type")
     source_ref = payload.get("source_ref")
     if not isinstance(source_ref, str) or not source_ref.strip():
         raise ValueError("source_ref is required")
+    style = style_rules.parse(payload.get("summary_style"), payload.get("style_note"))
     if source_type == "direct_url":
-        return source_type, source_ref, await ingest_direct_url(source_ref, settings)
+        # Only the URL is extracted here: a direct link may be presigned, so its
+        # query string has to survive intact.
+        source_ref = extract_url(source_ref)
+        return source_type, source_ref, await ingest_direct_url(source_ref, settings), style
     if source_type == "youtube":
-        return source_type, source_ref, await ingest_youtube(source_ref, settings)
+        source_ref = normalize_video_url(source_ref)
+        return source_type, source_ref, await ingest_video(source_ref, settings), style
     raise ValueError("source_type must be local_file, direct_url, or youtube")
 
 
-async def _ingest_batch_request(request: Request) -> list[tuple[str, str, IngestedAudio]]:
+async def _ingest_batch_request(
+    request: Request,
+) -> list[tuple[str, str, IngestedAudio, style_rules.SummaryStyle]]:
     settings = request.app.state.settings
     content_type = request.headers.get("content-type", "")
     if content_type.startswith("multipart/form-data"):
@@ -374,8 +395,11 @@ async def _ingest_batch_request(request: Request) -> list[tuple[str, str, Ingest
         uploads = [item for item in [*form.getlist("files"), *form.getlist("file")] if isinstance(item, UploadFile)]
         if not uploads:
             raise ValueError("multipart batch requires at least one file")
+        # One style for the whole batch: the submit modal styles a submission,
+        # not a file.
+        style = style_rules.parse(form.get("summary_style"), form.get("style_note"))
         return [
-            ("local_file", upload.filename or "audio", await ingest_local_file(upload, settings))
+            ("local_file", upload.filename or "audio", await ingest_local_file(upload, settings), style)
             for upload in uploads
         ]
 
@@ -383,7 +407,8 @@ async def _ingest_batch_request(request: Request) -> list[tuple[str, str, Ingest
     items = payload.get("items") if isinstance(payload, dict) else None
     if not isinstance(items, list) or not items:
         raise ValueError("batch payload must contain a non-empty items list")
-    ingested: list[tuple[str, str, IngestedAudio]] = []
+    batch_style = style_rules.parse(payload.get("summary_style"), payload.get("style_note"))
+    ingested: list[tuple[str, str, IngestedAudio, style_rules.SummaryStyle]] = []
     for item in items:
         if not isinstance(item, dict):
             raise ValueError("each batch item must be an object")
@@ -391,10 +416,17 @@ async def _ingest_batch_request(request: Request) -> list[tuple[str, str, Ingest
         source_ref = item.get("source_ref")
         if not isinstance(source_ref, str) or not source_ref.strip():
             raise ValueError("source_ref is required for URL batch items")
+        style = (
+            style_rules.parse(item.get("summary_style"), item.get("style_note"))
+            if "summary_style" in item or "style_note" in item
+            else batch_style
+        )
         if source_type == "direct_url":
-            ingested.append((source_type, source_ref, await ingest_direct_url(source_ref, settings)))
+            source_ref = extract_url(source_ref)
+            ingested.append((source_type, source_ref, await ingest_direct_url(source_ref, settings), style))
         elif source_type == "youtube":
-            ingested.append((source_type, source_ref, await ingest_youtube(source_ref, settings)))
+            source_ref = normalize_video_url(source_ref)
+            ingested.append((source_type, source_ref, await ingest_video(source_ref, settings), style))
         else:
             raise ValueError("batch source_type must be direct_url or youtube for JSON requests")
     return ingested
@@ -402,10 +434,10 @@ async def _ingest_batch_request(request: Request) -> list[tuple[str, str, Ingest
 
 def _check_batch_conflicts(
     session: Session,
-    ingested_items: list[tuple[str, str, IngestedAudio]],
+    ingested_items: list[tuple[str, str, IngestedAudio, style_rules.SummaryStyle]],
 ) -> None:
     seen: set[tuple[str, str]] = set()
-    for source_type, source_ref, _ in ingested_items:
+    for source_type, source_ref, _, _ in ingested_items:
         key = (source_type, source_ref)
         if source_type in {"direct_url", "youtube"}:
             if key in seen or _existing_link(session, source_type, source_ref):
@@ -413,12 +445,19 @@ def _check_batch_conflicts(
             seen.add(key)
 
 
-def _cleanup_ingested(ingested_items: list[tuple[str, str, IngestedAudio]]) -> None:
-    for _, _, ingested in ingested_items:
+def _cleanup_ingested(
+    ingested_items: list[tuple[str, str, IngestedAudio, style_rules.SummaryStyle]],
+) -> None:
+    for _, _, ingested, _ in ingested_items:
         shutil.rmtree(ingested.normalized_path.parent, ignore_errors=True)
 
 
-def _episode_from_ingest(source_type: str, source_ref: str, ingested: IngestedAudio) -> Episode:
+def _episode_from_ingest(
+    source_type: str,
+    source_ref: str,
+    ingested: IngestedAudio,
+    style: style_rules.SummaryStyle,
+) -> Episode:
     return Episode(
         id=ingested.episode_id,
         source_type=source_type,
@@ -427,6 +466,8 @@ def _episode_from_ingest(source_type: str, source_ref: str, ingested: IngestedAu
         podcast_name=ingested.podcast_name,
         duration_seconds=ingested.duration_seconds,
         status="pending",
+        summary_style=style.preset,
+        style_note=style.note,
         data_dir=str(ingested.normalized_path.parent),
     )
 

@@ -176,6 +176,28 @@ description: "Task list for 001-podcast-summary implementation"
 
 ---
 
+## Phase 8: Increment — Usefulness Score (FR-027)
+
+**Added**: 2026-09-09. Every episode gets a 0-100 usefulness score alongside the summary, so the list view can be triaged by score. Scoring is an **optional** pipeline stage: it never blocks an episode from reaching `done` (FR-026).
+
+**Independent test**: Re-run a processed episode; the detail page shows a 0-100 score with a band label and a one-sentence rationale, `summary.json` validates against the updated schema, and forcing the scoring LLM call to fail leaves the episode `done` with the score area reading "未评分".
+
+- [X] T081 Author `prompts/usefulness_score.v1.md` — frontmatter `role: usefulness_score` / `version: v1` / `lang_aware: true`; slots `{lang}`, `{episode_title}`, `{transcript}`; body returns JSON `{score, rationale}` with explicit 0-100 band anchors and instructions to ignore audio quality, host fame, production polish, and episode length. *(authored 2026-09-09 together with this spec increment.)*
+- [ ] T082 Implement `backend/src/podsum/domain/usefulness_scorer.py::band_for(score: int) -> Band` — the sole writer of `usefulness_band`: `85-100 → must_listen`, `70-84 → worth_listening`, `50-69 → skimmable`, `0-49 → skippable`. Pure function, no I/O, raises on out-of-range input.
+- [ ] T083 Implement `backend/src/podsum/domain/structured_parser.py::parse_usefulness(raw_json) -> Usefulness` — strict pydantic validation: `score` must be an `int` in 0-100 (reject floats, numeric strings, and out-of-range values with `RetriableValidationError`; **never clamp**), `rationale` must be a non-empty, non-whitespace single sentence; reject extra keys. Band is filled in by T082, not read from the model response.
+- [ ] T084 [P] [unit-test] `backend/tests/unit/test_usefulness.py` — `band_for` boundaries (0, 49, 50, 69, 70, 84, 85, 100) and out-of-range raise; `parse_usefulness` cases: valid, `score=101`, `score=-1`, `score=78.5`, `score="78"`, missing `rationale`, whitespace-only `rationale`, extra key. Keeps the domain package above the 80% coverage gate (Constitution III).
+- [ ] T085 Persistence: add `usefulness_score` (INTEGER, CHECK 0-100), `usefulness_band` (TEXT, CHECK in the four bands), `usefulness_rationale` (TEXT) to `SummaryArtifact` in `backend/src/podsum/persistence/models.py`, plus an index on `usefulness_score` for the score sort. Generate Alembic revision `0002_usefulness_score.py` — nullable columns, no data backfill; existing rows get `stage_status.usefulness = "missing"` (they are re-scored only on explicit retry, so the migration never calls the LLM).
+- [ ] T086 Register the `usefulness_score` stage in `backend/src/podsum/services/pipeline.py` via `register_us1_stages`, `required=False`, placed after `summarize_three_act` and before `chapter_outline`. `_stage_usefulness_score` renders the T081 prompt, calls `LLMClient.complete_json`, parses with T083, derives the band with T082, writes all three columns in one transaction, sets `stage_status["usefulness"]="present"` and `prompt_versions["usefulness_score"]="v1"`. On retry-budget exhaustion: `stage_status["usefulness"]="failed_after_retries"`, all three columns stay NULL, pipeline continues (FR-026).
+- [ ] T087 [P] Exporters: `backend/src/podsum/exporters/markdown.py` emits a `## Usefulness` section (`<score>/100 · <band label> · <rationale>`) between `## Hook` and `## Three-Act Summary`, omitted entirely when unscored; `backend/src/podsum/exporters/json_export.py` emits the `usefulness` object (or `null`) plus the new `stage_status.usefulness` and `prompt_versions.usefulness_score` keys, matching `contracts/episode-output.schema.json`.
+- [ ] T088 API: surface `usefulness` on both `EpisodeSummary` and `EpisodeDetail` in `backend/src/podsum/api/episodes.py`; add `?band=`, `?min_score=`, and `?sort=created_at|usefulness_score` to `GET /api/episodes` (unscored episodes sort last, ties broken by `created_at DESC`); emit `stage_status_update` frames with `stage="usefulness"` from `api/ws_progress.py`.
+- [ ] T089 [P] Frontend (**both SPAs are live per the Makefile — `frontend/` and `frontend-v2/`**): a `ScoreBadge` per `ui-brief.md` §6.8 (number + band label; muted "未评分" when `usefulness` is null — **never render a missing score as 0**) wired into the list row / `frontend-v2/src/components/EpisodeCard.tsx`; a `UsefulnessCard` per §3.3.1 rendered under the hook on the detail page (next to `frontend-v2/src/components/HookHero.tsx`), carrying the `prompt_versions.usefulness_score` provenance line and the `MissingStagePlaceholder` fallback; band filter + score sort controls in the list page's filter row per §2.3. Update the shared API types so `usefulness` is `Usefulness | null`, not an optional number.
+- [ ] T090 [P] [integration-test] `backend/tests/integration/test_usefulness_stage.py` — (a) happy path: mocked LLM returns `{"score": 78, "rationale": "..."}`, assert DB columns, `summary.json` validates against the updated schema, and Markdown contains the section; (b) degradation: mocked LLM always fails, assert episode still reaches `done`, all three columns NULL, `stage_status.usefulness == "failed_after_retries"`, and `usefulness` serializes as `null`; (c) TTS digest script does **not** mention the score (FR-027).
+- [ ] T091 Docs: append the scoring design decision + calibration observations to `detail.md`, and update the 核心实现 section of `report.md`. Record the SC-008 check (score vs. a human go/no-go call, plus band spread) or explicitly note it as waived, consistent with the T079 evaluation waiver.
+
+**Checkpoint**: FR-027 delivered; scoring degrades cleanly and no other stage's behavior changes.
+
+---
+
 ## Dependencies
 
 ```text
@@ -190,6 +212,7 @@ Phase 1 (Setup) ──► Phase 2 (Foundational) ──► Phase 3 (US1 — MVP)
 
 - Phases 4, 5, 6 each depend on Phase 3 outputs (Episode/Job/Pipeline scaffolding) but are independent of each other; they can be implemented in any order or in parallel by separate agents.
 - Phase 7 depends on all stories being merged.
+- Phase 8 (usefulness score) depends on Phase 3 (US1 summarization stages + exporters) only. Inside it: T082/T083 → T084; T085 → T086; T086 → T087/T088 → T089; T090 after T088.
 - Inside each phase, parallelism is marked with `[P]` per task; the rule is "different file, no dependency on an incomplete same-phase task."
 
 ## Parallel Execution Examples

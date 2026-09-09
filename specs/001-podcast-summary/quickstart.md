@@ -62,6 +62,7 @@ This sequence exercises every required FR end-to-end and is the manual gate befo
 7. **FR-024** — submit a > 1 GB file (or a > 6 h YouTube video); confirm rejection at ingestion with `413 payload_too_large` and no `data/<id>/` created.
 8. **FR-025** — delete an episode from the UI; confirm the row disappears and `data/<id>/` is gone from disk.
 9. **FR-026** — temporarily break the TTS API key (`OPENAI_API_KEY=invalid`), trigger a digest; confirm `stage_status.tts="failed_after_retries"` while the rest of the episode remains usable.
+10. **FR-027** — on the same processed episode, confirm the detail page shows a 0-100 usefulness score with a band label and a one-sentence rationale in the source language, that `summary.md` / `summary.json` carry the same score, and that sorting the list by 评分优先 reorders the rows. Then point the LLM at an invalid key and re-run the episode: confirm the episode still reaches `done`, `stage_status.usefulness="failed_after_retries"`, `usefulness` serializes as `null`, and the UI reads "未评分" (not `0`).
 
 ## Test commands
 

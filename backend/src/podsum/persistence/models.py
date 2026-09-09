@@ -69,6 +69,10 @@ class Episode(Base):
     duration_seconds: Mapped[int | None] = mapped_column(Integer)
     language: Mapped[str | None] = mapped_column(String(16))
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
+    summary_style: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="default", server_default="default"
+    )
+    style_note: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
     data_dir: Mapped[str] = mapped_column(Text, nullable=False, unique=True)

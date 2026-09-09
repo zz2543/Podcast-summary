@@ -37,6 +37,14 @@ class Settings(BaseSettings):
     MAX_CONCURRENCY: int = Field(default=2, ge=1, le=8)
     LOG_LEVEL: str = "INFO"
 
+    # Video ingestion (yt-dlp). All optional: the pipeline reaches YouTube and
+    # Bilibili anonymously by default, and YTDLP_COOKIEFILE is only needed for
+    # members-only or age-gated media.
+    YTDLP_COOKIEFILE: Path | None = None
+    YTDLP_MAX_ATTEMPTS: int = Field(default=5, ge=1, le=10)
+    YTDLP_RETRY_DELAY_SECONDS: float = Field(default=1.5, ge=0.0, le=30.0)
+    BILIBILI_ANONYMOUS_COOKIES: bool = True
+
     ASR_PROVIDER: ASRProvider = "doubao"
     LLM_PROVIDER: LLMProvider = "deepseek"
     TTS_PROVIDER: TTSProvider = "doubao"
@@ -85,6 +93,15 @@ class Settings(BaseSettings):
     DEEPGRAM_API_KEY: SecretStr | None = None
     ANTHROPIC_API_KEY: SecretStr | None = None
     DASHSCOPE_API_KEY: SecretStr | None = None
+
+    @field_validator("YTDLP_COOKIEFILE", mode="before")
+    @classmethod
+    def blank_cookiefile_means_none(cls, value: object) -> object:
+        # A commented-out `YTDLP_COOKIEFILE=` in .env would otherwise land as
+        # Path("."), which yt-dlp then tries to read as a cookie jar.
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
     @field_validator("LOG_LEVEL")
     @classmethod

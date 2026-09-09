@@ -87,23 +87,25 @@ Server-side rejections (HTTP 413 / 415) surface as a toast (§6.4) — see error
 Single row, sticky:
 
 - Left: status filter pills: **全部 (default)** / 处理中 / 已完成 / 部分完成 / 失败
+- Middle: 有用性筛选下拉 "全部评分 (default) / 必听 / 值得听 / 可跳读 / 可跳过"，映射到 `?band=` (FR-027)
+- Middle: 排序下拉 "最新优先 (default) / 评分优先"，映射到 `?sort=created_at|usefulness_score`
 - Right: search box (placeholder "在已处理的节目中搜索…", v1 may filter client-side over loaded items only)
 
 ### 2.4 EpisodeGrid
 
-A vertical list of **EpisodeRow** items, sorted by `created_at DESC`.
+A vertical list of **EpisodeRow** items, sorted by `created_at DESC` unless the user picks 评分优先 in §2.3.
 
 #### 2.4.1 EpisodeRow
 
 Single horizontal card per episode. Roughly 96 px tall.
 
 ```
-┌────┬──────────────────────────────────────────┬──────────┬─────────┐
-│ A  │ B title                                  │ C status │ D actions│
-│    │   B subtitle (podcast / source / ⏱)     │          │          │
-│    │ E hook (only when status=done|partial)   │          │          │
-│    │ F progress bar (only when processing)    │          │          │
-└────┴──────────────────────────────────────────┴──────────┴─────────┘
+┌────┬──────────────────────────────────────────┬───────┬──────────┬─────────┐
+│ A  │ B title                                  │ G 分数 │ C status │ D actions│
+│    │   B subtitle (podcast / source / ⏱)     │       │          │          │
+│    │ E hook (only when status=done|partial)   │       │          │          │
+│    │ F progress bar (only when processing)    │       │          │          │
+└────┴──────────────────────────────────────────┴───────┴──────────┴─────────┘
 ```
 
 | Slot | Content |
@@ -115,6 +117,7 @@ Single horizontal card per episode. Roughly 96 px tall.
 | D actions | Icon buttons: ▶️ "打开详情" (always), 🔁 "重试" (only when status=failed/partial), 🗑 "删除" (always) |
 | E hook | Truncated to 1 line with ellipsis. Cyan/highlight tint to draw the eye. (Only present once `stage_status.hook="present"`) |
 | F progress | Stage-aware progress bar (see §6.3). Only visible while status=processing. |
+| G 分数 | `ScoreBadge` — see §6.8. Shows the 0-100 usefulness score; renders the muted "未评分" state when `usefulness` is null. |
 
 Clicking anywhere on the row except action icons navigates to `/episodes/:id`.
 
@@ -179,6 +182,27 @@ The most visually prominent single block on the page. The user uses the hook to 
 - Below the sentence in tiny muted text: "Prompt 版本：<value from `prompt_versions.one_liner`>" (Constitution V — visible provenance)
 
 If `stage_status.hook != "present"`: show a `MissingStagePlaceholder` (§6.5) saying "一句话摘要生成失败，可在下方点击重试".
+
+### 3.3.1 UsefulnessCard
+
+Sits directly under the HookCard (or inline at its right edge at ≥ 1280 px width) — the hook says what the episode is about, this says whether it is worth the time.
+
+```
+┌─────────────────────────────────────────────┐
+│  78  / 100     值得听                        │
+│  ▰▰▰▰▰▰▰▰▱▱                                 │
+│  围绕 A 给出了可验证的数据，但后半段偏闲聊。   │
+│  Prompt 版本：v1                             │
+└─────────────────────────────────────────────┘
+```
+
+- The number is the visual anchor (e.g. 40-48 px), the "/ 100" muted and much smaller.
+- Band label to its right, using the copy map in §6.8. Band color also tints the meter bar.
+- `usefulness.rationale` below in body text, one sentence, never truncated.
+- Tiny muted line: "Prompt 版本：<value from `prompt_versions.usefulness_score`>" (Constitution V — visible provenance, same treatment as the HookCard).
+- The score is advisory: no wording anywhere should imply the episode was verified or endorsed. Neutral tooltip on the band label: "由模型根据转写内容给出的参考评分。"
+
+If `stage_status.usefulness != "present"`: show a `MissingStagePlaceholder` (§6.5) with stage label "有用性评分". This never blocks the rest of the page (FR-026).
 
 ### 3.4 ThreeActSection
 
@@ -355,7 +379,7 @@ A subdued box used wherever a stage's data should appear but is `missing` or `fa
 └──────────────────────────────────────┘
 ```
 
-`stage_label` map: hook→"一句话摘要", three_act→"三段式摘要", chapters→"章节大纲", entities→"实体识别", tts→"音频摘要".
+`stage_label` map: hook→"一句话摘要", three_act→"三段式摘要", chapters→"章节大纲", entities→"实体识别", usefulness→"有用性评分", tts→"音频摘要".
 
 ### 6.6 QuoteChip
 
@@ -377,6 +401,29 @@ Modal, centered:
 - Body: "这会同时删除：缓存的音频、转写文本、Markdown / JSON 导出、音频摘要。此操作不可撤销。"
 - Buttons: "取消" (secondary) · "确认删除" (destructive)
 - Confirming → `DELETE /api/episodes/:id` → toast "已删除" → navigate back to `/`
+
+### 6.8 ScoreBadge
+
+Compact 0-100 usefulness indicator used in EpisodeRow (§2.4.1 slot G) and anywhere a score appears outside the detail page.
+
+```
+┌────────┐        ┌────────┐
+│  78    │        │  未评分 │
+│ 值得听  │        │        │
+└────────┘        └────────┘
+```
+
+| `usefulness.band` | Label | Tone |
+|-------------------|-------|------|
+| `must_listen` | 必听 | strongest accent |
+| `worth_listening` | 值得听 | positive |
+| `skimmable` | 可跳读 | neutral |
+| `skippable` | 可跳过 | muted / de-emphasized, never alarm-red |
+
+- `usefulness === null` → muted "未评分" chip, same footprint, no number, no color accent. This is the state for episodes processed before scoring existed and for `failed_after_retries`.
+- Never render a missing score as `0` — 0 is a real, meaningful score.
+- Band color must not be the only signal: the number and the label always ship together, so the badge stays readable without color perception.
+- Tooltip on hover: `usefulness.rationale` (the detail page shows it inline instead).
 
 ---
 

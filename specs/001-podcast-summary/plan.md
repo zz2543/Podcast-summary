@@ -163,7 +163,8 @@ prompts/                         # Constitution V — all LLM prompts live here
 ├── one_liner.v1.md
 ├── three_act_summary.v1.md
 ├── chapter_outline.v1.md
-└── entity_extraction.v1.md
+├── entity_extraction.v1.md
+└── usefulness_score.v1.md
 
 data/                            # gitignored runtime artifacts (audio cache, transcripts, exports)
 .env.example

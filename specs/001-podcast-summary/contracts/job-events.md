@@ -39,7 +39,7 @@ All frames are JSON objects with a `type` discriminator.
 {
   "type": "stage_status_update",
   "episode_id": "ULID",
-  "stage": "hook | three_act | chapters | entities | tts",
+  "stage": "hook | three_act | chapters | entities | usefulness | tts",
   "status": "present | missing | failed_after_retries"
 }
 ```

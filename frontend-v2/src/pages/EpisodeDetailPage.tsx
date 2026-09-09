@@ -14,7 +14,6 @@ import { useJobStream } from "@/ws/useJobStream";
 import { HookHero } from "@/components/HookHero";
 import { ThreeActPanel } from "@/components/ThreeActPanel";
 import { ChaptersTimeline } from "@/components/ChaptersTimeline";
-import { EntityCloud } from "@/components/EntityCloud";
 import { EpisodeDock } from "@/components/EpisodeDock";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -186,8 +185,6 @@ export default function EpisodeDetailPage() {
           audioSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
         }}
       />
-
-      <EntityCloud entities={episode.entities} />
 
       {toast && (
         <div className="fixed bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-full bg-text px-4 py-2 text-sm font-medium text-white shadow-card">

@@ -34,6 +34,7 @@ def render(episode_detail: Any) -> dict[str, Any]:
         "status": _value(episode, "status"),
         "stage_status": stage_status,
         "prompt_versions": prompt_versions,
+        "summary_style": _summary_style(episode),
         "hook": _value(artifact, "hook") if stage_status["hook"] == "present" else None,
         "three_act": (
             _value(artifact, "three_act") if stage_status["three_act"] == "present" else None
@@ -129,11 +130,23 @@ def _stage_status(values: dict[str, str]) -> dict[str, str]:
 
 
 def _prompt_versions(values: dict[str, str]) -> dict[str, str]:
-    return {
+    versions = {
         "one_liner": values.get("one_liner", "v1"),
         "three_act": values.get("three_act", "v1"),
         "chapter_outline": values.get("chapter_outline", "v1"),
         "entity_extraction": values.get("entity_extraction", "v1"),
+    }
+    # Only present when the reader picked a non-default style for this episode.
+    if values.get("summary_style"):
+        versions["summary_style"] = values["summary_style"]
+    return versions
+
+
+def _summary_style(episode: Any) -> dict[str, Any]:
+    note = _value(episode, "style_note")
+    return {
+        "preset": _value(episode, "summary_style") or "default",
+        "note": note if note else None,
     }
 
 

@@ -318,7 +318,7 @@ function SubmitPanel({
           <span aria-hidden="true">↗</span> Audio Links
         </TabButton>
         <TabButton active={mode === "youtube"} onClick={() => setMode("youtube")}>
-          <span aria-hidden="true">▶</span> YouTube
+          <span aria-hidden="true">▶</span> Video Links
         </TabButton>
       </div>
       <div className="submit-body">
@@ -364,7 +364,7 @@ function SubmitPanel({
             placeholder={
               mode === "direct_url"
                 ? "Paste direct audio links, one per line. Supports .mp3 / .m4a / .wav"
-                : "Paste YouTube video links, one per line"
+                : "Paste YouTube or Bilibili links, one per line. Share text around a link is fine — 【title】https://..."
             }
           />
         )}
@@ -548,10 +548,17 @@ function buildInputs(mode: SubmitMode, files: File[], directUrls: string, youtub
     return files.map((file) => ({ source_type: "local_file", file }));
   }
   const sourceType = mode === "direct_url" ? "direct_url" : "youtube";
-  return parseLines(sourceType === "direct_url" ? directUrls : youtubeUrls).map((source_ref) => ({
+  return parseLines(sourceType === "direct_url" ? directUrls : youtubeUrls).map((line) => ({
     source_type: sourceType,
-    source_ref
+    source_ref: extractUrl(line)
   }));
+}
+
+// Share buttons hand out a whole sentence, e.g. 【title】https://...?vd_source=...
+// The backend normalises too; doing it here keeps link validation honest.
+function extractUrl(text: string): string {
+  const match = text.match(/https?:\/\/[^\s<>"'\u3000-\u303f\uff00-\uffef]+/);
+  return match ? match[0].replace(/[.,;:!?)\]}'"]+$/, "") : text.trim();
 }
 
 function validateInputs(inputs: CreateEpisodeInput[], mode: SubmitMode): string | null {
@@ -604,7 +611,7 @@ function episodeTitle(episode: EpisodeSummary): string {
 function sourceLabel(sourceType: SourceType): string {
   if (sourceType === "local_file") return "Local file";
   if (sourceType === "direct_url") return "Audio link";
-  return "YouTube";
+  return "Video link";
 }
 
 function sourceIcon(sourceType: SourceType): string {

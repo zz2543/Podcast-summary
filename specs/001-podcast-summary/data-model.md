@@ -38,6 +38,8 @@ The user-visible entry. One row per submitted item; surviving across retries and
 | `duration_seconds` | INTEGER | NULL | filled after ingestion probe |
 | `language` | TEXT | NULL, CHECK in (`zh`, `en`, `mixed`, NULL) | FR-007 |
 | `status` | TEXT | NOT NULL, CHECK in (`pending`, `processing`, `done`, `failed`, `partial`) | aggregated from latest job |
+| `summary_style` | TEXT | NOT NULL, DEFAULT `default` | preset id chosen in the submit modal; one of the sections of `prompts/summary_style.v1.md` |
+| `style_note` | TEXT | NULL | reader's own instruction, ≤ 200 chars after normalization |
 | `created_at` | DATETIME | NOT NULL | |
 | `updated_at` | DATETIME | NOT NULL | |
 | `data_dir` | TEXT | NOT NULL, UNIQUE | `data/<id>/` |
@@ -45,6 +47,9 @@ The user-visible entry. One row per submitted item; surviving across retries and
 **Indexes**: `idx_episode_status` on `status`; `idx_episode_created` on `created_at DESC`.
 
 **Validation**:
+- `summary_style` MUST be one of `default`, `study_notes`, `business_insight`, `debate`, `quick_skim`; anything else is rejected at submission with `400 bad_input`.
+- `style_note` is normalized before storage: control characters and newlines collapse to single spaces (so a note cannot forge its own instruction block in the assembled prompt), surrounding whitespace is trimmed, an empty result becomes NULL, and anything longer than 200 characters is rejected with `400 bad_input`.
+- Both fields are fixed at submission time and reused verbatim on retry, so a retried episode is re-summarized in the style it was submitted with.
 - `source_ref` MUST be unique across non-deleted rows for `(source_type, source_ref)` of types `direct_url` and `youtube` (no double-submission).
 - On insertion of a new episode, `duration_seconds` must already pass the FR-024 cap (≤ 21600 s = 6 h) AND file size on disk must be ≤ 1 GB; otherwise the row is never created.
 
@@ -150,13 +155,21 @@ Aggregated outputs and per-stage availability, mirroring FR-026's partial-degrad
 | `episode_id` | TEXT | PK, FK → `episode.id` ON DELETE CASCADE | |
 | `hook` | TEXT | NULL | one-line, ≤ 50 chars (validated at write time) |
 | `three_act` | TEXT (JSON) | NULL | `{background, core_argument, conclusion}` |
+| `usefulness_score` | INTEGER | NULL, CHECK (`usefulness_score IS NULL OR usefulness_score BETWEEN 0 AND 100`) | FR-027; NULL when `stage_status.usefulness != 'present'` |
+| `usefulness_band` | TEXT | NULL, CHECK in (`must_listen`, `worth_listening`, `skimmable`, `skippable`, NULL) | FR-027; derived from the score by code, never written from the model response |
+| `usefulness_rationale` | TEXT | NULL | one sentence, source language (FR-007) |
 | `markdown_path` | TEXT | NULL | `data/<id>/summary.md` |
 | `json_path` | TEXT | NULL | `data/<id>/summary.json` |
 | `tts_path` | TEXT | NULL | `data/<id>/digest.mp3` |
-| `stage_status` | TEXT (JSON) | NOT NULL | `{ "hook": "present", "three_act": "present", "chapters": "present", "entities": "missing", "tts": "failed_after_retries" }` |
-| `prompt_versions` | TEXT (JSON) | NOT NULL | `{ "one_liner": "v1", "three_act": "v1", "chapter_outline": "v1", "entity_extraction": "v1" }` (Constitution V) |
+| `stage_status` | TEXT (JSON) | NOT NULL | `{ "hook": "present", "three_act": "present", "chapters": "present", "entities": "missing", "usefulness": "present", "tts": "failed_after_retries" }` |
+| `prompt_versions` | TEXT (JSON) | NOT NULL | `{ "one_liner": "v1", "three_act": "v1", "chapter_outline": "v1", "entity_extraction": "v1", "usefulness_score": "v1" }` (Constitution V) |
 
-**Validation**: An episode reaches `episode.status='done'` only when `stage_status.hook = stage_status.three_act = stage_status.chapters = "present"`; if any of those is `missing`/`failed_after_retries`, `episode.status='failed'` instead.
+**Validation**:
+- An episode reaches `episode.status='done'` only when `stage_status.hook = stage_status.three_act = stage_status.chapters = "present"`; if any of those is `missing`/`failed_after_retries`, `episode.status='failed'` instead. `usefulness` is optional and never gates `done` (FR-026/FR-027).
+- The three `usefulness_*` columns are written together in one transaction: either all three are non-NULL and `stage_status.usefulness = "present"`, or all three are NULL and `stage_status.usefulness ∈ {pending, missing, failed_after_retries}`. No partially-scored row.
+- `usefulness_band` is computed from `usefulness_score` by `domain/usefulness_scorer.py::band_for(score)` — `85-100 → must_listen`, `70-84 → worth_listening`, `50-69 → skimmable`, `0-49 → skippable`. The model never chooses the band.
+
+**Backfill**: Episodes processed before this feature landed keep `usefulness_score IS NULL` and `stage_status.usefulness = "missing"`. They are re-scored only when the user retries the episode; the migration does not call the LLM.
 
 ---
 
@@ -185,6 +198,8 @@ Atomic episode delete (FR-025) = `DELETE FROM episode WHERE id = ?` (CASCADEs th
 | Audio MIME validation for direct URL | FR-002 | `services/ingest.py` |
 | YouTube fail-fast on restricted videos | FR-003 | `services/ingest.py` |
 | ≤ 50-char hook, distinct from title | FR-009 | `domain/structured_parser.py` (rejects + retriggers if violated) |
+| Usefulness score is an integer in 0-100 | FR-027 | `domain/structured_parser.py::parse_usefulness` (rejects + retriggers; never clamps) |
+| Usefulness band derived from score, not from the model | FR-027 | `domain/usefulness_scorer.py::band_for` (sole writer of `usefulness_band`) |
 | Verbatim quote substring check | FR-012, SC-004 | `domain/quote_verifier.py` (only place `Quote.verified` becomes 1) |
 | Required vs. optional stage gating | FR-026 | `services/pipeline.py` + `summary_artifact.stage_status` |
 | Output language = source language | FR-007 | `domain/prompt_assembler.py` (binds `{lang}` slot) |

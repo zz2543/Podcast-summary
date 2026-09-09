@@ -22,6 +22,13 @@ from podsum.domain.entity_extractor import extract as extract_entities
 from podsum.domain.prompt_assembler import PromptAssembler
 from podsum.domain.quote_verifier import verify_against_segments
 from podsum.domain.structured_parser import parse_chapter_payload, parse_one_liner, parse_three_act
+from podsum.domain.summary_style import (
+    DEFAULT_PRESET,
+    STYLE_PROMPT_ROLE,
+    STYLE_PROMPT_VERSION,
+    SummaryStyle,
+    build_directive,
+)
 from podsum.domain.transcript_postprocess import normalize
 from podsum.persistence.models import Chapter, Entity, Episode, Job, TranscriptSegment
 from podsum.persistence.repo import (
@@ -39,7 +46,7 @@ from podsum.services.ingest import (
     IngestedAudio,
     ingest_direct_url,
     ingest_local_file,
-    ingest_youtube,
+    ingest_video,
 )
 from podsum.services.llm_client import LLMClient, create_llm_client
 from podsum.services.tts_client import TTSClient, create_tts_client
@@ -363,7 +370,7 @@ async def _stage_fetch(context: PipelineContext, settings: Settings) -> StageRes
     if episode.source_type == "direct_url":
         ingested = await ingest_direct_url(episode.source_ref, settings, episode_id=episode.id)
     elif episode.source_type == "youtube":
-        ingested = await ingest_youtube(episode.source_ref, settings, episode_id=episode.id)
+        ingested = await ingest_video(episode.source_ref, settings, episode_id=episode.id)
     elif episode.source_type == "local_file":
         upload = _PathUpload(Path(episode.source_ref))
         try:
@@ -413,6 +420,30 @@ async def _stage_transcribe(context: PipelineContext, asr_client: ASRClient) -> 
     return {"segments": len(db_segments), "cached": False}
 
 
+def _style_directive(episode: Episode, prompt_assembler: PromptAssembler) -> str:
+    """Reader-chosen style block for this episode, or "" for the default style."""
+    style = SummaryStyle(
+        preset=episode.summary_style or DEFAULT_PRESET,
+        note=episode.style_note,
+    )
+    if style.is_default:
+        return ""
+    template = prompt_assembler.load(STYLE_PROMPT_ROLE, STYLE_PROMPT_VERSION)
+    return build_directive(template.body, style)
+
+
+def _prompt_versions(
+    artifact: Any,
+    role: str,
+    version: str,
+    directive: str,
+) -> dict[str, str]:
+    versions = {**dict(artifact.prompt_versions), role: version}
+    if directive:
+        versions[STYLE_PROMPT_ROLE] = STYLE_PROMPT_VERSION
+    return versions
+
+
 def _stage_summarize_hook(
     context: PipelineContext,
     llm_client: LLMClient,
@@ -420,10 +451,12 @@ def _stage_summarize_hook(
 ) -> StageResult:
     episode = _get_episode(context)
     transcript = _transcript_text(context.session, episode.id)
+    directive = _style_directive(episode, prompt_assembler)
     prompt = prompt_assembler.render(
         "one_liner",
-        "v1",
+        "v2",
         lang=episode.language or "mixed",
+        style_directive=directive,
         episode_title=episode.title or "",
         transcript=transcript,
     )
@@ -433,7 +466,7 @@ def _stage_summarize_hook(
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
     artifact.hook = hook
     artifact.stage_status = {**dict(artifact.stage_status), "hook": "present"}
-    artifact.prompt_versions = {**dict(artifact.prompt_versions), "one_liner": "v1"}
+    artifact.prompt_versions = _prompt_versions(artifact, "one_liner", "v2", directive)
     context.session.add(artifact)
     context.session.flush()
     return {"hook": hook}
@@ -446,10 +479,12 @@ def _stage_summarize_three_act(
 ) -> StageResult:
     episode = _get_episode(context)
     transcript = _transcript_text(context.session, episode.id)
+    directive = _style_directive(episode, prompt_assembler)
     prompt = prompt_assembler.render(
         "three_act_summary",
-        "v1",
+        "v2",
         lang=episode.language or "mixed",
+        style_directive=directive,
         transcript=transcript,
     )
     payload = llm_client.complete_json(prompt, _ThreeActPayload)
@@ -458,7 +493,7 @@ def _stage_summarize_three_act(
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
     artifact.three_act = three_act.model_dump()
     artifact.stage_status = {**dict(artifact.stage_status), "three_act": "present"}
-    artifact.prompt_versions = {**dict(artifact.prompt_versions), "three_act": "v1"}
+    artifact.prompt_versions = _prompt_versions(artifact, "three_act", "v2", directive)
     context.session.add(artifact)
     context.session.flush()
     return {"three_act": artifact.three_act}
@@ -472,10 +507,12 @@ def _stage_chapter_outline(
     episode = _get_episode(context)
     segments = SegmentRepo(context.session).list_for_episode(episode.id)
     spans = segment_chapters(segments)
+    directive = _style_directive(episode, prompt_assembler)
     prompt = prompt_assembler.render(
         "chapter_outline",
-        "v1",
+        "v2",
         lang=episode.language or "mixed",
+        style_directive=directive,
         transcript=_chapter_prompt_transcript(spans),
     )
     payload = llm_client.complete_json(prompt, _ChapterOutlinePayload)
@@ -514,7 +551,7 @@ def _stage_chapter_outline(
     context.session.add(context.job)
 
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
-    artifact.prompt_versions = {**dict(artifact.prompt_versions), "chapter_outline": "v1"}
+    artifact.prompt_versions = _prompt_versions(artifact, "chapter_outline", "v2", directive)
     context.session.add(artifact)
     context.session.flush()
     return {"chapters": len(drafts), "quote_candidates": len(quote_candidates)}

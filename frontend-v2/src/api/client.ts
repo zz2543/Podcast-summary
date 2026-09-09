@@ -67,7 +67,9 @@ export interface EpisodeDetail extends EpisodeSummary {
     three_act: string;
     chapter_outline: string;
     entity_extraction: string;
+    summary_style?: string;
   };
+  summary_style?: { preset: SummaryStylePreset; note: string | null };
   hook: string | null;
   three_act: ThreeAct | null;
   chapters: Chapter[];
@@ -112,9 +114,28 @@ export class ApiError extends Error {
   }
 }
 
-export type CreateEpisodeInput =
-  | { source_type: "local_file"; file: File }
-  | { source_type: "direct_url" | "youtube"; source_ref: string };
+export const SUMMARY_STYLE_PRESETS = [
+  "default",
+  "study_notes",
+  "business_insight",
+  "debate",
+  "quick_skim"
+] as const;
+
+export type SummaryStylePreset = (typeof SUMMARY_STYLE_PRESETS)[number];
+
+export const STYLE_NOTE_MAX_CHARS = 200;
+
+export interface SummaryStyleInput {
+  summary_style?: SummaryStylePreset;
+  style_note?: string;
+}
+
+export type CreateEpisodeInput = SummaryStyleInput &
+  (
+    | { source_type: "local_file"; file: File }
+    | { source_type: "direct_url" | "youtube"; source_ref: string }
+  );
 
 export interface CreateEpisodeResponse {
   episode: EpisodeSummary;
@@ -144,11 +165,30 @@ export type JobEvent =
     }
   | { type: "error"; code: string; message: string };
 
+// The style fields are omitted entirely when the reader left the default, so a
+// plain submission keeps the exact request body it had before.
+function appendStyle(form: FormData, style: SummaryStyleInput): void {
+  if (style.summary_style && style.summary_style !== "default") {
+    form.append("summary_style", style.summary_style);
+  }
+  if (style.style_note?.trim()) form.append("style_note", style.style_note.trim());
+}
+
+function styleFields(style: SummaryStyleInput): SummaryStyleInput {
+  const fields: SummaryStyleInput = {};
+  if (style.summary_style && style.summary_style !== "default") {
+    fields.summary_style = style.summary_style;
+  }
+  if (style.style_note?.trim()) fields.style_note = style.style_note.trim();
+  return fields;
+}
+
 export async function createEpisode(input: CreateEpisodeInput): Promise<CreateEpisodeResponse> {
   if (input.source_type === "local_file") {
     const form = new FormData();
     form.append("source_type", input.source_type);
     form.append("file", input.file);
+    appendStyle(form, input);
     return apiFetch<CreateEpisodeResponse>("/api/episodes", {
       method: "POST",
       body: form
@@ -157,7 +197,11 @@ export async function createEpisode(input: CreateEpisodeInput): Promise<CreateEp
   return apiFetch<CreateEpisodeResponse>("/api/episodes", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(input)
+    body: JSON.stringify({
+      source_type: input.source_type,
+      source_ref: input.source_ref,
+      ...styleFields(input)
+    })
   });
 }
 
@@ -167,11 +211,15 @@ export function createEpisodeBatch(
   if (inputs.length === 0) {
     return Promise.resolve({ items: [] });
   }
+  // One style applies to the whole batch: it belongs to the submission, not to
+  // an individual file or link.
+  const style = styleFields(inputs[0]);
   if (inputs.every((input) => input.source_type === "local_file")) {
     const form = new FormData();
     for (const input of inputs) {
       if (input.source_type === "local_file") form.append("files", input.file);
     }
+    appendStyle(form, style);
     return apiFetch<CreateEpisodeBatchResponse>("/api/episodes/batch", {
       method: "POST",
       body: form
@@ -186,7 +234,7 @@ export function createEpisodeBatch(
   return apiFetch<CreateEpisodeBatchResponse>("/api/episodes/batch", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ items })
+    body: JSON.stringify({ items, ...style })
   });
 }
 

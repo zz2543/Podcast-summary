@@ -20,11 +20,17 @@
 - Q: Should the one-line hook enforce a hard 50-character limit? → A: No. The hook should stay concise, but the system must not fail a job solely because the LLM returns a longer useful hook.
 - Q: Is the 5-episode manual evaluation required for this implementation handoff? → A: No. Manual evaluation is waived for this handoff; automated verification and production-mode serving remain required.
 
+### Session 2026-09-09
+
+- Q: Should the summary also carry a usefulness rating for the episode? → A: Yes. Every episode gets a 0-100 usefulness score produced alongside the summary.
+- Q: Overall score only, or a multi-dimension breakdown? → A: Overall score only, plus a derived rating band and a one-sentence rationale. No per-dimension sub-scores.
+- Q: Does a failed scoring stage block the episode from reaching "done"? → A: No. Scoring is an optional stage under FR-026; failure degrades to "unrated" and the rest of the summary stays usable.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Triage New Episodes Overnight (Priority: P1)
 
-A subscriber drops 5 newly released podcast episodes into the system in the evening. By next morning, each episode has a concise one-line hook and a three-act summary (Background / Core Argument / Conclusion). The user reads the hooks first, then opens the full summary only for episodes worth a deeper look — saving roughly an hour per low-value episode.
+A subscriber drops 5 newly released podcast episodes into the system in the evening. By next morning, each episode has a concise one-line hook, a 0-100 usefulness score, and a three-act summary (Background / Core Argument / Conclusion). The user scans the scores and hooks first, then opens the full summary only for episodes worth a deeper look — saving roughly an hour per low-value episode.
 
 **Why this priority**: This is the core value proposition. Without fast, reliable triage output, the system has no reason to exist. It alone constitutes a viable MVP.
 
@@ -35,6 +41,8 @@ A subscriber drops 5 newly released podcast episodes into the system in the even
 1. **Given** a 60-minute Chinese podcast MP3 uploaded, **When** processing finishes, **Then** the user sees a concise hook that is informationally distinct from (not a paraphrase of) the original episode title, plus a three-act Background/Core Argument/Conclusion summary in Chinese.
 2. **Given** an English podcast direct-audio URL submitted, **When** processing finishes, **Then** all generated summary fields are in English (input language preserved, no translation).
 3. **Given** processing fails midway through transcription, **When** the user retries the same job, **Then** already-transcribed segments are reused and only the failed work is repeated.
+4. **Given** a processed episode, **When** the user opens the list view, **Then** each episode shows a 0-100 usefulness score with a rating band, and the list can be sorted by that score so the highest-value episodes surface first.
+5. **Given** the scoring stage fails after all retries, **When** the user opens the episode, **Then** the episode is still marked "done", the score area reads "未评分", and every other summary artifact remains readable and downloadable.
 
 ---
 
@@ -125,6 +133,14 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 - **FR-011**: System MUST produce a **chapter outline** by auto-segmenting the episode; each chapter MUST include a chapter title, start time, end time, an ordered list of key points faithful to the original sequence, and zero or more verbatim quotes each carrying a timestamp.
 - **FR-012**: Every quote shown to users MUST be verifiable as a verbatim substring of the transcript via an automated check; quotes failing the check MUST NOT be displayed.
 - **FR-013**: System MUST produce an **entity list** of people, books, and products mentioned, each with an occurrence count.
+- **FR-027**: System MUST produce a **usefulness score** for each episode, generated from the transcript in the same summarization pass as the other artifacts:
+  - An integer **`score` in the inclusive range 0-100** measuring how much informational value the episode offers a listener deciding whether to spend time on it. The score MUST be grounded in what is said, not in audio quality, production polish, host/guest fame, or episode length.
+  - A **`band`** label derived deterministically from the score **by system code, not by the model**, so the same score always maps to the same band: `must_listen` (85-100), `worth_listening` (70-84), `skimmable` (50-69), `skippable` (0-49). The band is a stable machine value; user-facing wording is a UI concern (see `ui-brief.md`).
+  - A **one-sentence `rationale`** in the source language (FR-007) stating the concrete grounds for the score.
+  - A model-returned score outside 0-100, non-integer, or missing MUST be rejected as a structural failure and retried rather than clamped silently.
+  - The score MUST be included in the Markdown export (FR-014), the JSON export (FR-015), the list view, and the detail view. It MUST NOT be narrated in the TTS digest (FR-016), which stays a summary of content.
+  - Scoring is an **optional stage** under FR-026: persistent failure marks the artifact `failed_after_retries` and the episode still reaches "done".
+  - No per-dimension sub-scores are produced in this version (explicitly decided 2026-09-09).
 
 **Output formats**
 
@@ -140,7 +156,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 
 - **FR-026**: After a configurable number of automatic retries, the system MUST adopt **partial-degraded output** semantics rather than fail the whole episode:
   - **Required stages** for an episode to reach status "done": hook, three-act summary, chapter outline (with at least one chapter). If any of these cannot be produced after retries, the episode MUST be marked "failed" and any partially-generated artifacts MUST be retained for inspection but MUST NOT be presented as a finished summary.
-  - **Optional stages** (TTS audio digest, individual chapter quotes, entity extraction): persistent failure of any of these MUST mark only that artifact as "missing" / "unavailable" in both the UI and the JSON output, while all successful artifacts remain visible and downloadable.
+  - **Optional stages** (TTS audio digest, individual chapter quotes, entity extraction, usefulness score): persistent failure of any of these MUST mark only that artifact as "missing" / "unavailable" in both the UI and the JSON output, while all successful artifacts remain visible and downloadable.
   - The JSON output MUST encode the status of each artifact explicitly (e.g., `present` / `missing` / `failed_after_retries`) so downstream tooling can detect partial output.
   - Quote-verbatim verification (FR-012) MUST still apply to every quote that *is* shown, regardless of which other stages succeeded or failed.
 
@@ -171,7 +187,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 - **Chapter**: A contiguous segment of an episode produced by auto-segmentation. Attributes: title, start time, end time, ordered key points, list of Quote references.
 - **Quote**: A verbatim substring of the transcript displayed to users. Attributes: text, timestamp, parent chapter, verified flag (must be true to be displayed).
 - **Entity**: A named-entity mention. Attributes: name, type ∈ {person, book, product}, occurrence count, sample timestamps.
-- **Summary Artifact**: The per-episode output bundle. Attributes: hook, three-act summary, chapter list, entity list, Markdown export, JSON export, optional TTS audio digest.
+- **Summary Artifact**: The per-episode output bundle. Attributes: hook, three-act summary, chapter list, entity list, usefulness score (0-100 integer + derived band + one-sentence rationale), Markdown export, JSON export, optional TTS audio digest.
 
 ## Success Criteria *(mandatory)*
 
@@ -184,6 +200,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 - **SC-005**: Audio-digest narration is rated "fluent and natural" (no obvious mispronunciation, awkward prosody, or robotic dropouts) by a human reviewer on **≥ 80%** of evaluation episodes per language (Chinese and English evaluated separately).
 - **SC-006**: A 60-minute episode completes end-to-end processing in **≤ 10 minutes** on the reference Apple M2 MacBook configuration.
 - **SC-007**: When a job is retried after a mid-pipeline failure **or after a server restart**, wall-clock time spent in the ASR stage on the retry is **≤ 20%** of the cost of a from-scratch run, demonstrating effective resume across both same-process retries and cold restarts.
+- **SC-008**: Across a mixed evaluation set, the usefulness score agrees with a human reviewer's own go/no-go call on **≥ 80%** of episodes (agreement = the reviewer would listen when the band is `must_listen`/`worth_listening`, and would not when it is `skimmable`/`skippable`), and the scores are not degenerate — the set spans at least two bands rather than every episode landing in one.
 
 ## Assumptions
 

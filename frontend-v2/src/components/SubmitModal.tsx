@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import {
   Modal,
@@ -14,7 +14,10 @@ import {
   ApiError,
   createEpisode,
   createEpisodeBatch,
-  type CreateEpisodeInput
+  STYLE_NOTE_MAX_CHARS,
+  type CreateEpisodeInput,
+  type SummaryStyleInput,
+  type SummaryStylePreset
 } from "@/api/client";
 
 export function SubmitModal({ onSubmitted }: { onSubmitted: () => void }) {
@@ -38,6 +41,23 @@ function SubmitTrigger() {
   );
 }
 
+// Share buttons hand out a whole sentence, e.g. 【title】https://...?vd_source=...
+// The backend normalises too; doing it here keeps the field forgiving.
+function extractUrl(text: string): string {
+  const match = text.match(/https?:\/\/[^\s<>"'\u3000-\u303f\uff00-\uffef]+/);
+  return match ? match[0].replace(/[.,;:!?)\]}'"]+$/, "") : text.trim();
+}
+
+// The presets mirror the sections of prompts/summary_style.v1.md; the backend is
+// the authority on what each one means, this table only labels them.
+const STYLE_PRESETS: { id: SummaryStylePreset; label: string; hint: string }[] = [
+  { id: "default", label: "Default", hint: "Balanced, no particular slant" },
+  { id: "study_notes", label: "Study notes", hint: "Mechanisms, terms, cause and effect" },
+  { id: "business_insight", label: "Business", hint: "Markets, numbers, what it changes" },
+  { id: "debate", label: "Debate", hint: "Who disagrees, on what evidence" },
+  { id: "quick_skim", label: "Quick skim", hint: "Only the load-bearing claims" }
+];
+
 function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
   const { setOpen } = useModalControls();
   const [files, setFiles] = useState<File[]>([]);
@@ -47,6 +67,15 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState("upload");
+  const [preset, setPreset] = useState<SummaryStylePreset>("default");
+  const [note, setNote] = useState("");
+  const [styleOpen, setStyleOpen] = useState(false);
+
+  const styled = preset !== "default" || note.trim().length > 0;
+  const style: SummaryStyleInput = {
+    summary_style: preset,
+    style_note: note.trim() || undefined
+  };
 
   const onSubmit = async () => {
     setError(null);
@@ -56,26 +85,39 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
         if (files.length === 0) throw new Error("Choose at least one file");
         const inputs: CreateEpisodeInput[] = files.map((f) => ({
           source_type: "local_file",
-          file: f
+          file: f,
+          ...style
         }));
         if (inputs.length === 1) await createEpisode(inputs[0]);
         else await createEpisodeBatch(inputs);
       } else if (tab === "url") {
         if (!audioUrl.trim()) throw new Error("Enter an audio URL");
-        await createEpisode({ source_type: "direct_url", source_ref: audioUrl.trim() });
+        await createEpisode({
+          source_type: "direct_url",
+          source_ref: audioUrl.trim(),
+          ...style
+        });
       } else if (tab === "youtube") {
         const single = ytSingle.trim();
         const batch = ytBatch
           .split("\n")
           .map((l) => l.trim())
           .filter(Boolean);
-        if (!single && batch.length === 0) throw new Error("Enter a YouTube URL");
+        if (!single && batch.length === 0) throw new Error("Enter a video link");
         if (single) {
-          await createEpisode({ source_type: "youtube", source_ref: single });
+          await createEpisode({
+            source_type: "youtube",
+            source_ref: extractUrl(single),
+            ...style
+          });
         }
         if (batch.length > 0) {
           await createEpisodeBatch(
-            batch.map((url) => ({ source_type: "youtube", source_ref: url }))
+            batch.map((url) => ({
+              source_type: "youtube",
+              source_ref: extractUrl(url),
+              ...style
+            }))
           );
         }
       }
@@ -94,15 +136,89 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
     }
   };
 
+  const activeLabel = STYLE_PRESETS.find((p) => p.id === preset)?.label ?? "Default";
+
   return (
     <>
       <ModalContent>
-        <h2 className="font-display text-xl font-semibold tracking-tight">
-          Add a new episode
-        </h2>
-        <p className="mt-1 text-sm text-text-muted">
-          Choose where the audio comes from. Processing runs in the background.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-xl font-semibold tracking-tight">
+              Add a new episode
+            </h2>
+            <p className="mt-1 text-sm text-text-muted">
+              Choose where the audio comes from. Processing runs in the background.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setStyleOpen((open) => !open)}
+            aria-expanded={styleOpen}
+            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              styled
+                ? "border-text/30 bg-surface-elev text-text"
+                : "border-border text-text-muted hover:border-text/30 hover:text-text"
+            }`}
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={2.2} />
+            {styled ? activeLabel : "Summary style"}
+          </button>
+        </div>
+
+        {styleOpen && (
+          <div className="mt-4 rounded-2xl bg-surface-elev p-4">
+            <div className="flex flex-wrap gap-2">
+              {STYLE_PRESETS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  title={option.hint}
+                  onClick={() => setPreset(option.id)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    preset === option.id
+                      ? "bg-text text-white"
+                      : "bg-surface text-text-muted hover:text-text"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-text-muted">
+              {STYLE_PRESETS.find((p) => p.id === preset)?.hint}
+            </p>
+            <textarea
+              rows={2}
+              maxLength={STYLE_NOTE_MAX_CHARS}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Optional: one more instruction, e.g. lean on methodology, skip the personal anecdotes"
+              className="mt-3 w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-text/40"
+            />
+            <div className="mt-2 flex items-center justify-between text-xs text-text-muted">
+              <span>
+                Style shapes tone, emphasis and depth only — the summary keeps its
+                structure and stays faithful to the episode.
+              </span>
+              <span className="ml-3 shrink-0 tabular-nums">
+                {note.length}/{STYLE_NOTE_MAX_CHARS}
+              </span>
+            </div>
+            {styled && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPreset("default");
+                  setNote("");
+                }}
+                className="mt-2 text-xs font-medium text-text-muted underline-offset-2 hover:text-text hover:underline"
+              >
+                Reset to default
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="mt-6">
           <Tabs
             onChange={setTab}
@@ -128,19 +244,21 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
               },
               {
                 id: "youtube",
-                label: "YouTube",
+                label: "Video Link",
                 content: (
                   <div className="space-y-3">
                     <input
-                      type="url"
-                      placeholder="https://www.youtube.com/watch?v=..."
+                      // Not type="url": a pasted share string reads as
+                      // 【title】https://... and would fail native validation.
+                      type="text"
+                      placeholder="YouTube or Bilibili link — 【title】https://... is fine"
                       value={ytSingle}
                       onChange={(e) => setYtSingle(e.target.value)}
                       className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition-colors focus:border-text/40 focus:bg-white"
                     />
                     <details className="rounded-xl bg-surface-elev p-3">
                       <summary className="cursor-pointer text-xs font-medium text-text-muted">
-                        Batch (one URL per line)
+                        Batch (one link per line)
                       </summary>
                       <textarea
                         rows={4}

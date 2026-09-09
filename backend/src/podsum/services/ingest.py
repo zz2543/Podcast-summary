@@ -2,20 +2,80 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import shutil
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import httpx
 import yt_dlp
 
 from podsum.config import Settings
 from podsum.persistence.models import new_ulid
+from podsum.services import _bilibili_session
 
 MAX_FILE_BYTES = 1_000_000_000
 MAX_DURATION_SECONDS = 21_600
 CHUNK_SIZE = 1024 * 1024
+
+BILIBILI_HOSTS = ("bilibili.com", "b23.tv")
+
+# Share buttons hand out a whole sentence, e.g.
+# 【标题】https://www.bilibili.com/video/BV14dYx6iEwC?vd_source=e352aac...
+# so what a user pastes is rarely a bare URL. CJK punctuation and fullwidth
+# forms are excluded from the match because they abut URLs without whitespace.
+_URL_PATTERN = re.compile(r"https?://[^\s<>\"'\u3000-\u303f\uff00-\uffef]+")
+_TRAILING_PUNCTUATION = ".,;:!?)]}\"'"
+
+# These identify the sharer rather than the media. Dropping them also lets two
+# shares of the same video deduplicate against each other.
+_TRACKING_PARAMS = frozenset(
+    {
+        "vd_source",
+        "spm_id_from",
+        "from_source",
+        "from_spmid",
+        "share_source",
+        "share_medium",
+        "share_plat",
+        "share_tag",
+        "share_session_id",
+        "unique_k",
+        "msource",
+        "bbid",
+        "up_id",
+        "plat_id",
+        "buvid",
+        "si",
+        "feature",
+        "pp",
+    }
+)
+
+# Word boundaries matter here: a plain "age" substring also matches the very
+# common "Unable to download webpage", which would report a throttled request
+# as an authentication problem.
+_RESTRICTED_PATTERN = re.compile(
+    r"\b(?:age[ -]?restricted|age[ -]?gate\w*|region|geo[ -]?block\w*|drm"
+    r"|private video|requires? login|sign in|members?[ -]?only)\b",
+    re.IGNORECASE,
+)
+_THROTTLED_PATTERN = re.compile(
+    r"\b(?:412|429|precondition failed|too many requests|rate[ -]?limit\w*"
+    r"|temporarily unavailable)\b",
+    re.IGNORECASE,
+)
+# Transport failures mid-download are just as recoverable as a throttled
+# request, and just as common over a long audio fetch.
+_TRANSIENT_PATTERN = re.compile(
+    r"(?:\bssl\b|eof occurred|incomplete read|remote end closed"
+    r"|connection (?:reset|aborted|refused|error)|timed out|read timeout"
+    r"|temporary failure in name resolution)",
+    re.IGNORECASE,
+)
 
 
 class IngestError(ValueError):
@@ -132,7 +192,29 @@ async def ingest_direct_url(
         raise
 
 
-async def ingest_youtube(
+def extract_url(text: str) -> str:
+    """Return the first URL in ``text``, or the trimmed text when it holds none."""
+    match = _URL_PATTERN.search(text)
+    if match is None:
+        return text.strip()
+    return match.group(0).rstrip(_TRAILING_PUNCTUATION)
+
+
+def normalize_video_url(text: str) -> str:
+    """Pull the URL out of pasted share text and drop tracking parameters."""
+    url = extract_url(text)
+    parts = urlsplit(url)
+    if not parts.query:
+        return url
+    kept = [
+        (name, value)
+        for name, value in parse_qsl(parts.query, keep_blank_values=True)
+        if name not in _TRACKING_PARAMS
+    ]
+    return urlunsplit(parts._replace(query=urlencode(kept)))
+
+
+async def ingest_video(
     url: str,
     settings: Settings,
     episode_id: str | None = None,
@@ -142,7 +224,9 @@ async def ingest_youtube(
     episode_dir.mkdir(parents=True, exist_ok=False)
 
     try:
-        info, original_path = await asyncio.to_thread(_download_youtube_audio, url, episode_dir)
+        info, original_path = await asyncio.to_thread(
+            _download_video_audio, url, episode_dir, settings
+        )
         duration = info.get("duration")
         duration_seconds = int(round(float(duration))) if duration is not None else await _probe_duration_seconds(original_path)
         if duration_seconds > MAX_DURATION_SECONDS:
@@ -167,22 +251,54 @@ async def ingest_youtube(
         )
     except yt_dlp.utils.DownloadError as exc:
         shutil.rmtree(episode_dir, ignore_errors=True)
-        raise UnsupportedMedia(_youtube_error_message(exc)) from exc
+        raise UnsupportedMedia(_video_error_message(exc)) from exc
     except Exception:
         shutil.rmtree(episode_dir, ignore_errors=True)
         raise
 
 
-def _download_youtube_audio(url: str, episode_dir: Path) -> tuple[dict[str, object], Path]:
-    output_template = str(episode_dir / "audio.original.%(ext)s")
+def _download_video_audio(
+    url: str,
+    episode_dir: Path,
+    settings: Settings,
+) -> tuple[dict[str, object], Path]:
+    """Download audio with yt-dlp, retrying hosts that throttle anonymous traffic.
+
+    Bilibili rejects a share of anonymous requests with HTTP 412 while the
+    extractor is still fetching the page, which yt-dlp's own `extractor_retries`
+    does not cover. Each retry therefore happens here, with a fresh YoutubeDL.
+    """
+    cookiefile, cookiefile_is_temporary = _prepare_cookiefile(url, episode_dir, settings)
+    attempts = settings.YTDLP_MAX_ATTEMPTS
+    try:
+        for attempt in range(1, attempts + 1):
+            try:
+                return _extract_audio(url, episode_dir, cookiefile)
+            except yt_dlp.utils.DownloadError as exc:
+                if attempt == attempts or not _is_retryable(exc):
+                    raise
+                _clear_partial_downloads(episode_dir)
+                time.sleep(settings.YTDLP_RETRY_DELAY_SECONDS * attempt)
+        raise UnsupportedMedia("Video download exhausted all attempts")
+    finally:
+        if cookiefile is not None and cookiefile_is_temporary:
+            cookiefile.unlink(missing_ok=True)
+
+
+def _extract_audio(
+    url: str,
+    episode_dir: Path,
+    cookiefile: Path | None,
+) -> tuple[dict[str, object], Path]:
     options: dict[str, object] = {
         "format": "bestaudio/best",
-        "outtmpl": output_template,
+        "outtmpl": str(episode_dir / "audio.original.%(ext)s"),
         "noplaylist": True,
         "quiet": True,
         "no_warnings": True,
-        "cookiesfrombrowser": ("chrome",),
-        "remote_components": "ejs:github",
+        # yt-dlp normalises this to a set; handing it a bare string makes it
+        # iterate the characters and silently drop the component.
+        "remote_components": {"ejs:github"},
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
@@ -191,6 +307,11 @@ def _download_youtube_audio(url: str, episode_dir: Path) -> tuple[dict[str, obje
             }
         ],
     }
+    if cookiefile is not None:
+        options["cookiefile"] = str(cookiefile)
+    if _is_bilibili(url):
+        options["http_headers"] = {"Referer": _bilibili_session.REFERER}
+
     with yt_dlp.YoutubeDL(options) as ydl:
         info = ydl.extract_info(url, download=True)
 
@@ -200,16 +321,60 @@ def _download_youtube_audio(url: str, episode_dir: Path) -> tuple[dict[str, obje
 
     candidates = sorted(episode_dir.glob("audio.original.*"))
     if not candidates:
-        raise UnsupportedMedia("YouTube audio extraction produced no file")
+        raise UnsupportedMedia("Video audio extraction produced no file")
     return info, candidates[0]
 
 
-def _youtube_error_message(exc: Exception) -> str:
+def _prepare_cookiefile(
+    url: str,
+    episode_dir: Path,
+    settings: Settings,
+) -> tuple[Path | None, bool]:
+    """Pick the cookie jar for this download, and say whether we own it.
+
+    An operator-supplied jar wins, since it is the only way to reach
+    members-only or age-gated media, and it is never ours to delete. Otherwise
+    Bilibili gets a throwaway anonymous fingerprint, written per episode
+    because yt-dlp rewrites the jar on exit and concurrent jobs must not share
+    one.
+    """
+    if settings.YTDLP_COOKIEFILE is not None:
+        return settings.YTDLP_COOKIEFILE, False
+    if not (_is_bilibili(url) and settings.BILIBILI_ANONYMOUS_COOKIES):
+        return None, False
+    cookies = _bilibili_session.anonymous_cookies()
+    if not cookies:
+        return None, False
+    path = episode_dir / "cookies.bilibili.txt"
+    _bilibili_session.write_cookiefile(path, cookies)
+    return path, True
+
+
+def _is_bilibili(url: str) -> bool:
+    host = (urlsplit(url).hostname or "").lower()
+    return any(host == domain or host.endswith(f".{domain}") for domain in BILIBILI_HOSTS)
+
+
+def _clear_partial_downloads(episode_dir: Path) -> None:
+    for path in episode_dir.glob("audio.original.*"):
+        path.unlink(missing_ok=True)
+
+
+def _is_retryable(exc: Exception) -> bool:
+    """A throttled host or a dropped connection is worth another attempt."""
     message = str(exc)
-    lower = message.lower()
-    if any(token in lower for token in ("age", "region", "drm", "private", "login", "sign in")):
-        return "YouTube link is restricted or requires login"
-    return "YouTube link could not be resolved"
+    if _RESTRICTED_PATTERN.search(message):
+        return False
+    return bool(_THROTTLED_PATTERN.search(message) or _TRANSIENT_PATTERN.search(message))
+
+
+def _video_error_message(exc: Exception) -> str:
+    message = str(exc)
+    if _RESTRICTED_PATTERN.search(message):
+        return "Video link is restricted or requires login"
+    if _THROTTLED_PATTERN.search(message):
+        return "Video host is throttling anonymous requests; please retry shortly"
+    return "Video link could not be resolved"
 
 
 async def _write_upload(upload: UploadLike, out_path: Path) -> int:
