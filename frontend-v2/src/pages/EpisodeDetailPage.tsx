@@ -140,6 +140,7 @@ export default function EpisodeDetailPage() {
             ? "Retry audio digest"
             : "Generate audio digest"}
         </IridescentButton>
+        <span className="text-xs text-text-muted">A host script is written from the original transcript before TTS.</span>
         {digestReady && episode.artifact_paths?.tts && (
           <AudioPlayer src={episodeFileUrl(episode.id, "digest")} variant="ai" />
         )}

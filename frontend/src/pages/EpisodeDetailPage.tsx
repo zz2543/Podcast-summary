@@ -258,6 +258,7 @@ function ArtifactBar({
       >
         {digestReady ? "Regenerate Audio Digest" : digestFailed ? "Retry Audio Digest" : "Generate Audio Digest"}
       </button>
+      <span className="digest-caption">A host script is written from the original transcript before TTS.</span>
       <button className="secondary-button artifact-button" type="button" onClick={() => void onRetry()} disabled={!["failed", "partial"].includes(episode.status)}>
         ↻ Reprocess
       </button>

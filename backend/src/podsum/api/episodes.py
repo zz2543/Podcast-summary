@@ -584,6 +584,7 @@ async def _run_digest_job(app: Any, job_id: str) -> None:
             session,
             app.state.settings,
             tts_client=getattr(app.state, "tts_client", None),
+            llm_client=getattr(app.state, "llm_client", None),
         )
         await pipeline.run(job)
         session.commit()

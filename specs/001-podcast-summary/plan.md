@@ -181,3 +181,7 @@ Makefile                         # `make run`, `make test`, `make lint`
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | TypeScript / Node toolchain on the frontend (deviates from Constitution II "Python primary") | FR-017 requires a polished web UI with audio player + clickable timestamp seeks; browsers cannot execute Python. | Python-only alternatives (Streamlit, NiceGUI, Gradio) were evaluated but each constrains the visual flexibility the user plans to drive from externally generated image briefs (per FR-017). Node is build-time only; runtime served to the browser is static JS/CSS, with all business logic remaining in Python. |
+
+## Audio digest narration revision (2026-09-09)
+
+Replace summary-field concatenation with an independent transcript-grounded LLM script using `prompts/audio_digest.v1.md`, then existing TTS. Reuse configured LLM and prompt loader; no new dependencies or database migration. Persist `digest_script.json` with source fingerprint and prompt version in the episode directory, and reuse it across TTS retries. Cache audio only for the current narration prompt version; legacy audio regenerates on request. Keep failures inside the optional `tts` stage. Update both frontend descriptions and verify source-to-script-to-TTS routing, cache reuse, and failure isolation with mocked providers. Constitution check: existing dependencies, versioned prompt, English deliverables, and tested prompt assembly remain compliant.

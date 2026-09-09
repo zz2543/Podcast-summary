@@ -235,3 +235,10 @@ T027 (URL ingest), T028 (YouTube ingest), T031 (postprocess tests), T033/T034 se
 3. **Coverage discipline**: every domain task has a paired `[unit-test]` task in the same phase. Do not let coverage drift below 80% — `make test` enforces this on every commit (Constitution III).
 4. **Documentation discipline**: `detail.md` is appended to after every phase; `report.md` is rewritten at MVP completion and again at final submission.
 5. **Cloud cost discipline**: every cloud API call goes through tenacity with bounded retries and a per-stage budget; resume-on-restart (T025) makes long debugging sessions cheap.
+
+## Audio digest narration revision (2026-09-09)
+
+- [ ] AD01 Add a versioned transcript-grounded single-host script prompt and validated generation service.
+- [ ] AD02 Wire LLM → persisted script → TTS, reuse script on retries, and invalidate legacy audio cache.
+- [ ] AD03 Clarify the narration behavior in both frontends.
+- [ ] AD04 Verify routing, script validation, caching, failures, and existing regression checks.

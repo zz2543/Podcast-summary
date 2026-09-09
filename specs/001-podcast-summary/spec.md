@@ -64,15 +64,15 @@ A user finds an episode worth studying. They open its detail page and see a chap
 
 ### User Story 3 - Listen to a Condensed Audio Digest (Priority: P2)
 
-A commuter wants the gist of a 90-minute episode but cannot read on the go. They click "Generate audio digest" on the detail page; the system synthesizes a TTS rendering of the structured summary (hook + three-act + chapter key points) and exposes it as a playable / downloadable audio file.
+A commuter wants the gist of a 90-minute episode but cannot read on the go. They click "Generate audio digest" on the detail page; the system generates a fresh single-host spoken explanation from the original transcript, then synthesizes that script with TTS and exposes it as a playable / downloadable audio file.
 
 **Why this priority**: Differentiated value vs. plain text summarizers, but depends on P1 outputs existing first.
 
-**Independent Test**: Trigger audio digest generation on a processed episode; confirm a playable audio file is produced and that listening to it conveys the hook, three-act summary, and chapter key points in the same language as the source.
+**Independent Test**: Trigger audio digest generation on a processed episode; confirm a playable audio file is produced and that listening to it conveys the source content through a coherent single-host explanation in the source language, rather than reading the displayed summary.
 
 **Acceptance Scenarios**:
 
-1. **Given** a processed English episode, **When** the user requests an audio digest, **Then** a playable audio file is produced whose narration is in English and covers hook + three-act + chapter key points.
+1. **Given** a processed English episode, **When** the user requests an audio digest, **Then** a playable audio file is produced whose narration is a newly authored English single-host explanation grounded in the original transcript.
 2. **Given** a processed Chinese episode, **When** the user requests an audio digest, **Then** the digest is narrated in Chinese with natural prosody (no obvious robotic mispronunciation of common Chinese words).
 
 ---
@@ -146,7 +146,7 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 
 - **FR-014**: System MUST emit a Markdown file per episode containing all outputs (metadata, hook, three-act summary, chapter outline with quotes, entity list) suitable for human reading.
 - **FR-015**: System MUST emit a JSON file per episode containing the same outputs in a machine-readable schema (schema details deferred to plan phase) with stable field names so downstream tooling can rely on them.
-- **FR-016**: System MUST be able to synthesize a TTS audio digest covering hook + three-act summary + chapter key points, in the source language, on user request.
+- **FR-016**: System MUST generate a fresh single-host narration script from the original source transcript, then pass only that script to TTS, in the source language, on user request. The script MUST use a natural opening, explanations, transitions, and closing; MUST NOT concatenate or read the displayed summary, fabricate facts or personal experiences, or narrate usefulness scores. Missing transcripts or script-generation failures MUST fail the optional digest without falling back to summary readout. Persist the script for inspection and reuse on TTS retries; legacy summary-readout audio MUST NOT satisfy the new digest cache.
 
 **Web UI**
 

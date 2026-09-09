@@ -156,3 +156,7 @@ Each section follows the format mandated by the project: **Decision / Rationale 
 - ✅ Partial-degraded output → drives R7 state machine and exporter logic.
 
 No `NEEDS CLARIFICATION` markers remain.
+
+## Audio digest script source (2026-09-09)
+
+Considered rewriting the displayed summary versus authoring from the original transcript. Choose the transcript: it retains explanations and examples omitted from the written summary and directly meets the requested independent host narration. Reuse the configured LLM with a validated JSON script response. This adds one LLM call per new script; persist successful scripts so TTS retries do not repeat that cost. Long inputs retain the existing summarization provider context limits; never silently truncate or fall back to summary readout.
