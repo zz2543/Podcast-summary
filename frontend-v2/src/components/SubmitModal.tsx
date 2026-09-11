@@ -16,6 +16,7 @@ import {
   createEpisodeBatch,
   STYLE_NOTE_MAX_CHARS,
   type CreateEpisodeInput,
+  type DetailLevel,
   type SummaryStyleInput,
   type SummaryStylePreset
 } from "@/api/client";
@@ -58,6 +59,15 @@ const STYLE_PRESETS: { id: SummaryStylePreset; label: string; hint: string }[] =
   { id: "quick_skim", label: "Quick skim", hint: "Only the load-bearing claims" }
 ];
 
+// How much gets written, independent of the style presets above: style says how
+// to write, detail says how much. "Standard" is what the summary prompts already
+// describe, so it sends no directive at all.
+const DETAIL_OPTIONS: { id: DetailLevel; label: string; hint: string }[] = [
+  { id: "concise", label: "Brief", hint: "At most 3 key points per chapter, no chapter summary" },
+  { id: "standard", label: "Standard", hint: "4–6 full key points per chapter, summary where it helps" },
+  { id: "detailed", label: "Detailed", hint: "6–8 key points per chapter, every distinct example kept" }
+];
+
 function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
   const { setOpen } = useModalControls();
   const [files, setFiles] = useState<File[]>([]);
@@ -69,12 +79,14 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
   const [tab, setTab] = useState("upload");
   const [preset, setPreset] = useState<SummaryStylePreset>("default");
   const [note, setNote] = useState("");
+  const [detail, setDetail] = useState<DetailLevel>("standard");
   const [styleOpen, setStyleOpen] = useState(false);
 
-  const styled = preset !== "default" || note.trim().length > 0;
+  const styled = preset !== "default" || note.trim().length > 0 || detail !== "standard";
   const style: SummaryStyleInput = {
     summary_style: preset,
-    style_note: note.trim() || undefined
+    style_note: note.trim() || undefined,
+    detail_level: detail
   };
 
   const onSubmit = async () => {
@@ -136,7 +148,9 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
     }
   };
 
-  const activeLabel = STYLE_PRESETS.find((p) => p.id === preset)?.label ?? "Default";
+  const presetLabel = STYLE_PRESETS.find((p) => p.id === preset)?.label ?? "Default";
+  const detailLabel = DETAIL_OPTIONS.find((d) => d.id === detail)?.label ?? "Standard";
+  const activeLabel = detail === "standard" ? presetLabel : `${presetLabel} · ${detailLabel}`;
 
   return (
     <>
@@ -187,6 +201,29 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
             <p className="mt-2 text-xs text-text-muted">
               {STYLE_PRESETS.find((p) => p.id === preset)?.hint}
             </p>
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-xs font-medium text-text-muted">Detail</span>
+              <div className="inline-flex rounded-full bg-surface p-0.5">
+                {DETAIL_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    title={option.hint}
+                    onClick={() => setDetail(option.id)}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                      detail === option.id
+                        ? "bg-text text-white"
+                        : "text-text-muted hover:text-text"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-text-muted">
+              {DETAIL_OPTIONS.find((d) => d.id === detail)?.hint}
+            </p>
             <textarea
               rows={2}
               maxLength={STYLE_NOTE_MAX_CHARS}
@@ -210,6 +247,7 @@ function SubmitForm({ onSubmitted }: { onSubmitted: () => void }) {
                 onClick={() => {
                   setPreset("default");
                   setNote("");
+                  setDetail("standard");
                 }}
                 className="mt-2 text-xs font-medium text-text-muted underline-offset-2 hover:text-text hover:underline"
               >

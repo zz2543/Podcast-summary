@@ -5,7 +5,9 @@ import re
 import unicodedata
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+from podsum.domain.usefulness_scorer import Band, band_for
 
 
 class RetriableValidationError(ValueError):
@@ -28,11 +30,37 @@ class ThreeAct(BaseModel):
         return cleaned
 
 
-class CandidateQuote(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+class Usefulness(BaseModel):
+    """How useful an episode is to a listener deciding whether to spend time (FR-027)."""
 
-    text: str
-    start_ms: int
+    model_config = ConfigDict(extra="forbid")
+
+    score: int = Field(strict=True, ge=0, le=100)
+    rationale: str
+    band: Band
+
+    @field_validator("rationale")
+    @classmethod
+    def rationale_non_empty(cls, value: str) -> str:
+        cleaned = _clean_text(value)
+        if not cleaned:
+            raise ValueError("usefulness rationale must not be empty")
+        return cleaned
+
+
+class CandidateQuote(BaseModel):
+    """A key moment: a verbatim anchor plus what the listener gets from it.
+
+    `text` is the anchor and must be verbatim — it is how the moment gets an
+    accurate timestamp. `takeaway` is what the reader sees.
+    """
+
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    # The v3 prompt calls the anchor `quote`; older payloads call it `text`.
+    text: str = Field(validation_alias=AliasChoices("text", "quote"))
+    start_ms: int = 0
+    takeaway: str | None = None
 
     @field_validator("text")
     @classmethod
@@ -42,6 +70,13 @@ class CandidateQuote(BaseModel):
             raise ValueError("quote text must not be empty")
         return cleaned
 
+    @field_validator("takeaway")
+    @classmethod
+    def takeaway_or_none(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return _clean_text(value) or None
+
 
 class ChapterDraft(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -49,6 +84,20 @@ class ChapterDraft(BaseModel):
     title: str
     key_points: list[str]
     candidate_quotes: list[CandidateQuote] = []
+    key_moments: list[CandidateQuote] = []
+    summary: str | None = None
+
+    @property
+    def moments(self) -> list[CandidateQuote]:
+        """Key moments, falling back to the pre-v3 `candidate_quotes` field."""
+        return self.key_moments or self.candidate_quotes
+
+    @field_validator("summary")
+    @classmethod
+    def summary_or_none(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return _clean_text(value) or None
 
     @field_validator("title")
     @classmethod
@@ -87,6 +136,24 @@ def parse_three_act(raw_json: Any) -> ThreeAct:
         return ThreeAct.model_validate(_payload_dict(raw_json))
     except (ValidationError, RetriableValidationError) as exc:
         raise RetriableValidationError("three-act payload failed validation") from exc
+
+
+def parse_usefulness(raw_json: Any) -> Usefulness:
+    """Validate a ``{score, rationale}`` payload and attach the derived band.
+
+    An out-of-range, non-integer, or missing score is retried, never clamped:
+    silently turning 140 into 100 would invent a rating the model never gave.
+    """
+    payload = _payload_dict(raw_json)
+    score = payload.get("score")
+    try:
+        band = band_for(score)  # type: ignore[arg-type]
+    except ValueError as exc:
+        raise RetriableValidationError(f"usefulness score is invalid: {exc}") from exc
+    try:
+        return Usefulness.model_validate({**payload, "band": band})
+    except ValidationError as exc:
+        raise RetriableValidationError("usefulness payload failed validation") from exc
 
 
 def parse_chapter_payload(raw_json: Any) -> list[ChapterDraft]:

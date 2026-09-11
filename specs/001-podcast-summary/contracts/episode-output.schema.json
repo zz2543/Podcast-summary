@@ -63,7 +63,8 @@
           "type": "string",
           "enum": ["default", "study_notes", "business_insight", "debate", "quick_skim"]
         },
-        "note": { "type": ["string", "null"], "maxLength": 200 }
+        "note": { "type": ["string", "null"], "maxLength": 200 },
+        "detail": { "type": "string", "enum": ["concise", "standard", "detailed"] }
       }
     },
     "hook": {
@@ -146,16 +147,18 @@
         "start_ms":   { "type": "integer", "minimum": 0 },
         "end_ms":     { "type": "integer", "minimum": 1 },
         "key_points": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "summary":    { "type": ["string", "null"], "description": "Optional prose for a chapter whose key points alone lose the causal thread; null when the points stand on their own." },
         "quotes":     { "type": "array", "items": { "$ref": "#/$defs/Quote" } }
       }
     },
     "Quote": {
       "type": "object",
-      "description": "Always verified verbatim against the transcript before serialization (FR-012, SC-004).",
+      "description": "A key moment. `text` is always verified verbatim against the transcript before serialization (FR-012, SC-004) and is what pins the moment to an accurate timestamp; `takeaway` is the one-sentence reading shown to the reader.",
       "required": ["text", "start_ms"],
       "additionalProperties": false,
       "properties": {
         "text":     { "type": "string", "minLength": 1 },
+        "takeaway": { "type": ["string", "null"], "description": "One sentence saying what the listener gets at this moment; null for quotes stored before key moments existed." },
         "start_ms": { "type": "integer", "minimum": 0 }
       }
     },

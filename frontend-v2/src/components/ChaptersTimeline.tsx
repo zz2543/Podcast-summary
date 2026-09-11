@@ -46,6 +46,11 @@ export function ChaptersTimeline({
                   ))}
                 </ul>
               )}
+              {chapter.summary && (
+                <p className="mt-3 border-l-2 border-border pl-3 text-sm leading-relaxed text-text-muted">
+                  {chapter.summary}
+                </p>
+              )}
               {chapter.quotes.length > 0 && (
                 <div className="mt-3 flex flex-col gap-2">
                   {chapter.quotes.map((q, j) => (
@@ -59,8 +64,17 @@ export function ChaptersTimeline({
                         <Play className="h-2.5 w-2.5 fill-current" strokeWidth={0} />
                         {formatTimestamp(q.start_ms)}
                       </span>
-                      <span className="flex-1 whitespace-pre-wrap leading-relaxed text-text">
-                        {q.text}
+                      <span className="flex-1 leading-relaxed">
+                        {/* The takeaway is the point; the verbatim line below is
+                            the evidence it was actually said. */}
+                        <span className="block whitespace-pre-wrap text-text">
+                          {q.takeaway || q.text}
+                        </span>
+                        {q.takeaway && (
+                          <span className="mt-1 block whitespace-pre-wrap text-xs leading-relaxed text-text-muted">
+                            「{q.text}」
+                          </span>
+                        )}
                       </span>
                     </button>
                   ))}

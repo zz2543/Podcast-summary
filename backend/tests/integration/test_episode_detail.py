@@ -87,7 +87,8 @@ def test_episode_detail_includes_persisted_chapters_and_entities(tmp_path: Path)
             "start_ms": 0,
             "end_ms": 60_000,
             "key_points": ["Point one"],
-            "quotes": [{"text": "A verified quote.", "start_ms": 12_000}],
+            "summary": None,
+            "quotes": [{"text": "A verified quote.", "takeaway": None, "start_ms": 12_000}],
         }
     ]
     assert detail["entities"] == [

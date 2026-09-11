@@ -73,6 +73,9 @@ class Episode(Base):
         String(32), nullable=False, default="default", server_default="default"
     )
     style_note: Mapped[str | None] = mapped_column(Text)
+    detail_level: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="standard", server_default="standard"
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
     data_dir: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
@@ -187,6 +190,9 @@ class Chapter(Base):
         nullable=False,
         default=list,
     )
+    # Optional prose: the model writes it only where the bullets alone lose the
+    # causal thread, so most chapters leave it NULL.
+    summary: Mapped[str | None] = mapped_column(Text)
 
     episode: Mapped[Episode] = relationship(back_populates="chapters")
     quotes: Mapped[list[Quote]] = relationship(
@@ -207,7 +213,11 @@ class Quote(Base):
         nullable=False,
     )
     idx: Mapped[int] = mapped_column(Integer, nullable=False)
+    # `text` stays the verbatim transcript line: it is what pins the moment to an
+    # accurate timestamp. `takeaway` is the one-sentence reading of it shown to
+    # the user.
     text: Mapped[str] = mapped_column(Text, nullable=False)
+    takeaway: Mapped[str | None] = mapped_column(Text)
     start_ms: Mapped[int] = mapped_column(Integer, nullable=False)
     verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
@@ -250,6 +260,10 @@ class SummaryArtifact(Base):
     )
     hook: Mapped[str | None] = mapped_column(Text)
     three_act: Mapped[dict[str, str] | None] = mapped_column(MutableDict.as_mutable(JSON))
+    # FR-027: the three usefulness_* columns are written together or not at all.
+    usefulness_score: Mapped[int | None] = mapped_column(Integer)
+    usefulness_band: Mapped[str | None] = mapped_column(String(16))
+    usefulness_rationale: Mapped[str | None] = mapped_column(Text)
     markdown_path: Mapped[str | None] = mapped_column(Text)
     json_path: Mapped[str | None] = mapped_column(Text)
     tts_path: Mapped[str | None] = mapped_column(Text)
@@ -262,6 +276,19 @@ class SummaryArtifact(Base):
         MutableDict.as_mutable(JSON),
         nullable=False,
         default=dict,
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "usefulness_score IS NULL OR (usefulness_score BETWEEN 0 AND 100)",
+            name="ck_summary_usefulness_score_range",
+        ),
+        CheckConstraint(
+            "usefulness_band IS NULL OR usefulness_band IN "
+            "('must_listen', 'worth_listening', 'skimmable', 'skippable')",
+            name="ck_summary_usefulness_band",
+        ),
+        Index("idx_summary_usefulness_score", "usefulness_score"),
     )
 
     episode: Mapped[Episode] = relationship(back_populates="summary_artifact")

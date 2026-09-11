@@ -1,10 +1,11 @@
 """Preset-plus-note summary styling.
 
-The submit modal lets the reader pick one preset and add a short free-text note.
-Both are stored on the episode and assembled here into the `style_directive`
-block that the v2 summary prompts interpolate. All prompt text lives in
-`prompts/summary_style.v1.md` (Constitution V); this module only selects and
-frames it.
+The submit modal lets the reader pick one preset, a detail level, and add a
+short free-text note. All three are stored on the episode and assembled here
+into the `style_directive` block that the summary prompts interpolate. Style
+says *how* to write, detail says *how much*; they are independent axes. All
+prompt text lives in `prompts/summary_style.v2.md` (Constitution V); this module
+only selects and frames it.
 """
 
 from __future__ import annotations
@@ -13,7 +14,7 @@ import re
 from dataclasses import dataclass
 
 STYLE_PROMPT_ROLE = "summary_style"
-STYLE_PROMPT_VERSION = "v1"
+STYLE_PROMPT_VERSION = "v2"
 DEFAULT_PRESET = "default"
 MAX_NOTE_CHARS = 200
 PRESETS: tuple[str, ...] = (
@@ -23,6 +24,9 @@ PRESETS: tuple[str, ...] = (
     "debate",
     "quick_skim",
 )
+
+DEFAULT_DETAIL = "standard"
+DETAIL_LEVELS: tuple[str, ...] = ("concise", "standard", "detailed")
 
 HEADER_SECTION = "_header"
 NOTE_SECTION = "_reader_note"
@@ -39,10 +43,13 @@ class StyleError(ValueError):
 class SummaryStyle:
     preset: str = DEFAULT_PRESET
     note: str | None = None
+    detail: str = DEFAULT_DETAIL
 
     @property
     def is_default(self) -> bool:
-        return self.preset == DEFAULT_PRESET and not self.note
+        # "standard" detail is what the summary prompts already describe, so it
+        # needs no directive of its own.
+        return self.preset == DEFAULT_PRESET and not self.note and self.detail == DEFAULT_DETAIL
 
 
 def sanitize_note(raw: object) -> str | None:
@@ -61,7 +68,7 @@ def sanitize_note(raw: object) -> str | None:
     return note
 
 
-def parse(preset: object = None, note: object = None) -> SummaryStyle:
+def parse(preset: object = None, note: object = None, detail: object = None) -> SummaryStyle:
     """Validate untrusted request fields into a `SummaryStyle`."""
     if preset is None or preset == "":
         resolved = DEFAULT_PRESET
@@ -69,7 +76,13 @@ def parse(preset: object = None, note: object = None) -> SummaryStyle:
         resolved = preset
     else:
         raise StyleError(f"summary_style must be one of: {', '.join(PRESETS)}")
-    return SummaryStyle(preset=resolved, note=sanitize_note(note))
+    if detail is None or detail == "":
+        resolved_detail = DEFAULT_DETAIL
+    elif isinstance(detail, str) and detail in DETAIL_LEVELS:
+        resolved_detail = detail
+    else:
+        raise StyleError(f"detail_level must be one of: {', '.join(DETAIL_LEVELS)}")
+    return SummaryStyle(preset=resolved, note=sanitize_note(note), detail=resolved_detail)
 
 
 def split_sections(prompt_body: str) -> dict[str, str]:
@@ -92,7 +105,10 @@ def build_directive(prompt_body: str, style: SummaryStyle) -> str:
     if style.is_default:
         return ""
     sections = split_sections(prompt_body)
+    detail_section = detail_section_name(style.detail)
     required = [HEADER_SECTION, style.preset]
+    if detail_section is not None:
+        required.append(detail_section)
     if style.note:
         required.append(NOTE_SECTION)
     missing = [name for name in required if name not in sections]
@@ -102,6 +118,14 @@ def build_directive(prompt_body: str, style: SummaryStyle) -> str:
     parts = [sections[HEADER_SECTION]]
     if sections[style.preset]:
         parts.append(sections[style.preset])
+    if detail_section is not None and sections[detail_section]:
+        parts.append(sections[detail_section])
     if style.note:
         parts.append(sections[NOTE_SECTION].format(note=style.note))
     return "\n\n".join(parts) + "\n"
+
+
+def detail_section_name(detail: str) -> str | None:
+    """Section id for a detail level, or None for the level the prompts already
+    describe."""
+    return None if detail == DEFAULT_DETAIL else f"detail_{detail}"

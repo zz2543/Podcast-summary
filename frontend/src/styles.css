@@ -1284,3 +1284,135 @@ button:disabled {
     position: static;
   }
 }
+
+/* --- FR-027 usefulness score --------------------------------------------- */
+
+.score-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.score-badge strong {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Colour is never the only signal: the number and the label always ship
+   together, so a badge stays readable without colour perception. */
+.score-badge--must_listen {
+  background: rgba(23, 155, 106, 0.12);
+  color: #10794f;
+}
+
+.score-badge--worth_listening {
+  background: rgba(56, 108, 245, 0.12);
+  color: #2b56c4;
+}
+
+.score-badge--skimmable {
+  background: rgba(214, 141, 22, 0.14);
+  color: #8f5a06;
+}
+
+.score-badge--skippable {
+  background: rgba(120, 128, 148, 0.14);
+  color: #5c6478;
+}
+
+.score-badge--unrated {
+  background: rgba(120, 128, 148, 0.1);
+  color: #7a8296;
+  font-weight: 600;
+}
+
+.band-select select {
+  padding: 8px 12px;
+  border: 1px solid rgba(120, 128, 148, 0.28);
+  border-radius: 999px;
+  background: #fff;
+  color: #1f2433;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.usefulness-card {
+  margin-top: 18px;
+  padding: 22px 26px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 20, 40, 0.05), 0 12px 28px rgba(15, 20, 40, 0.05);
+}
+
+.usefulness-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.usefulness-headline strong {
+  color: #151927;
+  font-size: 42px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.usefulness-total {
+  color: #8b92a6;
+  font-size: 14px;
+}
+
+.usefulness-headline .score-badge {
+  margin-left: auto;
+}
+
+.usefulness-meter {
+  overflow: hidden;
+  margin-top: 16px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(120, 128, 148, 0.14);
+}
+
+.usefulness-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.usefulness-meter-fill--must_listen {
+  background: #17a06a;
+}
+
+.usefulness-meter-fill--worth_listening {
+  background: #386cf5;
+}
+
+.usefulness-meter-fill--skimmable {
+  background: #d68d16;
+}
+
+.usefulness-meter-fill--skippable {
+  background: #8b92a6;
+}
+
+.usefulness-card p {
+  margin: 16px 0 0;
+  color: #2b3145;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.usefulness-card small {
+  display: block;
+  margin-top: 12px;
+  color: #838aa0;
+  font-size: 12px;
+}

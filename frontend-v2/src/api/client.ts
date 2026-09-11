@@ -16,8 +16,30 @@ export interface StageStatusMap {
   three_act: StageStatus;
   chapters: StageStatus;
   entities: StageStatus;
+  usefulness: StageStatus;
   tts: StageStatus;
 }
+
+export const USEFULNESS_BANDS = [
+  "must_listen",
+  "worth_listening",
+  "skimmable",
+  "skippable"
+] as const;
+
+export type UsefulnessBand = (typeof USEFULNESS_BANDS)[number];
+
+/**
+ * FR-027 有用性评分。整集未评分时后端返回 null——不要渲染成 0，
+ * 0 是一个真实且有意义的分数。
+ */
+export interface Usefulness {
+  score: number;
+  band: UsefulnessBand;
+  rationale: string;
+}
+
+export type EpisodeSort = "created_at" | "usefulness_score";
 
 export interface EpisodeSummary {
   id: string;
@@ -28,6 +50,7 @@ export interface EpisodeSummary {
   language: "zh" | "en" | "mixed" | null;
   status: EpisodeStatus;
   stage_status: StageStatusMap;
+  usefulness: Usefulness | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,7 +62,10 @@ export interface ThreeAct {
 }
 
 export interface Quote {
+  /** Verbatim transcript line; it is what pins the moment to an accurate time. */
   text: string;
+  /** One sentence on what the listener gets here. Null for older episodes. */
+  takeaway?: string | null;
   start_ms: number;
 }
 
@@ -49,6 +75,8 @@ export interface Chapter {
   start_ms: number;
   end_ms: number;
   key_points: string[];
+  /** Present only where the key points alone lose the thread. */
+  summary?: string | null;
   quotes: Quote[];
 }
 
@@ -67,9 +95,10 @@ export interface EpisodeDetail extends EpisodeSummary {
     three_act: string;
     chapter_outline: string;
     entity_extraction: string;
+    usefulness_score?: string;
     summary_style?: string;
   };
-  summary_style?: { preset: SummaryStylePreset; note: string | null };
+  summary_style?: { preset: SummaryStylePreset; note: string | null; detail?: DetailLevel };
   hook: string | null;
   three_act: ThreeAct | null;
   chapters: Chapter[];
@@ -126,9 +155,16 @@ export type SummaryStylePreset = (typeof SUMMARY_STYLE_PRESETS)[number];
 
 export const STYLE_NOTE_MAX_CHARS = 200;
 
+export const DETAIL_LEVELS = ["concise", "standard", "detailed"] as const;
+
+export type DetailLevel = (typeof DETAIL_LEVELS)[number];
+
+export const DEFAULT_DETAIL_LEVEL: DetailLevel = "standard";
+
 export interface SummaryStyleInput {
   summary_style?: SummaryStylePreset;
   style_note?: string;
+  detail_level?: DetailLevel;
 }
 
 export type CreateEpisodeInput = SummaryStyleInput &
@@ -172,6 +208,9 @@ function appendStyle(form: FormData, style: SummaryStyleInput): void {
     form.append("summary_style", style.summary_style);
   }
   if (style.style_note?.trim()) form.append("style_note", style.style_note.trim());
+  if (style.detail_level && style.detail_level !== DEFAULT_DETAIL_LEVEL) {
+    form.append("detail_level", style.detail_level);
+  }
 }
 
 function styleFields(style: SummaryStyleInput): SummaryStyleInput {
@@ -180,6 +219,9 @@ function styleFields(style: SummaryStyleInput): SummaryStyleInput {
     fields.summary_style = style.summary_style;
   }
   if (style.style_note?.trim()) fields.style_note = style.style_note.trim();
+  if (style.detail_level && style.detail_level !== DEFAULT_DETAIL_LEVEL) {
+    fields.detail_level = style.detail_level;
+  }
   return fields;
 }
 
@@ -243,12 +285,18 @@ export function listEpisodes(
     limit?: number;
     cursor?: string;
     status?: EpisodeStatus;
+    band?: UsefulnessBand;
+    minScore?: number;
+    sort?: EpisodeSort;
   } = {}
 ): Promise<EpisodeListResponse> {
   const search = new URLSearchParams();
   if (params.limit) search.set("limit", String(params.limit));
   if (params.cursor) search.set("cursor", params.cursor);
   if (params.status) search.set("status", params.status);
+  if (params.band) search.set("band", params.band);
+  if (params.minScore !== undefined) search.set("min_score", String(params.minScore));
+  if (params.sort) search.set("sort", params.sort);
   const suffix = search.toString() ? `?${search.toString()}` : "";
   return apiFetch<EpisodeListResponse>(`/api/episodes${suffix}`);
 }

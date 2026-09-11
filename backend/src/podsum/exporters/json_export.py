@@ -39,6 +39,7 @@ def render(episode_detail: Any) -> dict[str, Any]:
         "three_act": (
             _value(artifact, "three_act") if stage_status["three_act"] == "present" else None
         ),
+        "usefulness": _usefulness(artifact, stage_status),
         "chapters": _render_chapters(_value(episode_detail, "chapters")),
         "entities": _render_entities(_value(episode_detail, "entities")),
         "artifact_paths": {
@@ -67,6 +68,7 @@ def _render_chapters(value: Any) -> list[dict[str, Any]]:
                 "start_ms": _int_value(_value(chapter, "start_ms")),
                 "end_ms": max(1, _int_value(_value(chapter, "end_ms"))),
                 "key_points": [str(item) for item in _iter_items(_value(chapter, "key_points"))],
+                "summary": _optional_text(_value(chapter, "summary")),
                 "quotes": _render_quotes(_value(chapter, "quotes")),
             }
         )
@@ -81,10 +83,16 @@ def _render_quotes(value: Any) -> list[dict[str, Any]]:
         quotes.append(
             {
                 "text": str(_value(quote, "text") or ""),
+                "takeaway": _optional_text(_value(quote, "takeaway")),
                 "start_ms": _int_value(_value(quote, "start_ms")),
             }
         )
     return quotes
+
+
+def _optional_text(value: Any) -> str | None:
+    text = str(value).strip() if isinstance(value, str) else ""
+    return text or None
 
 
 def _render_entities(value: Any) -> list[dict[str, Any]]:
@@ -119,12 +127,25 @@ def _int_value(value: Any) -> int:
         return 0
 
 
+def _usefulness(artifact: Any, stage_status: dict[str, str]) -> dict[str, Any] | None:
+    """FR-027: the whole object is null when the episode is unscored — never a zero."""
+    if stage_status["usefulness"] != "present":
+        return None
+    score = _value(artifact, "usefulness_score")
+    band = _value(artifact, "usefulness_band")
+    rationale = _value(artifact, "usefulness_rationale")
+    if score is None or not band or not rationale:
+        return None
+    return {"score": int(score), "band": str(band), "rationale": str(rationale)}
+
+
 def _stage_status(values: dict[str, str]) -> dict[str, str]:
     return {
         "hook": values.get("hook", "missing"),
         "three_act": values.get("three_act", "missing"),
         "chapters": values.get("chapters", "missing"),
         "entities": values.get("entities", "missing"),
+        "usefulness": values.get("usefulness", "missing"),
         "tts": values.get("tts", "missing"),
     }
 
@@ -136,6 +157,8 @@ def _prompt_versions(values: dict[str, str]) -> dict[str, str]:
         "chapter_outline": values.get("chapter_outline", "v1"),
         "entity_extraction": values.get("entity_extraction", "v1"),
     }
+    if values.get("usefulness_score"):
+        versions["usefulness_score"] = values["usefulness_score"]
     # Only present when the reader picked a non-default style for this episode.
     if values.get("summary_style"):
         versions["summary_style"] = values["summary_style"]
@@ -147,6 +170,7 @@ def _summary_style(episode: Any) -> dict[str, Any]:
     return {
         "preset": _value(episode, "summary_style") or "default",
         "note": note if note else None,
+        "detail": _value(episode, "detail_level") or "standard",
     }
 
 

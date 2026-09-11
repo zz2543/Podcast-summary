@@ -3,6 +3,7 @@ import { Headphones } from "lucide-react";
 import { BentoCell } from "@/components/ui/bento-grid";
 import { GlareCard } from "@/components/ui/glare-card";
 import { StatusDot } from "@/components/StatusDot";
+import { ScoreBadge } from "@/components/ScoreBadge";
 import { formatDuration, formatRelative } from "@/lib/time";
 import type { EpisodeStatus, EpisodeSummary } from "@/api/client";
 
@@ -25,7 +26,10 @@ export function EpisodeCard({
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-elev text-text-muted">
                 <Headphones className="h-4 w-4" strokeWidth={1.6} />
               </div>
-              <StatusDot status={status} />
+              <div className="flex items-center gap-2">
+                <ScoreBadge usefulness={episode.usefulness} />
+                <StatusDot status={status} />
+              </div>
             </div>
             <div className="flex-1">
               <h3 className="font-display text-base font-semibold leading-snug tracking-tight text-text line-clamp-2">

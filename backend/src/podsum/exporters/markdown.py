@@ -23,6 +23,10 @@ def render(episode_detail: Any) -> str:
     if hook:
         lines.extend(["", "## Hook", str(hook)])
 
+    usefulness = _usefulness_line(artifact)
+    if usefulness:
+        lines.extend(["", "## Usefulness", usefulness])
+
     three_act = _value(artifact, "three_act")
     if isinstance(three_act, dict):
         lines.extend(
@@ -55,18 +59,26 @@ def render(episode_detail: Any) -> str:
             )
             for point in _list_value(chapter, "key_points"):
                 lines.append(f"  - {point}")
+            summary = _value(chapter, "summary")
+            if isinstance(summary, str) and summary.strip():
+                lines.extend(["", summary.strip()])
             quotes = [
                 quote
                 for quote in _list_value(chapter, "quotes")
                 if _value(quote, "verified") is not False
             ]
             if quotes:
-                lines.append("- Quotes:")
+                lines.append("- Key moments:")
                 for quote in quotes:
                     start_ms = _value(quote, "start_ms")
+                    takeaway = _value(quote, "takeaway")
+                    headline = takeaway if isinstance(takeaway, str) and takeaway.strip() else None
                     lines.append(
-                        f"  - [{_timestamp(start_ms)}](#t={start_ms}) \"{_value(quote, 'text')}\""
+                        f"  - [{_timestamp(start_ms)}](#t={start_ms}) "
+                        + (headline if headline else f"\"{_value(quote, 'text')}\"")
                     )
+                    if headline:
+                        lines.append(f"    > {_value(quote, 'text')}")
 
     entities = _list_value(episode_detail, "entities")
     if entities:
@@ -80,6 +92,25 @@ def render(episode_detail: Any) -> str:
                 lines.append(f"- {_value(entity, 'name')} × {_value(entity, 'count')}")
 
     return "\n".join(lines).rstrip() + "\n"
+
+
+_BAND_LABELS = {
+    "must_listen": "Must listen",
+    "worth_listening": "Worth listening",
+    "skimmable": "Skimmable",
+    "skippable": "Skippable",
+}
+
+
+def _usefulness_line(artifact: Any) -> str:
+    """FR-027 one-liner, or "" when the episode is unscored (section is then omitted)."""
+    score = _value(artifact, "usefulness_score")
+    band = _value(artifact, "usefulness_band")
+    rationale = _value(artifact, "usefulness_rationale")
+    if score is None or not band or not rationale:
+        return ""
+    label = _BAND_LABELS.get(str(band), str(band))
+    return f"{int(score)}/100 · {label} · {rationale}"
 
 
 def _value(source: Any, key: str) -> Any:

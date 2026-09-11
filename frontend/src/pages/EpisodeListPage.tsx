@@ -13,13 +13,17 @@ import {
   deleteEpisode,
   getEpisode,
   listEpisodes,
+  type EpisodeSort,
+  type UsefulnessBand,
   retryEpisode,
   useJobs
 } from "../api/client";
 import { AppHeader } from "../components/AppHeader";
+import { ScoreBadge } from "../components/ScoreBadge";
 
 type SubmitMode = "local_file" | "direct_url" | "youtube";
 type FilterStatus = "all" | EpisodeStatus;
+type BandFilter = "all" | UsefulnessBand;
 
 const STATUS_LABELS: Record<EpisodeStatus, string> = {
   pending: "Queued",
@@ -45,6 +49,8 @@ export function EpisodeListPage() {
   const [episodes, setEpisodes] = useState<EpisodeSummary[]>([]);
   const [detailsById, setDetailsById] = useState<Record<string, EpisodeDetail>>({});
   const [filter, setFilter] = useState<FilterStatus>("all");
+  const [band, setBand] = useState<BandFilter>("all");
+  const [sort, setSort] = useState<EpisodeSort>("created_at");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
@@ -60,10 +66,20 @@ export function EpisodeListPage() {
     return { processing, queued };
   }, [jobsState.jobs]);
 
-  const loadEpisodes = async (status: FilterStatus = filter) => {
+  const loadEpisodes = async (
+    status: FilterStatus = filter,
+    bandFilter: BandFilter = band,
+    sortBy: EpisodeSort = sort
+  ) => {
     setLoading(true);
     try {
-      const response = await listEpisodes(status === "all" ? {} : { status });
+      const response = await listEpisodes({
+        ...(status === "all" ? {} : { status }),
+        // Filtering by band hides unscored episodes: there is no honest bucket
+        // to put them in.
+        ...(bandFilter === "all" ? {} : { band: bandFilter }),
+        sort: sortBy
+      });
       setEpisodes(response.items);
     } catch (error) {
       setToast(errorMessage(error));
@@ -73,8 +89,8 @@ export function EpisodeListPage() {
   };
 
   useEffect(() => {
-    void loadEpisodes(filter);
-  }, [filter]);
+    void loadEpisodes(filter, band, sort);
+  }, [filter, band, sort]);
 
   useEffect(() => {
     const terminalUpdateSeen = jobsState.jobs.some((job) => ["done", "partial", "failed"].includes(job.state));
@@ -194,6 +210,27 @@ export function EpisodeListPage() {
             </FilterButton>
             <FilterButton active={filter === "failed"} onClick={() => setFilter("failed")}>
               Failed
+            </FilterButton>
+          </div>
+          <label className="band-select">
+            <span className="sr-only">Filter by usefulness score</span>
+            <select value={band} onChange={(event) => setBand(event.target.value as BandFilter)}>
+              <option value="all">All ratings</option>
+              <option value="must_listen">Must listen</option>
+              <option value="worth_listening">Worth listening</option>
+              <option value="skimmable">Skimmable</option>
+              <option value="skippable">Skippable</option>
+            </select>
+          </label>
+          <div className="filter-pills">
+            <FilterButton active={sort === "created_at"} onClick={() => setSort("created_at")}>
+              Newest
+            </FilterButton>
+            <FilterButton
+              active={sort === "usefulness_score"}
+              onClick={() => setSort("usefulness_score")}
+            >
+              Top score
             </FilterButton>
           </div>
           <label className="search-box">
@@ -418,6 +455,7 @@ function EpisodeRow({
       <div className="episode-main">
         <div className="episode-title-row">
           <h2>{episodeTitle(episode)}</h2>
+          <ScoreBadge usefulness={episode.usefulness} />
           <StatusBadge status={status} />
         </div>
         <p className="episode-meta">

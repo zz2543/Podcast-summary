@@ -84,6 +84,22 @@ def test_us1_end_to_end_upload_reaches_done(tmp_path: Path) -> None:
                                 "type": "text",
                                 "text": json.dumps(
                                     {
+                                        "score": 78,
+                                        "rationale": "Concrete claims about review time, little filler.",
+                                    }
+                                ),
+                            }
+                        ]
+                    },
+                ),
+                httpx.Response(
+                    200,
+                    json={
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": json.dumps(
+                                    {
                                         "chapters": [
                                             {
                                                 "title": "Opening",

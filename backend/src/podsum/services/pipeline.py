@@ -8,21 +8,28 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 from tenacity import AsyncRetrying, RetryError, stop_after_attempt
 
 from podsum.api.ws_progress import Broadcaster
 from podsum.api.ws_progress import broadcaster as default_broadcaster
 from podsum.config import Settings
+from podsum.domain import language as language_rules
 from podsum.domain.chapter_segmenter import ChapterSpan
 from podsum.domain.chapter_segmenter import segment as segment_chapters
 from podsum.domain.entity_extractor import Entity as DomainEntity
 from podsum.domain.entity_extractor import extract as extract_entities
 from podsum.domain.prompt_assembler import PromptAssembler
 from podsum.domain.quote_verifier import verify_against_segments
-from podsum.domain.structured_parser import parse_chapter_payload, parse_one_liner, parse_three_act
+from podsum.domain.structured_parser import (
+    parse_chapter_payload,
+    parse_one_liner,
+    parse_three_act,
+    parse_usefulness,
+)
 from podsum.domain.summary_style import (
+    DEFAULT_DETAIL,
     DEFAULT_PRESET,
     STYLE_PROMPT_ROLE,
     STYLE_PROMPT_VERSION,
@@ -116,11 +123,19 @@ class Pipeline:
                     return job
                 optional_failed = True
                 artifact_stage = self._artifact_stage_key(stage.name)
-                SummaryArtifactRepo(self.session).update_stage_status(
+                artifact_repo = SummaryArtifactRepo(self.session)
+                artifact = artifact_repo.update_stage_status(
                     job.episode_id,
                     artifact_stage,
                     "failed_after_retries",
                 )
+                if artifact_stage == "usefulness":
+                    # FR-027: score, band and rationale live and die together, so a
+                    # failed re-run must not leave the previous run's score behind.
+                    artifact.usefulness_score = None
+                    artifact.usefulness_band = None
+                    artifact.usefulness_rationale = None
+                    self.session.add(artifact)
                 self.session.commit()
                 await self.broadcaster.publish_stage_status(
                     episode_id=job.episode_id,
@@ -229,6 +244,8 @@ class Pipeline:
             return "hook"
         if stage_name == "summarize_three_act":
             return "three_act"
+        if stage_name == "usefulness_score":
+            return "usefulness"
         return stage_name
 
 
@@ -246,11 +263,19 @@ class _ThreeActPayload(BaseModel):
     conclusion: str
 
 
-class _CandidateQuotePayload(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+class _UsefulnessPayload(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
-    text: str
-    start_ms: int
+    score: int
+    rationale: str
+
+
+class _CandidateQuotePayload(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    text: str = Field(validation_alias=AliasChoices("text", "quote"))
+    start_ms: int = 0
+    takeaway: str | None = None
 
 
 class _ChapterPayload(BaseModel):
@@ -259,6 +284,8 @@ class _ChapterPayload(BaseModel):
     title: str
     key_points: list[str]
     candidate_quotes: list[_CandidateQuotePayload] = []
+    key_moments: list[_CandidateQuotePayload] = []
+    summary: str | None = None
 
 
 class _ChapterOutlinePayload(BaseModel):
@@ -315,6 +342,11 @@ def register_us1_stages(
         "summarize_three_act",
         required=True,
         run=lambda context: _stage_summarize_three_act(context, llm_client, prompt_assembler),
+    )
+    pipeline.register_stage(
+        "usefulness_score",
+        required=False,
+        run=lambda context: _stage_usefulness_score(context, llm_client, prompt_assembler),
     )
     pipeline.register_stage(
         "chapter_outline",
@@ -424,11 +456,25 @@ async def _stage_transcribe(context: PipelineContext, asr_client: ASRClient) -> 
     return {"segments": len(db_segments), "cached": False}
 
 
+def _language_instruction(context: PipelineContext, episode: Episode) -> str:
+    """The `{lang}` slot: a language the model can actually write in.
+
+    `episode.language` may be "mixed", which is a description of the source, not
+    an instruction — feeding it to a prompt is what made Chinese episodes come
+    back summarized in English.
+    """
+    if episode.language in language_rules.LANGUAGE_INSTRUCTIONS:
+        return language_rules.LANGUAGE_INSTRUCTIONS[episode.language]
+    segments = SegmentRepo(context.session).list_for_episode(episode.id)
+    return language_rules.instruction(episode.language, segments)
+
+
 def _style_directive(episode: Episode, prompt_assembler: PromptAssembler) -> str:
     """Reader-chosen style block for this episode, or "" for the default style."""
     style = SummaryStyle(
         preset=episode.summary_style or DEFAULT_PRESET,
         note=episode.style_note,
+        detail=episode.detail_level or DEFAULT_DETAIL,
     )
     if style.is_default:
         return ""
@@ -459,7 +505,7 @@ def _stage_summarize_hook(
     prompt = prompt_assembler.render(
         "one_liner",
         "v2",
-        lang=episode.language or "mixed",
+        lang=_language_instruction(context, episode),
         style_directive=directive,
         episode_title=episode.title or "",
         transcript=transcript,
@@ -486,8 +532,8 @@ def _stage_summarize_three_act(
     directive = _style_directive(episode, prompt_assembler)
     prompt = prompt_assembler.render(
         "three_act_summary",
-        "v2",
-        lang=episode.language or "mixed",
+        "v3",
+        lang=_language_instruction(context, episode),
         style_directive=directive,
         transcript=transcript,
     )
@@ -497,10 +543,45 @@ def _stage_summarize_three_act(
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
     artifact.three_act = three_act.model_dump()
     artifact.stage_status = {**dict(artifact.stage_status), "three_act": "present"}
-    artifact.prompt_versions = _prompt_versions(artifact, "three_act", "v2", directive)
+    artifact.prompt_versions = _prompt_versions(artifact, "three_act", "v3", directive)
     context.session.add(artifact)
     context.session.flush()
     return {"three_act": artifact.three_act}
+
+
+def _stage_usefulness_score(
+    context: PipelineContext,
+    llm_client: LLMClient,
+    prompt_assembler: PromptAssembler,
+) -> StageResult:
+    """Rate how useful the episode is (FR-027).
+
+    Optional stage: if it keeps failing the pipeline marks it
+    ``failed_after_retries`` and the episode still reaches ``done``. The reader's
+    summary style is deliberately not applied here — style shapes how the summary
+    reads, not how valuable the episode is.
+    """
+    episode = _get_episode(context)
+    transcript = _transcript_text(context.session, episode.id)
+    prompt = prompt_assembler.render(
+        "usefulness_score",
+        "v1",
+        lang=_language_instruction(context, episode),
+        episode_title=episode.title or "",
+        transcript=transcript,
+    )
+    payload = llm_client.complete_json(prompt, _UsefulnessPayload)
+    usefulness = parse_usefulness(payload)
+
+    artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
+    artifact.usefulness_score = usefulness.score
+    artifact.usefulness_band = usefulness.band
+    artifact.usefulness_rationale = usefulness.rationale
+    artifact.stage_status = {**dict(artifact.stage_status), "usefulness": "present"}
+    artifact.prompt_versions = {**dict(artifact.prompt_versions), "usefulness_score": "v1"}
+    context.session.add(artifact)
+    context.session.flush()
+    return {"usefulness_score": usefulness.score, "usefulness_band": usefulness.band}
 
 
 def _stage_chapter_outline(
@@ -514,8 +595,8 @@ def _stage_chapter_outline(
     directive = _style_directive(episode, prompt_assembler)
     prompt = prompt_assembler.render(
         "chapter_outline",
-        "v2",
-        lang=episode.language or "mixed",
+        "v3",
+        lang=_language_instruction(context, episode),
         style_directive=directive,
         transcript=_chapter_prompt_transcript(spans),
     )
@@ -536,16 +617,18 @@ def _stage_chapter_outline(
             start_ms=span.start_ms if span is not None else 0,
             end_ms=span.end_ms if span is not None else max(1, episode.duration_seconds or 1) * 1000,
             key_points=draft.key_points,
+            summary=draft.summary,
         )
         context.session.add(chapter)
         context.session.flush()
-        for quote in draft.candidate_quotes:
+        for moment in draft.moments:
             quote_candidates.append(
                 {
                     "chapter_id": chapter.id,
                     "chapter_idx": idx,
-                    "text": quote.text,
-                    "start_ms": quote.start_ms,
+                    "text": moment.text,
+                    "takeaway": moment.takeaway,
+                    "start_ms": moment.start_ms,
                 }
             )
 
@@ -555,7 +638,7 @@ def _stage_chapter_outline(
     context.session.add(context.job)
 
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
-    artifact.prompt_versions = _prompt_versions(artifact, "chapter_outline", "v2", directive)
+    artifact.prompt_versions = _prompt_versions(artifact, "chapter_outline", "v3", directive)
     context.session.add(artifact)
     context.session.flush()
     return {"chapters": len(drafts), "quote_candidates": len(quote_candidates)}
@@ -571,6 +654,7 @@ def _stage_quote_verify(context: PipelineContext) -> StageResult:
 
     verified_count = 0
     quote_indexes_by_chapter: dict[int, int] = {}
+    anchored_starts: dict[int, int] = {}
     quote_repo = QuoteRepo(context.session)
     chapter_ids = {chapter.id for chapter in ChapterRepo(context.session).list_for_episode(episode.id)}
     # Wipe any quotes left over from a prior run of this stage so the
@@ -588,21 +672,106 @@ def _stage_quote_verify(context: PipelineContext) -> StageResult:
         if not ok:
             continue
         quote_index = quote_indexes_by_chapter.get(chapter_id, 0)
+        start_ms = (
+            matched_start_ms
+            if matched_start_ms is not None
+            else int(candidate.get("start_ms", 0) or 0)
+        )
+        takeaway = candidate.get("takeaway")
         quote_repo.insert_verified(
             chapter_id=chapter_id,
             idx=quote_index,
             text=text,
-            start_ms=matched_start_ms if matched_start_ms is not None else int(candidate.get("start_ms", 0)),
+            start_ms=start_ms,
             transcript_text=transcript,
+            takeaway=takeaway if isinstance(takeaway, str) and takeaway.strip() else None,
         )
         quote_indexes_by_chapter[chapter_id] = quote_index + 1
         verified_count += 1
+        earliest = anchored_starts.get(chapter_id)
+        if earliest is None or start_ms < earliest:
+            anchored_starts[chapter_id] = start_ms
+
+    _retime_chapters(context, episode, segments, anchored_starts)
 
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
     artifact.stage_status = {**dict(artifact.stage_status), "chapters": "present"}
     context.session.add(artifact)
     context.session.flush()
     return {"verified_quotes": verified_count}
+
+
+def _retime_chapters(
+    context: PipelineContext,
+    episode: Episode,
+    segments: list[TranscriptSegment],
+    anchored_starts: dict[int, int],
+) -> None:
+    """Give each chapter the time range its own content actually occupies.
+
+    The outline stage can only guess: it maps the Nth chapter onto the Nth
+    segmenter span, and the model is free to return more chapters than there are
+    spans — which used to leave every chapter after the first sharing one range.
+    Verified key moments are real transcript positions, so once they are in we
+    know where each chapter starts.
+    """
+    chapters = ChapterRepo(context.session).list_for_episode(episode.id)
+    if not chapters or not anchored_starts:
+        return
+
+    episode_end = max(
+        (segment.end_ms for segment in segments),
+        default=max(1, (episode.duration_seconds or 1) * 1000),
+    )
+    episode_start = min((segment.start_ms for segment in segments), default=0)
+
+    # Chapter 0 always opens the episode; later chapters start at their earliest
+    # verified moment, and a chapter with no verified moment keeps its place
+    # between its neighbours.
+    starts: list[int | None] = [
+        episode_start if index == 0 else anchored_starts.get(chapter.id)
+        for index, chapter in enumerate(chapters)
+    ]
+    resolved = _fill_monotonic(starts, episode_start, episode_end)
+    if resolved is None:
+        return
+
+    for index, chapter in enumerate(chapters):
+        chapter.start_ms = resolved[index]
+        chapter.end_ms = resolved[index + 1] if index + 1 < len(resolved) else episode_end
+        if chapter.end_ms <= chapter.start_ms:
+            chapter.end_ms = chapter.start_ms + 1
+        context.session.add(chapter)
+    context.session.flush()
+
+
+def _fill_monotonic(
+    starts: list[int | None],
+    episode_start: int,
+    episode_end: int,
+) -> list[int] | None:
+    """Turn sparse, possibly out-of-order anchors into strictly rising starts."""
+    known = [(index, value) for index, value in enumerate(starts) if value is not None]
+    if not known:
+        return None
+
+    resolved: list[int] = []
+    previous = episode_start - 1
+    for index, value in enumerate(starts):
+        if value is None or value <= previous:
+            # No anchor, or the model anchored this chapter before the previous
+            # one: spread it evenly towards the next usable anchor instead.
+            following = [(i, v) for i, v in known if i > index and v > previous]
+            if following:
+                next_index, next_value = following[0]
+                step = max(1, (next_value - previous) // (next_index - index + 1))
+            else:
+                step = max(1, (episode_end - previous) // (len(starts) - index + 1))
+            value = previous + step
+        value = min(value, max(episode_end - 1, previous + 1))
+        resolved.append(value)
+        previous = value
+    return resolved
 
 
 def _stage_entity_extract(context: PipelineContext, llm_client: LLMClient) -> StageResult:
@@ -694,10 +863,9 @@ def _apply_ingested_audio(episode: Episode, ingested: IngestedAudio) -> None:
 
 
 def _episode_language(segments: list[TranscriptSegment]) -> str | None:
-    languages = {segment.language for segment in segments if segment.language}
-    if not languages:
-        return None
-    return languages.pop() if len(languages) == 1 else "mixed"
+    # Weighed by characters, not by per-utterance ASR labels: a Chinese episode
+    # that borrows a few English product names is Chinese, not "mixed".
+    return language_rules.classify(segments)
 
 
 def _write_normalized_transcript(episode: Episode, segments: list[TranscriptSegment]) -> None:

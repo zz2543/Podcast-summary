@@ -25,22 +25,24 @@ Create a new episode and enqueue a job. Accepts either a JSON body (URL/YouTube)
   "source_type": "direct_url" | "youtube",
   "source_ref": "https://example.com/ep01.mp3",
   "summary_style": "default | study_notes | business_insight | debate | quick_skim",
-  "style_note": "optional, ≤ 200 chars"
+  "style_note": "optional, ≤ 200 chars",
+  "detail_level": "concise | standard | detailed"
 }
 ```
 
 **Body — variant B: file upload (`multipart/form-data`)**
 - `source_type=local_file`
 - `file`: the audio file (mp3 / m4a / wav)
-- `summary_style`, `style_note`: optional, same values as variant A
+- `summary_style`, `style_note`, `detail_level`: optional, same values as variant A
 
-**Summary style** (both variants, both optional). `summary_style` names a section of
-`prompts/summary_style.v1.md`; `style_note` is the reader's own instruction. They are
-stored on the episode and turned into the `style_directive` slot of the v2 summary
-prompts, which shapes tone, emphasis and depth only — output keys, language and
-factual grounding are unaffected. Omitting both (or sending `summary_style=default`
-with no note) produces exactly the pre-style prompt text. Both are validated before
-the audio is fetched.
+**Summary style** (all three optional, both variants). `summary_style` names a section
+of `prompts/summary_style.v2.md` and says *how* to write; `detail_level` says *how
+much* (`standard` is what the summary prompts already describe, so it sends no
+directive); `style_note` is the reader's own instruction. All three are stored on the
+episode and composed into the `style_directive` slot of the summary prompts, which
+shapes tone, emphasis and depth only — output keys, language and factual grounding are
+unaffected. Omitting all three produces exactly the pre-style prompt text. All three
+are validated before the audio is fetched, and they are reused verbatim on retry.
 
 **201 Created**
 ```json
@@ -50,7 +52,7 @@ the audio is fetched.
 }
 ```
 
-**400 `bad_input`** unsupported `source_type`, malformed URL, unknown `summary_style`, or `style_note` longer than 200 characters.
+**400 `bad_input`** unsupported `source_type`, malformed URL, unknown `summary_style` or `detail_level`, or `style_note` longer than 200 characters.
 **413 `payload_too_large`** file > 1 GB OR (after probe) duration > 6 h (FR-024).
 **415 `unsupported_media`** direct URL Content-Type not `audio/*` (FR-002), or YouTube link unresolvable (FR-003), or file extension not in {mp3, m4a, wav} (FR-001).
 **409 `conflict`** an active (non-deleted) episode already exists for the same `(source_type, source_ref)` of types `direct_url` / `youtube`.

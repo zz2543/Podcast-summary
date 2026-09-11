@@ -46,6 +46,8 @@ class FakeLLMClient:
             }
         if "entities" in schema.model_fields:
             return {"entities": [{"name": "world", "kind": "product", "count": 1}]}
+        if "score" in schema.model_fields:
+            return {"score": 72, "rationale": "Concrete restart-cost numbers, little filler."}
         return {
             "background": "The run already transcribed audio.",
             "core_argument": "Resume should skip ASR costs.",

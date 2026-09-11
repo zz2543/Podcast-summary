@@ -48,9 +48,12 @@ def get_session(request: Request) -> Any:
 
 
 SESSION_DEP = Depends(get_session)
+
+USEFULNESS_BANDS = {"must_listen", "worth_listening", "skimmable", "skippable"}
 SOURCE_TYPE_FORM = Form(default=None, alias="source_type")
 SUMMARY_STYLE_FORM = Form(default=None, alias="summary_style")
 STYLE_NOTE_FORM = Form(default=None, alias="style_note")
+DETAIL_LEVEL_FORM = Form(default=None, alias="detail_level")
 UPLOAD_FILE_FIELD = File(default=None)
 
 
@@ -64,6 +67,7 @@ async def create_episode(
     source_type_form: str | None = SOURCE_TYPE_FORM,
     summary_style_form: str | None = SUMMARY_STYLE_FORM,
     style_note_form: str | None = STYLE_NOTE_FORM,
+    detail_level_form: str | None = DETAIL_LEVEL_FORM,
     file: UploadFile | None = UPLOAD_FILE_FIELD,
     session: Session = SESSION_DEP,
 ) -> JSONResponse:
@@ -74,6 +78,7 @@ async def create_episode(
             file,
             summary_style_form,
             style_note_form,
+            detail_level_form,
         )
     except PayloadTooLarge as exc:
         return _api_error(413, "payload_too_large", str(exc))
@@ -104,10 +109,25 @@ async def list_episodes(
     limit: int = 50,
     cursor: str | None = None,
     status: str | None = None,
+    band: str | None = None,
+    min_score: int | None = None,
+    sort: str = "created_at",
     session: Session = SESSION_DEP,
-) -> dict[str, Any]:
+) -> Any:
     del cursor
-    items = EpisodeRepo(session).list_recent(limit=min(max(limit, 1), 200), status=status)
+    if band is not None and band not in USEFULNESS_BANDS:
+        return _api_error(400, "bad_input", f"unknown band: {band}")
+    if min_score is not None and not 0 <= min_score <= 100:
+        return _api_error(400, "bad_input", "min_score must be within 0-100")
+    if sort not in {"created_at", "usefulness_score"}:
+        return _api_error(400, "bad_input", f"unknown sort: {sort}")
+    items = EpisodeRepo(session).list_recent(
+        limit=min(max(limit, 1), 200),
+        status=status,
+        band=band,
+        min_score=min_score,
+        sort=sort,
+    )
     return {"items": [_episode_summary(session, episode) for episode in items], "next_cursor": None}
 
 
@@ -356,6 +376,7 @@ async def _ingest_request(
     file: UploadFile | None,
     summary_style_form: str | None,
     style_note_form: str | None,
+    detail_level_form: str | None,
 ) -> tuple[str, str, IngestedAudio, style_rules.SummaryStyle]:
     settings = request.app.state.settings
     content_type = request.headers.get("content-type", "")
@@ -364,7 +385,7 @@ async def _ingest_request(
             raise ValueError("multipart upload requires source_type=local_file and file")
         # Style is validated before the upload is normalised, so a bad preset
         # fails fast instead of leaving a half-ingested directory behind.
-        style = style_rules.parse(summary_style_form, style_note_form)
+        style = style_rules.parse(summary_style_form, style_note_form, detail_level_form)
         ingested = await ingest_local_file(file, settings)
         return "local_file", file.filename or ingested.original_path.name, ingested, style
 
@@ -373,7 +394,11 @@ async def _ingest_request(
     source_ref = payload.get("source_ref")
     if not isinstance(source_ref, str) or not source_ref.strip():
         raise ValueError("source_ref is required")
-    style = style_rules.parse(payload.get("summary_style"), payload.get("style_note"))
+    style = style_rules.parse(
+        payload.get("summary_style"),
+        payload.get("style_note"),
+        payload.get("detail_level"),
+    )
     if source_type == "direct_url":
         # Only the URL is extracted here: a direct link may be presigned, so its
         # query string has to survive intact.
@@ -397,7 +422,11 @@ async def _ingest_batch_request(
             raise ValueError("multipart batch requires at least one file")
         # One style for the whole batch: the submit modal styles a submission,
         # not a file.
-        style = style_rules.parse(form.get("summary_style"), form.get("style_note"))
+        style = style_rules.parse(
+            form.get("summary_style"),
+            form.get("style_note"),
+            form.get("detail_level"),
+        )
         return [
             ("local_file", upload.filename or "audio", await ingest_local_file(upload, settings), style)
             for upload in uploads
@@ -407,7 +436,11 @@ async def _ingest_batch_request(
     items = payload.get("items") if isinstance(payload, dict) else None
     if not isinstance(items, list) or not items:
         raise ValueError("batch payload must contain a non-empty items list")
-    batch_style = style_rules.parse(payload.get("summary_style"), payload.get("style_note"))
+    batch_style = style_rules.parse(
+        payload.get("summary_style"),
+        payload.get("style_note"),
+        payload.get("detail_level"),
+    )
     ingested: list[tuple[str, str, IngestedAudio, style_rules.SummaryStyle]] = []
     for item in items:
         if not isinstance(item, dict):
@@ -417,8 +450,12 @@ async def _ingest_batch_request(
         if not isinstance(source_ref, str) or not source_ref.strip():
             raise ValueError("source_ref is required for URL batch items")
         style = (
-            style_rules.parse(item.get("summary_style"), item.get("style_note"))
-            if "summary_style" in item or "style_note" in item
+            style_rules.parse(
+                item.get("summary_style"),
+                item.get("style_note"),
+                item.get("detail_level"),
+            )
+            if {"summary_style", "style_note", "detail_level"} & item.keys()
             else batch_style
         )
         if source_type == "direct_url":
@@ -468,6 +505,7 @@ def _episode_from_ingest(
         status="pending",
         summary_style=style.preset,
         style_note=style.note,
+        detail_level=style.detail,
         data_dir=str(ingested.normalized_path.parent),
     )
 
@@ -497,10 +535,28 @@ def _episode_summary(session: Session, episode: Episode) -> dict[str, Any]:
             "three_act": stage_status.get("three_act", "pending"),
             "chapters": stage_status.get("chapters", "missing"),
             "entities": stage_status.get("entities", "missing"),
+            "usefulness": stage_status.get("usefulness", "missing"),
             "tts": stage_status.get("tts", "missing"),
         },
+        "usefulness": _usefulness_payload(artifact, stage_status),
         "created_at": _isoformat(episode.created_at),
         "updated_at": _isoformat(episode.updated_at),
+    }
+
+
+def _usefulness_payload(
+    artifact: SummaryArtifact | None,
+    stage_status: dict[str, Any],
+) -> dict[str, Any] | None:
+    """FR-027 rating, or None when unscored — the UI shows "未评分", never a 0."""
+    if artifact is None or stage_status.get("usefulness") != "present":
+        return None
+    if artifact.usefulness_score is None or not artifact.usefulness_band:
+        return None
+    return {
+        "score": artifact.usefulness_score,
+        "band": artifact.usefulness_band,
+        "rationale": artifact.usefulness_rationale or "",
     }
 
 

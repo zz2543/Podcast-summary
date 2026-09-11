@@ -7,6 +7,7 @@ from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from podsum.domain import language as language_rules
 from podsum.domain.prompt_assembler import PromptAssembler
 
 EntityKind = Literal["person", "book", "product"]
@@ -52,7 +53,7 @@ def extract(transcript_segments: list[Any], llm: JsonLLM) -> list[Entity]:
     prompt = PromptAssembler().render(
         "entity_extraction",
         "v1",
-        lang=_language_hint(transcript),
+        lang=language_rules.instruction(None, transcript_segments),
         transcript=transcript,
     )
     payload = llm.complete_json(prompt, _EntityPayload)
@@ -95,16 +96,6 @@ def _transcript_text(segments: list[Any]) -> str:
     return " ".join(
         text for text in (_normalize(_field(segment, "text")) for segment in segments) if text
     )
-
-
-def _language_hint(transcript: str) -> str:
-    cjk_count = sum("\u4e00" <= char <= "\u9fff" for char in transcript)
-    latin_count = sum(char.isascii() and char.isalpha() for char in transcript)
-    if cjk_count and latin_count:
-        return "mixed"
-    if cjk_count:
-        return "zh"
-    return "en"
 
 
 def _normalize(value: str) -> str:

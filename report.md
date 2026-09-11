@@ -25,6 +25,7 @@
 | 输入与持久化 | 本地文件、直链、YouTube、批量提交 | 上传前后执行格式与时长/大小限制；metadata 写入 SQLite。 |
 | Pipeline | 可恢复任务状态机、并发队列、阶段降级 | required stage 失败则 job failed；optional TTS/entity 失败可降级继续。 |
 | 摘要生成 | hook、三段式摘要、章节 outline | Prompt 文件集中在 `prompts/`，代码只引用 prompt role/version。 |
+| 有用性评分 | 0–100 分 + 四档标签 + 一句理由（FR-027） | 模型只给分数与理由，分档由代码按区间映射；越界分数重试而非截断；未评分返回 `null` 而不是 0。列表页支持按分档筛选与按分数排序。 |
 | 引用校验 | candidate quote 必须逐字命中 transcript | Repository 写入和 JSON 导出各做一层 verified 防御。 |
 | 实体统计 | people/books/products 分类与计数 | LLM 只给候选，最终 count 由 transcript 重扫确定。 |
 | 导出与回放 | Markdown、JSON、原音频 Range、TTS digest | quote timestamp 驱动前端 `<audio>` seek；digest 按需生成。 |

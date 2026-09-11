@@ -12,6 +12,7 @@ import {
 } from "@/api/client";
 import { useJobStream } from "@/ws/useJobStream";
 import { HookHero } from "@/components/HookHero";
+import { UsefulnessCard } from "@/components/UsefulnessCard";
 import { ThreeActPanel } from "@/components/ThreeActPanel";
 import { ChaptersTimeline } from "@/components/ChaptersTimeline";
 import { EpisodeDock } from "@/components/EpisodeDock";
@@ -130,6 +131,8 @@ export default function EpisodeDetailPage() {
       </Link>
 
       <HookHero episode={episode} />
+
+      <UsefulnessCard episode={episode} onRetry={handleRetry} />
 
       <section className="flex flex-wrap items-center gap-3">
         <IridescentButton onClick={handleDigest} disabled={busy}>

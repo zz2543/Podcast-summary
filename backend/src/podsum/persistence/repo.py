@@ -29,10 +29,40 @@ class EpisodeRepo:
     def get(self, episode_id: str) -> Episode | None:
         return self.session.get(Episode, episode_id)
 
-    def list_recent(self, *, limit: int = 50, status: str | None = None) -> list[Episode]:
-        statement: Select[tuple[Episode]] = select(Episode).order_by(Episode.created_at.desc())
+    def list_recent(
+        self,
+        *,
+        limit: int = 50,
+        status: str | None = None,
+        band: str | None = None,
+        min_score: int | None = None,
+        sort: str = "created_at",
+    ) -> list[Episode]:
+        """List episodes, newest first by default.
+
+        ``sort="usefulness_score"`` orders by the FR-027 score, highest first,
+        with unscored episodes last and ties broken by recency. ``band`` and
+        ``min_score`` filter on the score, which excludes unscored episodes.
+        """
+        statement: Select[tuple[Episode]] = select(Episode)
+        if band is not None or min_score is not None or sort == "usefulness_score":
+            statement = statement.outerjoin(
+                SummaryArtifact, SummaryArtifact.episode_id == Episode.id
+            )
         if status is not None:
             statement = statement.where(Episode.status == status)
+        if band is not None:
+            statement = statement.where(SummaryArtifact.usefulness_band == band)
+        if min_score is not None:
+            statement = statement.where(SummaryArtifact.usefulness_score >= min_score)
+        if sort == "usefulness_score":
+            statement = statement.order_by(
+                SummaryArtifact.usefulness_score.is_(None),
+                SummaryArtifact.usefulness_score.desc(),
+                Episode.created_at.desc(),
+            )
+        else:
+            statement = statement.order_by(Episode.created_at.desc())
         return list(self.session.scalars(statement.limit(limit)))
 
     def delete(self, episode_id: str) -> bool:
@@ -134,6 +164,7 @@ class QuoteRepo:
         text: str,
         start_ms: int,
         transcript_text: str,
+        takeaway: str | None = None,
     ) -> Quote:
         """Insert a quote only after the FR-012 verifier proves it is verbatim.
 
@@ -147,6 +178,7 @@ class QuoteRepo:
             chapter_id=chapter_id,
             idx=idx,
             text=text,
+            takeaway=takeaway,
             start_ms=start_ms,
             verified=True,
         )

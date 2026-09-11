@@ -15,12 +15,14 @@ import {
 import { AppHeader } from "../components/AppHeader";
 import { ChapterOutline } from "../components/ChapterOutline";
 import { EntityPanel } from "../components/EntityPanel";
+import { BAND_LABELS } from "../components/ScoreBadge";
 
 const STAGE_COPY: Record<string, string> = {
   hook: "one-line hook",
   three_act: "three-act summary",
   chapters: "chapter outline",
   entities: "entity extraction",
+  usefulness: "usefulness score",
   tts: "audio digest"
 };
 
@@ -121,6 +123,7 @@ export function EpisodeDetailPage({ episodeId }: { episodeId: string }) {
           <>
             <MetaHeader episode={episode} job={currentJob} />
             <HookCard episode={episode} onRetry={onRetry} />
+            <UsefulnessCard episode={episode} onRetry={onRetry} />
             <section className="detail-content-grid">
               <div className="detail-main-column">
                 <ThreeActSection episode={episode} onRetry={onRetry} />
@@ -183,6 +186,49 @@ function HookCard({ episode, onRetry }: { episode: EpisodeDetail; onRetry: () =>
       <span>One-Line Hook</span>
       <p>{episode.hook}</p>
       <small>Prompt version: {episode.prompt_versions.one_liner}</small>
+    </section>
+  );
+}
+
+/**
+ * FR-027: how useful this episode is. Sits under the hook — the hook says what
+ * the episode is about, this says whether it is worth the time. Optional stage,
+ * so a missing score degrades to a placeholder and leaves the page usable.
+ */
+function UsefulnessCard({ episode, onRetry }: { episode: EpisodeDetail; onRetry: () => Promise<void> }) {
+  const usefulness = episode.usefulness;
+  if (episode.stage_status.usefulness !== "present" || !usefulness) {
+    if (episode.stage_status.usefulness === "pending") return null;
+    return (
+      <MissingStagePlaceholder
+        stage="usefulness"
+        status={episode.stage_status.usefulness}
+        onRetry={onRetry}
+      />
+    );
+  }
+  return (
+    <section className="usefulness-card">
+      <div className="usefulness-headline">
+        <strong>{usefulness.score}</strong>
+        <span className="usefulness-total">/ 100</span>
+        <span
+          className={`score-badge score-badge--${usefulness.band}`}
+          title="A model's advisory rating based on the transcript."
+        >
+          {BAND_LABELS[usefulness.band]}
+        </span>
+      </div>
+      <div className="usefulness-meter" aria-hidden="true">
+        <span
+          className={`usefulness-meter-fill usefulness-meter-fill--${usefulness.band}`}
+          style={{ width: `${usefulness.score}%` }}
+        />
+      </div>
+      <p>{usefulness.rationale}</p>
+      {episode.prompt_versions.usefulness_score && (
+        <small>Prompt version: {episode.prompt_versions.usefulness_score}</small>
+      )}
     </section>
   );
 }

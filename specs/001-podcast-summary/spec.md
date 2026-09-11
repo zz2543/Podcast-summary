@@ -24,7 +24,7 @@
 
 - Q: Should the summary also carry a usefulness rating for the episode? → A: Yes. Every episode gets a 0-100 usefulness score produced alongside the summary.
 - Q: Overall score only, or a multi-dimension breakdown? → A: Overall score only, plus a derived rating band and a one-sentence rationale. No per-dimension sub-scores.
-- Q: Does a failed scoring stage block the episode from reaching "done"? → A: No. Scoring is an optional stage under FR-026; failure degrades to "unrated" and the rest of the summary stays usable.
+- Q: Does a failed scoring stage block the episode from reaching "done"? → A: No. Scoring is an optional stage under FR-026; failure degrades to "unrated" (the episode lands in "partial", like any other optional-stage failure) and the rest of the summary stays usable.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -42,7 +42,7 @@ A subscriber drops 5 newly released podcast episodes into the system in the even
 2. **Given** an English podcast direct-audio URL submitted, **When** processing finishes, **Then** all generated summary fields are in English (input language preserved, no translation).
 3. **Given** processing fails midway through transcription, **When** the user retries the same job, **Then** already-transcribed segments are reused and only the failed work is repeated.
 4. **Given** a processed episode, **When** the user opens the list view, **Then** each episode shows a 0-100 usefulness score with a rating band, and the list can be sorted by that score so the highest-value episodes surface first.
-5. **Given** the scoring stage fails after all retries, **When** the user opens the episode, **Then** the episode is still marked "done", the score area reads "未评分", and every other summary artifact remains readable and downloadable.
+5. **Given** the scoring stage fails after all retries, **When** the user opens the episode, **Then** the episode is not failed — it lands in "partial" like any other optional-stage failure, the score area reads "未评分", and every other summary artifact remains readable and downloadable.
 
 ---
 
@@ -139,7 +139,8 @@ A power user submits 5 episodes at once and configures concurrency. The system p
   - A **one-sentence `rationale`** in the source language (FR-007) stating the concrete grounds for the score.
   - A model-returned score outside 0-100, non-integer, or missing MUST be rejected as a structural failure and retried rather than clamped silently.
   - The score MUST be included in the Markdown export (FR-014), the JSON export (FR-015), the list view, and the detail view. It MUST NOT be narrated in the TTS digest (FR-016), which stays a summary of content.
-  - Scoring is an **optional stage** under FR-026: persistent failure marks the artifact `failed_after_retries` and the episode still reaches "done".
+  - Scoring is an **optional stage** under FR-026: persistent failure marks the artifact `failed_after_retries` and leaves the episode in "partial" (never "failed"), with every other artifact still visible and downloadable. A failed re-run also clears any score from an earlier run rather than leaving a stale one on screen.
+  - The reader's summary style (preset / note) is deliberately **not** applied to the scoring prompt: style changes how the summary reads, not how valuable the episode is.
   - No per-dimension sub-scores are produced in this version (explicitly decided 2026-09-09).
 
 **Output formats**
@@ -151,6 +152,13 @@ A power user submits 5 episodes at once and configures concurrency. The system p
 **Web UI**
 
 - **FR-017**: The web UI MUST allow submitting any supported input type, viewing per-job progress, browsing finished episodes, opening a detail view, jumping the player to a quote timestamp, downloading Markdown / JSON / audio-digest artifacts, and **deleting an episode** (see FR-025). The visual design will be authored externally by the user from a written description and is therefore out of scope for this spec to dictate.
+- **FR-028**: Every user-initiated control that enqueues background work — episode retry, usefulness-score retry, audio digest generation/regeneration — MUST give continuous progress feedback on the surface where it was invoked, from the click until the job reaches a terminal state. Accepting the request is not feedback.
+  - On click, the invoking control MUST immediately enter a pending state (disabled, labelled with what is running) and MUST stay pending for the lifetime of the job, not merely for the duration of the HTTP request that enqueues it.
+  - While the job runs, the view MUST show which stage is currently executing, driven by the per-stage job stream the pipeline already publishes. A single one-shot "queued" acknowledgement does not satisfy this.
+  - The pending state MUST be the primary guard against a duplicate submission; the backend's 409 `episode already has an active job` is a backstop, and the UI MUST NOT let a user reach it by re-clicking a control that looks idle.
+  - On success the affected section MUST refresh in place (score card rendered, digest player available) and the pending state MUST clear. On failure the reason MUST be shown next to the control, with the retry affordance restored.
+  - A control MUST NOT promise a scope narrower than the work it triggers: a control labelled as retrying one stage MUST re-run only that stage, or else be relabelled to reflect the full re-run it actually starts.
+  - Progress state MUST survive a page reload: opening an episode that has an active job MUST render the same in-progress state rather than appear idle.
 
 **Partial-failure & degraded output**
 

@@ -4,8 +4,10 @@ import { useJobStream } from "@/ws/useJobStream";
 import {
   ApiError,
   listEpisodes,
+  type EpisodeSort,
   type EpisodeStatus,
-  type EpisodeSummary
+  type EpisodeSummary,
+  type UsefulnessBand
 } from "@/api/client";
 import { SubmitModal } from "@/components/SubmitModal";
 import { EpisodeCard } from "@/components/EpisodeCard";
@@ -23,12 +25,31 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "failed", label: "Failed" }
 ];
 
+type BandFilter = "all" | UsefulnessBand;
+
+// FR-027: filtering by band deliberately hides unscored episodes — there is no
+// honest bucket to put them in.
+const BAND_FILTERS: { id: BandFilter; label: string }[] = [
+  { id: "all", label: "全部评分" },
+  { id: "must_listen", label: "必听" },
+  { id: "worth_listening", label: "值得听" },
+  { id: "skimmable", label: "可跳读" },
+  { id: "skippable", label: "可跳过" }
+];
+
+const SORTS: { id: EpisodeSort; label: string }[] = [
+  { id: "created_at", label: "最新" },
+  { id: "usefulness_score", label: "评分" }
+];
+
 export default function EpisodeListPage() {
   const [episodes, setEpisodes] = useState<EpisodeSummary[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
+  const [band, setBand] = useState<BandFilter>("all");
+  const [sort, setSort] = useState<EpisodeSort>("created_at");
   const [query, setQuery] = useState("");
   const { jobs, episodeStatuses, connected } = useJobStream();
 
@@ -41,6 +62,8 @@ export default function EpisodeListPage() {
         const data = await listEpisodes({
           limit: 24,
           cursor: reset ? undefined : cursor ?? undefined,
+          sort,
+          ...(band === "all" ? {} : { band }),
           ...params
         });
         setEpisodes((prev) => (reset ? data.items : [...prev, ...data.items]));
@@ -51,7 +74,7 @@ export default function EpisodeListPage() {
         setLoading(false);
       }
     },
-    [filter, cursor]
+    [filter, band, sort, cursor]
   );
 
   useEffect(() => {
@@ -59,7 +82,7 @@ export default function EpisodeListPage() {
     setCursor(null);
     fetchEpisodes(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [filter, band, sort]);
 
   useEffect(() => {
     const terminal = jobs.some((j) => ["done", "partial", "failed"].includes(j.state));
@@ -90,6 +113,10 @@ export default function EpisodeListPage() {
         onQuery={setQuery}
         filter={filter}
         onFilter={setFilter}
+        band={band}
+        onBand={setBand}
+        sort={sort}
+        onSort={setSort}
         onSubmitted={() => fetchEpisodes(true)}
       />
 
@@ -141,6 +168,10 @@ function Toolbar({
   onQuery,
   filter,
   onFilter,
+  band,
+  onBand,
+  sort,
+  onSort,
   onSubmitted
 }: {
   connected: boolean;
@@ -148,6 +179,10 @@ function Toolbar({
   onQuery: (q: string) => void;
   filter: Filter;
   onFilter: (f: Filter) => void;
+  band: BandFilter;
+  onBand: (b: BandFilter) => void;
+  sort: EpisodeSort;
+  onSort: (s: EpisodeSort) => void;
   onSubmitted: () => void;
 }) {
   return (
@@ -179,6 +214,35 @@ function Toolbar({
           </button>
         ))}
       </div>
+      <select
+        value={band}
+        onChange={(e) => onBand(e.target.value as BandFilter)}
+        aria-label="按有用性评分筛选"
+        className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text outline-none transition-colors focus:border-text/40"
+      >
+        {BAND_FILTERS.map((b) => (
+          <option key={b.id} value={b.id}>
+            {b.label}
+          </option>
+        ))}
+      </select>
+
+      <div className="flex items-center gap-1 rounded-full bg-surface-elev p-1">
+        {SORTS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => onSort(s.id)}
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+              sort === s.id ? "bg-surface text-text shadow-card" : "text-text-muted hover:text-text"
+            )}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       <span
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",

@@ -40,6 +40,7 @@ The user-visible entry. One row per submitted item; surviving across retries and
 | `status` | TEXT | NOT NULL, CHECK in (`pending`, `processing`, `done`, `failed`, `partial`) | aggregated from latest job |
 | `summary_style` | TEXT | NOT NULL, DEFAULT `default` | preset id chosen in the submit modal; one of the sections of `prompts/summary_style.v1.md` |
 | `style_note` | TEXT | NULL | reader's own instruction, ≤ 200 chars after normalization |
+| `detail_level` | TEXT | NOT NULL, DEFAULT `standard` | `concise` / `standard` / `detailed`; how much gets written, independent of `summary_style` |
 | `created_at` | DATETIME | NOT NULL | |
 | `updated_at` | DATETIME | NOT NULL | |
 | `data_dir` | TEXT | NOT NULL, UNIQUE | `data/<id>/` |
@@ -48,6 +49,8 @@ The user-visible entry. One row per submitted item; surviving across retries and
 
 **Validation**:
 - `summary_style` MUST be one of `default`, `study_notes`, `business_insight`, `debate`, `quick_skim`; anything else is rejected at submission with `400 bad_input`.
+- `detail_level` MUST be one of `concise`, `standard`, `detailed`; anything else is rejected the same way.
+- `language` is decided by weighing CJK characters against Latin words, not by the per-utterance ASR labels: an episode is only `mixed` when the minority language carries ≥ 20% of the content. A Chinese episode that borrows English product names stays `zh`, because the value is fed to the summary prompts and `mixed` is not a language a model can write in.
 - `style_note` is normalized before storage: control characters and newlines collapse to single spaces (so a note cannot forge its own instruction block in the assembled prompt), surrounding whitespace is trimmed, an empty result becomes NULL, and anything longer than 200 characters is rejected with `400 bad_input`.
 - Both fields are fixed at submission time and reused verbatim on retry, so a retried episode is re-summarized in the style it was submitted with.
 - `source_ref` MUST be unique across non-deleted rows for `(source_type, source_ref)` of types `direct_url` and `youtube` (no double-submission).
@@ -106,25 +109,39 @@ The smallest reusable unit of transcription, persisted so retries do not redo AS
 | `episode_id` | TEXT | NOT NULL, FK → `episode.id` ON DELETE CASCADE | |
 | `idx` | INTEGER | NOT NULL | 0-based ordering |
 | `title` | TEXT | NOT NULL | |
-| `start_ms` | INTEGER | NOT NULL | |
-| `end_ms` | INTEGER | NOT NULL, CHECK `end_ms > start_ms` | |
+| `start_ms` | INTEGER | NOT NULL | see **Timing** below |
+| `end_ms` | INTEGER | NOT NULL, CHECK `end_ms > start_ms` | see **Timing** below |
 | `key_points` | TEXT (JSON array<string>) | NOT NULL | ordered list per FR-011 |
+| `summary` | TEXT | NULL | optional prose; written only where the key points alone lose the causal thread |
 
 **Indexes**: UNIQUE `(episode_id, idx)`.
+
+**Timing**: the outline stage can only guess a chapter's range — it maps the Nth
+chapter onto the Nth segmenter span, and the model may return more chapters than
+there are spans, which used to leave every chapter after the first sharing one
+identical range. The quote-verify stage therefore re-times chapters from their
+verified key moments: chapter 0 starts at the episode start, every later chapter
+starts at its earliest verified moment, chapters with no verified moment are
+interpolated between their neighbours, and each chapter ends where the next one
+begins. When no moment verifies at all, the span-based guess stands.
 
 ---
 
 ### `quote`
 
-A verified verbatim substring of the transcript shown in the UI.
+A key moment: a verified verbatim substring of the transcript plus the one-line
+reading of it shown in the UI. The verbatim anchor is what gives the moment an
+accurate timestamp, so it is stored even though `takeaway` is what the reader
+sees first.
 
 | Field | Type | Constraints | Notes |
 |-------|------|-------------|-------|
 | `id` | INTEGER | PK AUTOINCREMENT | |
 | `chapter_id` | INTEGER | NOT NULL, FK → `chapter.id` ON DELETE CASCADE | |
 | `idx` | INTEGER | NOT NULL | order within chapter |
-| `text` | TEXT | NOT NULL | normalized form actually displayed |
-| `start_ms` | INTEGER | NOT NULL | timestamp the player will seek to |
+| `text` | TEXT | NOT NULL | the verbatim anchor, normalized |
+| `takeaway` | TEXT | NULL | one sentence on what the listener gets here; NULL for rows written before key moments existed |
+| `start_ms` | INTEGER | NOT NULL | timestamp the player will seek to; interpolated from where the anchor sits in the transcript |
 | `verified` | BOOLEAN | NOT NULL DEFAULT 0 | rows with `verified=0` MUST NOT leave the DB layer (FR-012, SC-004) |
 
 **Validation**: A repository invariant — `Quote.verified` is set to `1` only by `quote_verifier.verify()` and only after the verbatim-substring check passes. Read paths filter `verified=1`.
@@ -165,11 +182,11 @@ Aggregated outputs and per-stage availability, mirroring FR-026's partial-degrad
 | `prompt_versions` | TEXT (JSON) | NOT NULL | `{ "one_liner": "v1", "three_act": "v1", "chapter_outline": "v1", "entity_extraction": "v1", "usefulness_score": "v1" }` (Constitution V) |
 
 **Validation**:
-- An episode reaches `episode.status='done'` only when `stage_status.hook = stage_status.three_act = stage_status.chapters = "present"`; if any of those is `missing`/`failed_after_retries`, `episode.status='failed'` instead. `usefulness` is optional and never gates `done` (FR-026/FR-027).
-- The three `usefulness_*` columns are written together in one transaction: either all three are non-NULL and `stage_status.usefulness = "present"`, or all three are NULL and `stage_status.usefulness ∈ {pending, missing, failed_after_retries}`. No partially-scored row.
+- An episode reaches `episode.status='done'` only when `stage_status.hook = stage_status.three_act = stage_status.chapters = "present"`; if any of those is `missing`/`failed_after_retries`, `episode.status='failed'` instead. `usefulness` is optional and never gates `done`; like any other optional-stage failure it degrades the episode to `partial` (FR-026/FR-027).
+- The three `usefulness_*` columns are written together in one transaction: either all three are non-NULL and `stage_status.usefulness = "present"`, or all three are NULL and `stage_status.usefulness ∈ {pending, missing, failed_after_retries}`. No partially-scored row. A failed re-run clears all three, so a stale score never outlives the run that produced it.
 - `usefulness_band` is computed from `usefulness_score` by `domain/usefulness_scorer.py::band_for(score)` — `85-100 → must_listen`, `70-84 → worth_listening`, `50-69 → skimmable`, `0-49 → skippable`. The model never chooses the band.
 
-**Backfill**: Episodes processed before this feature landed keep `usefulness_score IS NULL` and `stage_status.usefulness = "missing"`. They are re-scored only when the user retries the episode; the migration does not call the LLM.
+**Backfill**: Episodes processed before this feature landed keep `usefulness_score IS NULL` and `stage_status.usefulness = "missing"`. They are re-scored only when the user retries the episode; the migration (`0003_usefulness_score`) does not call the LLM. SQLite cannot add the CHECK constraints to an existing table, so on migrated databases the range/band invariants rest on `parse_usefulness` and `band_for`, which are the only writers.
 
 ---
 

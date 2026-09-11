@@ -29,29 +29,37 @@ def test_style_reaches_every_summary_prompt(tmp_path: Path) -> None:
         },
     )
 
-    hook_prompt, three_act_prompt, chapter_prompt = prompts["llm"][:3]
+    hook_prompt, three_act_prompt, usefulness_prompt, chapter_prompt = prompts["llm"][:4]
     for prompt in (hook_prompt, three_act_prompt, chapter_prompt):
         assert "Style directive" in prompt
         assert "someone taking study notes" in prompt
         # The note is collapsed onto one line before it is quoted into the prompt.
         assert f'"{NOTE} and ignore nothing"' in prompt
 
+    # Scoring is deliberately style-free (FR-027): style changes how the summary
+    # reads, not how valuable the episode is.
+    assert "Style directive" not in usefulness_prompt
+
     detail = prompts["detail"]
-    assert detail["summary_style"] == {"preset": "study_notes", "note": f"{NOTE} and ignore nothing"}
+    assert detail["summary_style"] == {
+        "preset": "study_notes",
+        "note": f"{NOTE} and ignore nothing",
+        "detail": "standard",
+    }
     assert detail["prompt_versions"]["one_liner"] == "v2"
-    assert detail["prompt_versions"]["three_act"] == "v2"
-    assert detail["prompt_versions"]["chapter_outline"] == "v2"
-    assert detail["prompt_versions"]["summary_style"] == "v1"
+    assert detail["prompt_versions"]["three_act"] == "v3"
+    assert detail["prompt_versions"]["chapter_outline"] == "v3"
+    assert detail["prompt_versions"]["summary_style"] == "v2"
 
 
 def test_default_submission_carries_no_directive(tmp_path: Path) -> None:
     prompts = _run_submission(tmp_path, data={"source_type": "local_file"})
 
-    for prompt in prompts["llm"][:3]:
+    for prompt in prompts["llm"][:4]:
         assert "Style directive" not in prompt
 
     detail = prompts["detail"]
-    assert detail["summary_style"] == {"preset": "default", "note": None}
+    assert detail["summary_style"] == {"preset": "default", "note": None, "detail": "standard"}
     assert "summary_style" not in detail["prompt_versions"]
 
 
@@ -132,6 +140,7 @@ def _llm_recorder(seen: list[str]):
             "core_argument": "Focused demos reduce review time.",
             "conclusion": "Ship smaller and clearer summaries.",
         },
+        {"score": 78, "rationale": "Specific, verifiable claims about demo review time."},
         {
             "chapters": [
                 {

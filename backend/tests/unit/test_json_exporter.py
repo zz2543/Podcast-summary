@@ -61,7 +61,9 @@ def test_json_render_populates_us1_fields() -> None:
 
     assert EPISODE_OUTPUT_SCHEMA["title"] == "EpisodeOutput"
     assert output["hook"] == "A useful reason to listen"
-    assert output["chapters"][0]["quotes"] == [{"text": "Verified quote.", "start_ms": 12_000}]
+    assert output["chapters"][0]["quotes"] == [
+        {"text": "Verified quote.", "takeaway": None, "start_ms": 12_000}
+    ]
     assert output["entities"][0] == {
         "name": "DeepSeek",
         "kind": "product",

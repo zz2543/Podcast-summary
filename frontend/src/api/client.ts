@@ -18,8 +18,30 @@ export interface StageStatusMap {
   three_act: StageStatus;
   chapters: StageStatus;
   entities: StageStatus;
+  usefulness: StageStatus;
   tts: StageStatus;
 }
+
+export const USEFULNESS_BANDS = [
+  "must_listen",
+  "worth_listening",
+  "skimmable",
+  "skippable"
+] as const;
+
+export type UsefulnessBand = (typeof USEFULNESS_BANDS)[number];
+
+/**
+ * FR-027 usefulness rating. The whole object is null when the episode is
+ * unscored — never render that as 0, which is a real, meaningful score.
+ */
+export interface Usefulness {
+  score: number;
+  band: UsefulnessBand;
+  rationale: string;
+}
+
+export type EpisodeSort = "created_at" | "usefulness_score";
 
 export interface EpisodeSummary {
   id: string;
@@ -30,6 +52,7 @@ export interface EpisodeSummary {
   language: "zh" | "en" | "mixed" | null;
   status: EpisodeStatus;
   stage_status: StageStatusMap;
+  usefulness: Usefulness | null;
   created_at: string;
   updated_at: string;
 }
@@ -69,6 +92,7 @@ export interface EpisodeDetail extends EpisodeSummary {
     three_act: string;
     chapter_outline: string;
     entity_extraction: string;
+    usefulness_score?: string;
   };
   hook: string | null;
   three_act: ThreeAct | null;
@@ -202,11 +226,17 @@ export function listEpisodes(params: {
   limit?: number;
   cursor?: string;
   status?: EpisodeStatus;
+  band?: UsefulnessBand;
+  minScore?: number;
+  sort?: EpisodeSort;
 } = {}): Promise<EpisodeListResponse> {
   const search = new URLSearchParams();
   if (params.limit) search.set("limit", String(params.limit));
   if (params.cursor) search.set("cursor", params.cursor);
   if (params.status) search.set("status", params.status);
+  if (params.band) search.set("band", params.band);
+  if (params.minScore !== undefined) search.set("min_score", String(params.minScore));
+  if (params.sort) search.set("sort", params.sort);
   const suffix = search.toString() ? `?${search.toString()}` : "";
   return apiFetch<EpisodeListResponse>(`/api/episodes${suffix}`);
 }
