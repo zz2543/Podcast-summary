@@ -213,6 +213,14 @@ TTS 关闭时 digest 被拒、SSE 错误路径、音频 URL 回退、删除。
 - **提交一个没有协议头的链接返回 500。** httpx 的 `UnsupportedProtocol` 从
   `ingest_direct_url` 深处冒出来，API 层的 `except (IngestError, ValueError)`
   接不住。现在在下载之前就判协议，返回 400，也顺便不再留下空的剧集目录。
+- **粘一段 B 站分享文案会被归成"直链"。** 分享按钮给的是
+  `【标题】https://…?vd_source=…` 一整句，拿整串解 host 解不出来，于是走了
+  直链下载去抓 B 站的 HTML 页面。后端本就有 `extract_url` 专治这个，
+  但归类发生在客户端——现在客户端也抠链接，并且把抠出来的那一段显示出来，
+  让读者看得见系统认出了什么。
+- **那条路上的失败还是 500。** B 站对 HEAD 回 412，httpx 的 `HTTPStatusError`
+  从 `ingest_direct_url` 里漏出去，越过了 API 层的 `except (IngestError, ValueError)`。
+  现在归成 `400 bad_input`，消息里带上真实状态码。
 - **第 1 章的起点显示成「—」。** `Fmt.timestamp` 复用了 `Fmt.duration`，
   而后者把 0 当作"不知道多长"。时间戳的 0 就是开头，第 1 章起点恰恰总是 0。
 

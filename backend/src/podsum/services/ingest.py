@@ -164,18 +164,30 @@ async def ingest_direct_url(
     original_tmp = episode_dir / "audio.original.download"
 
     try:
-        async with httpx.AsyncClient(follow_redirects=True, timeout=60.0) as client:
-            head = await client.head(url)
-            head.raise_for_status()
-            _validate_audio_content_type(head.headers.get("content-type"))
-            content_length = head.headers.get("content-length")
-            if content_length is not None and int(content_length) > MAX_FILE_BYTES:
-                raise PayloadTooLarge("audio file exceeds 1 GB limit")
+        try:
+            async with httpx.AsyncClient(follow_redirects=True, timeout=60.0) as client:
+                head = await client.head(url)
+                head.raise_for_status()
+                _validate_audio_content_type(head.headers.get("content-type"))
+                content_length = head.headers.get("content-length")
+                if content_length is not None and int(content_length) > MAX_FILE_BYTES:
+                    raise PayloadTooLarge("audio file exceeds 1 GB limit")
 
-            async with client.stream("GET", url) as response:
-                response.raise_for_status()
-                _validate_audio_content_type(response.headers.get("content-type"))
-                file_size = await _write_response_stream(response, original_tmp)
+                async with client.stream("GET", url) as response:
+                    response.raise_for_status()
+                    _validate_audio_content_type(response.headers.get("content-type"))
+                    file_size = await _write_response_stream(response, original_tmp)
+        except IngestError:
+            # PayloadTooLarge / UnsupportedMedia already say the right thing.
+            raise
+        except httpx.HTTPStatusError as exc:
+            # A 403 from a video site's HTML page used to escape as a bare httpx
+            # error, so a mis-classified link came back to the caller as a 500.
+            raise IngestError(
+                f"source URL returned HTTP {exc.response.status_code}"
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise IngestError(f"could not fetch source URL: {exc}") from exc
 
         detected_ext = _detect_audio_ext(original_tmp)
         original_path = episode_dir / f"audio.original.{detected_ext}"

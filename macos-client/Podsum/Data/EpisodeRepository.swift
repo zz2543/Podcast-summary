@@ -38,13 +38,31 @@ public struct Submission: Sendable {
         self.style = style
     }
 
+    /// 从分享文案里把链接抠出来。
+    ///
+    /// 分享按钮给的是一整句话：
+    ///   【标题】https://www.bilibili.com/video/BV1…?vd_source=e352aac…
+    /// 直接拿整串去解 host 会解不出来，于是被归成"直链"，后端真的去把
+    /// B 站网页当音频下载——这条路走过一次。后端有 `extract_url` 专治这个，
+    /// 但归类发生在客户端，所以客户端也得会抠。
+    ///
+    /// 正则与后端 `ingest.py` 的 `_URL_PATTERN` 一致：CJK 标点与全角符号
+    /// 排除在外，因为它们会紧贴着 URL 出现，中间不留空格。
+    public static func extractURL(_ raw: String) -> String {
+        let text = raw.trimmed
+        let pattern = "https?://[^\\s<>\"'\\u{3000}-\\u{303f}\\u{ff00}-\\u{ffef}]+"
+        guard let range = text.range(of: pattern, options: .regularExpression) else { return text }
+        // 句末标点不属于链接
+        let trailing = CharacterSet(charactersIn: ".,;:!?)]}\"'")
+        return String(text[range]).trimmingCharacters(in: trailing)
+    }
+
     /// 链接归哪一类：视频站走 yt-dlp（后端叫 "youtube"，实际也吃 bilibili），
     /// 其余当直链音频。判断用 host —— source_type 字段本身不可信，
     /// 真实数据里 29 集全标 youtube，其中一堆是 bilibili（见 api-shapes.md 第 1 条）。
     public static func guessSourceType(_ raw: String) -> SourceType {
-        guard let host = URL(string: raw.trimmed)?.host()?.lowercased() else { return .directURL }
-        let videoHosts = ["youtube.com", "youtu.be", "bilibili.com", "b23.tv", "www.youtube.com",
-                          "m.youtube.com", "www.bilibili.com", "m.bilibili.com"]
+        guard let host = URL(string: extractURL(raw))?.host()?.lowercased() else { return .directURL }
+        let videoHosts = ["youtube.com", "youtu.be", "bilibili.com", "b23.tv"]
         return videoHosts.contains(where: { host == $0 || host.hasSuffix("." + $0) }) ? .youtube : .directURL
     }
 }

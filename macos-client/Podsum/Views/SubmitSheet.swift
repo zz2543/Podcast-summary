@@ -98,7 +98,7 @@ struct SubmitSheet: View {
                 .background(Tone.surface, in: RoundedRectangle(cornerRadius: Radius.small))
                 .overlay(RoundedRectangle(cornerRadius: Radius.small).strokeBorder(Tone.border.opacity(0.6)))
 
-            Text("一行一个链接。YouTube 与 B 站走 yt-dlp 抓取，其余当作直链音频。")
+            Text("一行一个链接，直接粘分享文案也行。YouTube 与 B 站走 yt-dlp 抓取，其余当作直链音频。")
                 .podsumFont(.micro)
                 .foregroundStyle(Tone.textSubtle)
 
@@ -229,11 +229,17 @@ struct SubmitSheet: View {
 
     // MARK: 数据
 
+    /// 一行一项，抠出其中的链接。显示与提交用的都是抠出来的那一段而不是原文——
+    /// 读者得看见系统究竟认出了什么，否则粘一段分享文案被归错类时，
+    /// 界面上没有任何线索。
     private var parsedLinks: [(String, SourceType)] {
         linkText.split(whereSeparator: \.isNewline)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
-            .map { ($0, Submission.guessSourceType($0)) }
+            .map { line in
+                let url = Submission.extractURL(line)
+                return (url, Submission.guessSourceType(url))
+            }
     }
 
     private var items: [Submission.Item] {
