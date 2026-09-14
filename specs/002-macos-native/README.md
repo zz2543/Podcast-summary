@@ -33,7 +33,37 @@ open macos-client/Podsum.xcodeproj
 已完成：StatusDot、ScoreBadge、EpisodeCard、UsefulnessCard、HookHero（并入详情页）、ThreeActPanel、ChaptersTimeline（含关键时刻与 takeaway）、实体标签、溯源信息。
 待做：AudioPlayer（`AVPlayer` 播本地 `file://`）、ChatPanel（`URLSession.bytes` 流式）、提交/重试/删除。
 
-排版说明：不使用 `.callout` / `.caption` 等语义字体——macOS 上它们只有 12pt / 10pt，是为密集控件设计的，用在阅读型内容上偏小。统一走 `Typo` 显式标度（正文 15pt，标题 30pt，钩子 20pt）。
+### 排版与间距的依据
+
+本机 macOS 26.5 实测 `NSFont.preferredFont` 的磅值 / 行高：
+
+| 样式 | 磅值 | 行高 |
+|---|---|---|
+| largeTitle | 26 | 32 |
+| title1 | 22 | 26 |
+| title2 | 17 | 22 |
+| title3 | 15 | 20 |
+| headline / body | 13 | 16 |
+| callout | 12 | 15 |
+| caption | 10 | 13 |
+
+Apple HIG 明确：**macOS 默认正文 13pt、最小 10pt**，长段落应使用宽松行距，并避免 Ultralight/Thin/Light 字重。
+
+所以不用 `.callout`(12) / `.caption`(10) 承载正文——它们在默认值以下。阅读正文取 **15pt**，与系统 title3 的 15/20 度量一致，是有依据的阅读尺寸而非拍脑袋放大。间距统一走 `Space` 标度（4/8/12/16/20/28），HIG 的理由是对齐传达关联、留白表达分组。
+
+### 离屏设计核对
+
+`macos-client/design-check/` 用 `ImageRenderer` 把组件渲染成 PNG，不启动 app、不需要屏幕解锁也能看到真实渲染结果：
+
+```bash
+swiftc -O specs/002-macos-native/contracts/PodsumModels.swift \
+       macos-client/Podsum/Design/Theme.swift \
+       macos-client/Podsum/Views/UsefulnessCard.swift \
+       macos-client/design-check/main.swift -o /tmp/podsum-design \
+  && /tmp/podsum-design /tmp/cards.png && open /tmp/cards.png
+```
+
+注意 `ImageRenderer` 不触发 `onAppear`，带入场动画的视图要用 `animate: false` 构造。
 
 **阶段 3 — 接入与封装（2 天）**
 `LiveRepository` 换掉 Mock（View 一行不改）+ WebSocket 进度 + ChatPanel 流式 + Python 环境打包 + Settings 面板。

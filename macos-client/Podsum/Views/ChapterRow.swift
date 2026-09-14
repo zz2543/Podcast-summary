@@ -4,7 +4,7 @@ struct ChapterRow: View {
     let chapter: Chapter
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: Space.m) {
             HStack(alignment: .firstTextBaseline) {
                 Text("\(chapter.idx + 1). \(chapter.title)")
                     .font(Typo.cardTitle)
@@ -17,7 +17,7 @@ struct ChapterRow: View {
             }
 
             if !chapter.keyPoints.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: Space.s) {
                     ForEach(Array(chapter.keyPoints.enumerated()), id: \.offset) { _, point in
                         HStack(alignment: .top, spacing: 8) {
                             Circle()
@@ -48,7 +48,7 @@ struct ChapterRow: View {
             }
 
             if !chapter.quotes.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: Space.s) {
                     ForEach(Array(chapter.quotes.enumerated()), id: \.offset) { _, q in
                         QuoteBlock(quote: q)
                     }
@@ -56,10 +56,10 @@ struct ChapterRow: View {
                 .padding(.top, 2)
             }
         }
-        .padding(18)
+        .padding(Space.card)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Tone.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Tone.border.opacity(0.5)))
+        .background(Tone.surface, in: RoundedRectangle(cornerRadius: Radius.medium))
+        .overlay(RoundedRectangle(cornerRadius: Radius.medium).strokeBorder(Tone.border.opacity(0.5)))
     }
 }
 
@@ -91,8 +91,8 @@ struct QuoteBlock: View {
                     .padding(.leading, 56)
             }
         }
-        .padding(12)
+        .padding(Space.m)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Tone.surfaceElev.opacity(0.7), in: RoundedRectangle(cornerRadius: 10))
+        .background(Tone.surfaceElev.opacity(0.7), in: RoundedRectangle(cornerRadius: Radius.small))
     }
 }

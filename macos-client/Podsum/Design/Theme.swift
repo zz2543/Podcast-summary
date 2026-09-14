@@ -35,8 +35,13 @@ extension Color {
 
 // MARK: - 排版标度
 //
-// 不用 .callout / .caption 这类语义字体：macOS 上它们分别只有 12pt 和 10pt，
-// 是为密集控件设计的，用在阅读型内容上偏小。这里给出显式尺寸。
+// 校准依据（本机 macOS 26.5 实测 NSFont.preferredFont 的磅值 / 行高）：
+//   largeTitle 26/32   title1 22/26   title2 17/22   title3 15/20
+//   headline 13/16     body 13/16     callout 12/15  caption 10/13
+// Apple HIG：macOS 默认正文 13pt、最小 10pt，且长段落应使用宽松行距。
+//
+// 所以不直接用 .callout(12) / .caption(10) 承载正文——它们在默认值以下。
+// 阅读正文取 15pt，与系统 title3 的度量一致（15/20），是有依据的阅读尺寸。
 
 public enum Typo {
     public static let pageTitle    = Font.system(size: 30, weight: .semibold)
@@ -49,18 +54,48 @@ public enum Typo {
     public static let secondary = Font.system(size: 13)
     public static let meta      = Font.system(size: 12)
 
+    /// 脚注级：溯源、Prompt 版本这类元信息
+    public static let micro     = Font.system(size: 11)
+
     public static let mono      = Font.system(size: 12, design: .monospaced)
     public static let monoSmall = Font.system(size: 11, design: .monospaced)
 
-    public static let score      = Font.system(size: 34, weight: .semibold, design: .rounded)
+    public static let score      = Font.system(size: 44, weight: .semibold, design: .rounded)
     public static let scoreSmall = Font.system(size: 17, weight: .semibold, design: .rounded)
     public static let band       = Font.system(size: 12, weight: .medium)
     public static let bandSmall  = Font.system(size: 10, weight: .medium)
 }
 
 public extension View {
-    /// 阅读型段落的行距
-    func readable() -> some View { self.lineSpacing(3.5) }
+    /// 阅读型段落的行距：15pt 正文默认行高约 18pt，+3 得 21pt，
+    /// 接近系统 title3 的 15/20 并略宽松，符合 HIG 对长段落的建议。
+    func readable() -> some View { self.lineSpacing(3) }
+}
+
+// MARK: - 间距标度
+//
+// 统一的节奏比零散的魔数更容易对齐。HIG：对齐让内容易于扫读，
+// 留白与容器形状用来表达分组。
+
+public enum Space {
+    public static let xs: CGFloat = 4
+    public static let s:  CGFloat = 8
+    public static let m:  CGFloat = 12
+    public static let l:  CGFloat = 16
+    public static let xl: CGFloat = 20
+    public static let xxl: CGFloat = 28
+
+    /// 卡片内边距
+    public static let card: CGFloat = 18
+    /// 区块之间
+    public static let section: CGFloat = 30
+}
+
+public enum Radius {
+    public static let pill: CGFloat = 999
+    public static let small: CGFloat = 10
+    public static let medium: CGFloat = 14
+    public static let large: CGFloat = 16
 }
 
 // MARK: - 格式化

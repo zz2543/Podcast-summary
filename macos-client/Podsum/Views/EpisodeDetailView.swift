@@ -31,15 +31,17 @@ struct EpisodeDetailView: View {
     @ViewBuilder
     private func loaded(_ e: EpisodeDetail) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 30) {
+            VStack(alignment: .leading, spacing: Space.section) {
                 hero(e)
-                UsefulnessCard(usefulness: e.usefulness, stage: e.stageStatus.usefulness)
+                UsefulnessCard(usefulness: e.usefulness,
+                               stage: e.stageStatus.usefulness,
+                               promptVersion: e.promptVersions.usefulnessScore)
                 threeAct(e)
                 chapters(e)
                 entities(e)
                 provenance(e)
             }
-            .padding(28)
+            .padding(Space.xxl)
             .frame(maxWidth: 900, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
@@ -50,8 +52,8 @@ struct EpisodeDetailView: View {
 
     @ViewBuilder
     private func hero(_ e: EpisodeDetail) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: Space.m) {
+            HStack(spacing: Space.s) {
                 if let name = e.podcastName, !name.isEmpty {
                     Text(name).font(Typo.secondary.weight(.semibold)).foregroundStyle(Tone.text)
                     Text("·").foregroundStyle(Tone.border)
@@ -76,9 +78,9 @@ struct EpisodeDetailView: View {
                     .foregroundStyle(Tone.text)
                     .readable()
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(20)
+                    .padding(Space.xl)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Tone.surfaceElev, in: RoundedRectangle(cornerRadius: 16))
+                    .background(Tone.surfaceElev, in: RoundedRectangle(cornerRadius: Radius.large))
             }
         }
     }
@@ -89,7 +91,7 @@ struct EpisodeDetailView: View {
     private func threeAct(_ e: EpisodeDetail) -> some View {
         if let ta = e.threeAct {
             section("三幕摘要") {
-                HStack(alignment: .top, spacing: 12) {
+                HStack(alignment: .top, spacing: Space.m) {
                     actCard("背景", ta.background)
                     actCard("核心论点", ta.coreArgument)
                     actCard("结论", ta.conclusion)
@@ -99,7 +101,7 @@ struct EpisodeDetailView: View {
     }
 
     private func actCard(_ label: String, _ body: String) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
+        VStack(alignment: .leading, spacing: Space.s) {
             Text(label)
                 .font(Typo.sectionLabel).textCase(.uppercase)
                 .foregroundStyle(Tone.textSubtle)
@@ -109,10 +111,10 @@ struct EpisodeDetailView: View {
                 .readable()
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(16)
+        .padding(Space.l)
         .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(Tone.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Tone.border.opacity(0.5)))
+        .background(Tone.surface, in: RoundedRectangle(cornerRadius: Radius.medium))
+        .overlay(RoundedRectangle(cornerRadius: Radius.medium).strokeBorder(Tone.border.opacity(0.5)))
     }
 
     // MARK: 章节
@@ -121,7 +123,7 @@ struct EpisodeDetailView: View {
     private func chapters(_ e: EpisodeDetail) -> some View {
         if !e.chapters.isEmpty {
             section("章节 · \(e.chapters.count)") {
-                VStack(spacing: 12) {
+                VStack(spacing: Space.m) {
                     ForEach(e.chapters) { ChapterRow(chapter: $0) }
                 }
             }
@@ -139,7 +141,7 @@ struct EpisodeDetailView: View {
             }
         } else {
             section("提及 · \(e.entities.count)") {
-                FlowRow(spacing: 8) {
+                FlowRow(spacing: Space.s) {
                     ForEach(e.entities) { entity in
                         HStack(spacing: 5) {
                             Image(systemName: icon(entity.kind))
@@ -173,7 +175,7 @@ struct EpisodeDetailView: View {
     @ViewBuilder
     private func provenance(_ e: EpisodeDetail) -> some View {
         section("溯源") {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: Space.s) {
                 row("来源", e.sourceRef)
                 row("提示词版本", "one_liner \(e.promptVersions.oneLiner) · three_act \(e.promptVersions.threeAct) · chapters \(e.promptVersions.chapterOutline) · entities \(e.promptVersions.entityExtraction)")
                 if let s = e.summaryStyle {
@@ -187,10 +189,10 @@ struct EpisodeDetailView: View {
     private func row(_ label: String, _ value: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Text(label)
-                .font(Typo.meta).foregroundStyle(Tone.textSubtle)
+                .font(Typo.micro).foregroundStyle(Tone.textSubtle)
                 .frame(width: 82, alignment: .leading)
             Text(value)
-                .font(Typo.meta).foregroundStyle(Tone.textMuted)
+                .font(Typo.micro).foregroundStyle(Tone.textMuted)
                 .textSelection(.enabled)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -199,7 +201,7 @@ struct EpisodeDetailView: View {
     // MARK: 脚手架
 
     private func section<C: View>(_ title: String, @ViewBuilder content: () -> C) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: Space.m) {
             Text(title)
                 .font(Typo.sectionLabel).textCase(.uppercase)
                 .foregroundStyle(Tone.textSubtle)
