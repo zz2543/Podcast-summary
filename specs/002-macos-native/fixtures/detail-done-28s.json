@@ -1,0 +1,138 @@
+{
+  "id": "01KS40ADBZE4Y9ES3G88N9YQYF",
+  "title": "The Boys Finale Was a Complete Disaster 😤 | The Boys Season 5 Episode 8 Was Worst",
+  "podcast_name": "Mr Critical",
+  "guests": null,
+  "source_type": "youtube",
+  "source_ref": "https://www.youtube.com/shorts/miASXW5dvqE",
+  "duration_seconds": 28,
+  "language": "en",
+  "status": "done",
+  "stage_status": {
+    "hook": "present",
+    "three_act": "present",
+    "chapters": "present",
+    "entities": "present",
+    "usefulness": "missing",
+    "tts": "present"
+  },
+  "prompt_versions": {
+    "one_liner": "v1",
+    "three_act": "v1",
+    "chapter_outline": "v1",
+    "entity_extraction": "v1"
+  },
+  "summary_style": {
+    "preset": "default",
+    "note": null,
+    "detail": "standard"
+  },
+  "hook": "Fans are calling The Boys series finale a disaster, with many saying it wasted years of storytelling and left characters without satisfying endings.",
+  "three_act": {
+    "background": "The Boys finale has released after five seasons of buildup, but fans are seriously disappointed.",
+    "core_argument": "Viewers expected an epic ending where Butcher and the team finally get revenge on Homelander, but instead the finale left a huge part of the fan base angry and frustrated, with many calling it the worst finale ever and wasting years of storytelling. Characters didn't get satisfying endings, and the finale was too simple and predictable.",
+    "conclusion": "The finale's reception is overwhelmingly negative, with fans expressing disappointment on social media."
+  },
+  "usefulness": null,
+  "chapters": [
+    {
+      "idx": 0,
+      "title": "Fan Disappointment with The Boys Finale",
+      "start_ms": 120,
+      "end_ms": 28260,
+      "key_points": [
+        "Finale released after five seasons of buildup",
+        "Viewers expected epic revenge on Homelander",
+        "Ending left many fans angry and frustrated"
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "The Boys finale just dropped, and fans are seriously disappointed.",
+          "takeaway": null,
+          "start_ms": 120
+        },
+        {
+          "text": "After five seasons of buildup, viewers expected an epic ending where Butcher and the team finally get revenge on Homelander.",
+          "takeaway": null,
+          "start_ms": 3416
+        },
+        {
+          "text": "But instead, the finale left a huge part of the fan base angry and frustrated.",
+          "takeaway": null,
+          "start_ms": 9565
+        }
+      ]
+    },
+    {
+      "idx": 1,
+      "title": "Social Media Backlash",
+      "start_ms": 120,
+      "end_ms": 28260,
+      "key_points": [
+        "Social media exploded with complaints",
+        "Fans called it the worst finale ever",
+        "Criticized for wasting years of storytelling"
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "As soon as the episode dropped, social media exploded with people calling it the worst Finale ever, and saying the ending completely wasted years of story telling.",
+          "takeaway": null,
+          "start_ms": 13452
+        }
+      ]
+    },
+    {
+      "idx": 2,
+      "title": "Specific Complaints from Fans",
+      "start_ms": 120,
+      "end_ms": 28260,
+      "key_points": [
+        "Many characters didn't get satisfying endings",
+        "Finale felt too simple and predictable"
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "A lot of fans were mad because many characters didn't get satisfying ending, while others felt the finale was too simple and predictable.",
+          "takeaway": null,
+          "start_ms": 21520
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "name": "Butcher",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        120
+      ]
+    },
+    {
+      "name": "Homelander",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        120
+      ]
+    },
+    {
+      "name": "The Boys",
+      "kind": "product",
+      "count": 1,
+      "sample_timestamps_ms": [
+        120
+      ]
+    }
+  ],
+  "artifact_paths": {
+    "markdown": "data/01KS40ADBZE4Y9ES3G88N9YQYF/summary.md",
+    "json": "data/01KS40ADBZE4Y9ES3G88N9YQYF/summary.json",
+    "tts": "data/01KS40ADBZE4Y9ES3G88N9YQYF/digest.mp3"
+  },
+  "created_at": "2026-05-21T00:52:53.941405",
+  "updated_at": "2026-05-21T00:57:25.986106"
+}

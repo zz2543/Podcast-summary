@@ -1,0 +1,597 @@
+{
+  "items": [
+    {
+      "id": "01M2FKVC8GT40083QZHH6VRSMW",
+      "title": "学历贬值、投资衰退：大学生该怎么面对这个衰退的时代？",
+      "podcast_name": "降星驰",
+      "source_type": "youtube",
+      "duration_seconds": 1742,
+      "language": "zh",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "present",
+        "tts": "missing"
+      },
+      "usefulness": {
+        "score": 62,
+        "band": "skimmable",
+        "rationale": "主播以出生人口下降、AI冲击、学历扩招等具体背景支撑“衰退时代”论点,并给出实习、拥抱不确定性等建议,但缺乏新颖洞见且夹杂重复与闲聊,摘要即可获取核心要点。"
+      },
+      "created_at": "2026-09-14T09:27:15.770252",
+      "updated_at": "2026-09-14T09:32:55.984360"
+    },
+    {
+      "id": "01M27HDEZ79433BHKY99G5R528",
+      "title": "我的 AI 编程全流程：如何使用 AI 稳定交付一个高质量的产品",
+      "podcast_name": "马克的技术工作坊",
+      "source_type": "youtube",
+      "duration_seconds": 1494,
+      "language": "zh",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "present",
+        "tts": "present"
+      },
+      "usefulness": {
+        "score": 72,
+        "band": "worth_listening",
+        "rationale": "作者用一个电子书阅读器案例,具体演示了包含 Agent.md、Git 版本管理、MVP 讨论、技术方案文档、让 AI 自测与人工验证的五步工作流,并给出可操作的取舍原则,但内容多为个人实操经验的复述,缺少可验证的对比数据或新颖洞见,部分环节以顺带提及方式带过。"
+      },
+      "created_at": "2026-09-11T06:10:40.299758",
+      "updated_at": "2026-09-11T06:33:11.426412"
+    },
+    {
+      "id": "01M2519A4VN17APQPWS86FYERW",
+      "title": "【极客湾】飘哥在线简单讲解A20Pro封装逻辑",
+      "podcast_name": "极客Cut",
+      "source_type": "youtube",
+      "duration_seconds": 442,
+      "language": "zh",
+      "status": "processing",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "present",
+        "tts": "missing"
+      },
+      "usefulness": {
+        "score": 55,
+        "band": "skimmable",
+        "rationale": "飘哥用示意图讲解了A20 Pro从传统PoP封装改为类似PC的平面化封装加金属盖均热板、以及三通道96位LPDDR5X带宽提升50%这两个有用要点,但夹杂大量画图抱怨和闲聊,其余多为期待表态而无实证。"
+      },
+      "created_at": "2026-09-10T06:50:09.863219",
+      "updated_at": "2026-09-10T06:51:56.562781"
+    },
+    {
+      "id": "01M24YM3Z4SEHARQG1HKZP8RXA",
+      "title": "「小白」苹果Apple Watch S12/Ultra4 AirPods 5系列体验！",
+      "podcast_name": "小白测评",
+      "source_type": "youtube",
+      "duration_seconds": 264,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-09-10T06:03:37.500247",
+      "updated_at": "2026-09-10T06:04:16.844514"
+    },
+    {
+      "id": "01M24YD0Y31GTCCNDCYN19KV1R",
+      "title": "天才是如何思考的？",
+      "podcast_name": "鑫仔pro",
+      "source_type": "youtube",
+      "duration_seconds": 630,
+      "language": "zh",
+      "status": "partial",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "failed_after_retries"
+      },
+      "usefulness": null,
+      "created_at": "2026-09-10T05:59:49.253232",
+      "updated_at": "2026-09-11T05:23:10.614111"
+    },
+    {
+      "id": "01M23BSA2S11482KA01M56QS6S",
+      "title": "自学英语3000h来到澳洲，如何高效学英语（避坑必看",
+      "podcast_name": "万伯渊",
+      "source_type": "youtube",
+      "duration_seconds": 473,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-09-09T15:15:14.931914",
+      "updated_at": "2026-09-09T15:17:43.625631"
+    },
+    {
+      "id": "01M23B8NWB6BZSNFAH6G3H6P48",
+      "title": "秋招焦虑，那不妨听听我的秋招故事",
+      "podcast_name": "雯ww63",
+      "source_type": "youtube",
+      "duration_seconds": 176,
+      "language": "zh",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-09-09T15:06:05.197287",
+      "updated_at": "2026-09-09T15:07:04.543115"
+    },
+    {
+      "id": "01M1NCZWSSK2WZTJ8EAE9ER3E7",
+      "title": "南京大学ai专业学生大一下学期总结--也无风雨也无晴",
+      "podcast_name": "公孙知云",
+      "source_type": "youtube",
+      "duration_seconds": 1963,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-09-04T05:07:16.933223",
+      "updated_at": "2026-09-09T14:39:09.654390"
+    },
+    {
+      "id": "01KZ6A2WNHGCDSHW1134PC900F",
+      "title": "【流畅版】詹青云的英语学习进阶攻略",
+      "podcast_name": "moonsyouth",
+      "source_type": "youtube",
+      "duration_seconds": 5638,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-08-04T11:56:47.898258",
+      "updated_at": "2026-08-04T12:05:19.150143"
+    },
+    {
+      "id": "01KXDNZAZ8P9Z6SPXX9WXD8HHF",
+      "title": "How I Would Learn Python FAST (if I could start over)",
+      "podcast_name": "Andrew Codesmith",
+      "source_type": "youtube",
+      "duration_seconds": 633,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-07-13T12:07:26.555781",
+      "updated_at": "2026-07-13T12:08:40.739266"
+    },
+    {
+      "id": "01KWGV4CPQSH14ZXJ8MBMHZ2H2",
+      "title": "Scott Young：一年自学完成 MIT 计算机课程 | Dwarkesh #9",
+      "podcast_name": "opus精译",
+      "source_type": "youtube",
+      "duration_seconds": 5938,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-07-02T07:20:02.970385",
+      "updated_at": "2026-07-02T07:28:39.598716"
+    },
+    {
+      "id": "01KVJW29SZB570PBF4BWQ5D1Y3",
+      "title": "为什么即使没人看，你也应该做自媒体",
+      "podcast_name": "AliAbdaal",
+      "source_type": "youtube",
+      "duration_seconds": 822,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-06-20T15:58:33.611077",
+      "updated_at": "2026-06-20T16:00:41.766163"
+    },
+    {
+      "id": "01KT1HT3JPVFV40XM5816GAX0N",
+      "title": "[说说心里话] modern AI 入门 roadmap，RL4LLM",
+      "podcast_name": "五道口纳什",
+      "source_type": "youtube",
+      "duration_seconds": 1274,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-06-01T12:16:43.846443",
+      "updated_at": "2026-06-01T12:19:17.222584"
+    },
+    {
+      "id": "01KT1G5HGF13RQ34FDYG6WPE3J",
+      "title": "新手必学Claude Cowork工作流！打造你的专属「AI钢铁侠」",
+      "podcast_name": "JeffSu杰夫",
+      "source_type": "youtube",
+      "duration_seconds": 1248,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-06-01T11:47:54.814864",
+      "updated_at": "2026-06-01T11:49:47.643538"
+    },
+    {
+      "id": "01KSYYZ2YB2HSBEPTVE84TNTWG",
+      "title": "3 things you should try in Claude Cowork",
+      "podcast_name": "rillo",
+      "source_type": "youtube",
+      "duration_seconds": 91,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-31T12:08:43.374764",
+      "updated_at": "2026-05-31T12:09:04.008818"
+    },
+    {
+      "id": "01KS40R9T7G6S7GK66QXFC9PMM",
+      "title": "How to STUDY so FAST it feels like CHEATING",
+      "podcast_name": "The Angry Explainer",
+      "source_type": "youtube",
+      "duration_seconds": 483,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-21T01:01:07.366992",
+      "updated_at": "2026-05-21T01:02:05.595501"
+    },
+    {
+      "id": "01KS40ADBZE4Y9ES3G88N9YQYF",
+      "title": "The Boys Finale Was a Complete Disaster 😤 | The Boys Season 5 Episode 8 Was Worst",
+      "podcast_name": "Mr Critical",
+      "source_type": "youtube",
+      "duration_seconds": 28,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-21T00:52:53.941405",
+      "updated_at": "2026-05-21T00:57:25.986106"
+    },
+    {
+      "id": "01KS367BE3E6322WJKG2HYWW4V",
+      "title": "Top 5 Claude Cowork Tips I Wish I Knew from Day One",
+      "podcast_name": "Jeff Su",
+      "source_type": "youtube",
+      "duration_seconds": 1070,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-20T17:16:57.851133",
+      "updated_at": "2026-05-20T17:19:55.832376"
+    },
+    {
+      "id": "01KS35SGHG76XE52NXM1EG9MJN",
+      "title": "how to study even when you're EXHAUSTED",
+      "podcast_name": "Gohar Khan",
+      "source_type": "youtube",
+      "duration_seconds": 756,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-20T17:09:30.662964",
+      "updated_at": "2026-05-20T17:13:02.190837"
+    },
+    {
+      "id": "01KS35QTZXMB1DEBBADHADTRAK",
+      "title": "this DOPAMINE based routine got me EASILY ADDICTED to studying",
+      "podcast_name": "Kai Notebook",
+      "source_type": "youtube",
+      "duration_seconds": 609,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-20T17:08:32.456761",
+      "updated_at": "2026-05-20T17:12:12.578894"
+    },
+    {
+      "id": "01KS02TJHSFE1ZME0QJBMKBDAV",
+      "title": "如何比99%的人更高效地使用 Codex",
+      "podcast_name": "GoldenSpiderAI",
+      "source_type": "youtube",
+      "duration_seconds": 1656,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-19T12:19:44.290923",
+      "updated_at": "2026-05-19T12:22:39.005171"
+    },
+    {
+      "id": "01KRZNBZYAKE6G40GN02EQ1TRC",
+      "title": "【AI工具实战】Matt Pocock 演示：AI 辅助编程的高效工作流全流程",
+      "podcast_name": "Gelai_AI",
+      "source_type": "youtube",
+      "duration_seconds": 5790,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-19T08:25:12.565027",
+      "updated_at": "2026-05-19T08:41:36.847103"
+    },
+    {
+      "id": "01KRG4F0FCT0A0295ZBQK791QX",
+      "title": "AI Coding 进阶：从 Vibe/Plan/Spec 到 Harness Engineering 与 Agent Teams",
+      "podcast_name": "Qoder",
+      "source_type": "youtube",
+      "duration_seconds": 3032,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-13T07:40:39.891824",
+      "updated_at": "2026-05-13T07:47:03.007380"
+    },
+    {
+      "id": "01KRG4A1XRPVD1WP9ZA6JSKZTD",
+      "title": "【十字路口】探秘 Claude Code，搞懂 Agent Harness｜对谈来新璐【视频播客】",
+      "podcast_name": "Koji杨远骋at十字路口",
+      "source_type": "youtube",
+      "duration_seconds": 2866,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "missing"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-13T07:38:02.931084",
+      "updated_at": "2026-05-13T07:42:06.905356"
+    },
+    {
+      "id": "01KRE8F13XM3KDZ5S5YJWMQ3H8",
+      "title": "【高质量配音】别再 Vibe Coding 了：斯坦福CS146S老师教你用 AI 稳稳上线生产代码",
+      "podcast_name": "卜道配音",
+      "source_type": "youtube",
+      "duration_seconds": 3083,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-12T14:12:02.008220",
+      "updated_at": "2026-05-12T14:29:07.537059"
+    },
+    {
+      "id": "01KRDQVRZEB4JAMT2V86PZM0V2",
+      "title": "手把手实战教学：我是如何用一个周末掌握Claude Code的",
+      "podcast_name": "AliAbdaal",
+      "source_type": "youtube",
+      "duration_seconds": 2834,
+      "language": "en",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-12T09:21:56.882402",
+      "updated_at": "2026-05-12T09:28:18.320917"
+    },
+    {
+      "id": "01KRDN40JFJK96S19XHHTPBBA5",
+      "title": "AI 做的网站丑爆了？7 招教你去除 AI 味儿！AI编程必学技巧",
+      "podcast_name": "程序员鱼皮",
+      "source_type": "youtube",
+      "duration_seconds": 700,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-12T08:33:47.663507",
+      "updated_at": "2026-05-12T08:41:31.361836"
+    },
+    {
+      "id": "01KRD4ZKK8DKDT7SQCA9HVBWS5",
+      "title": "Claude Code + DeepSeek V4 Pro安装教程｜3步从零装好开始用（Mac/Windows）",
+      "podcast_name": "大牙大",
+      "source_type": "youtube",
+      "duration_seconds": 524,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-12T03:51:45.388935",
+      "updated_at": "2026-05-12T03:53:45.205327"
+    },
+    {
+      "id": "01KRCZZSMEHXWH70347X3P1J37",
+      "title": "Codex (APP) 保姆级全攻略，海量实战教程， 一期精通Codex",
+      "podcast_name": "技术爬爬虾  TechShrimp",
+      "source_type": "youtube",
+      "duration_seconds": 2292,
+      "language": "mixed",
+      "status": "done",
+      "stage_status": {
+        "hook": "present",
+        "three_act": "present",
+        "chapters": "present",
+        "entities": "present",
+        "usefulness": "missing",
+        "tts": "present"
+      },
+      "usefulness": null,
+      "created_at": "2026-05-12T02:24:47.328421",
+      "updated_at": "2026-05-12T02:33:13.781655"
+    }
+  ],
+  "next_cursor": null
+}

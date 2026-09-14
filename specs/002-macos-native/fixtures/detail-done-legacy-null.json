@@ -1,0 +1,461 @@
+{
+  "id": "01KRZNBZYAKE6G40GN02EQ1TRC",
+  "title": "【AI工具实战】Matt Pocock 演示：AI 辅助编程的高效工作流全流程",
+  "podcast_name": "Gelai_AI",
+  "guests": null,
+  "source_type": "youtube",
+  "source_ref": "https://www.bilibili.com/video/BV1us5r6MEg6?vd_source=e352aac32a47b1119609e13d767313f9",
+  "duration_seconds": 5790,
+  "language": "en",
+  "status": "done",
+  "stage_status": {
+    "hook": "present",
+    "three_act": "present",
+    "chapters": "present",
+    "entities": "present",
+    "usefulness": "missing",
+    "tts": "present"
+  },
+  "prompt_versions": {
+    "one_liner": "v1",
+    "three_act": "v1",
+    "chapter_outline": "v1",
+    "entity_extraction": "v1"
+  },
+  "summary_style": {
+    "preset": "default",
+    "note": null,
+    "detail": "standard"
+  },
+  "hook": "Matt Pocock demonstrates a full AI-assisted coding workflow, from planning with a 'grill me' skill to break down a feature request, creating a PRD and Kanban board, then implementing via parallel AFK agents using test-driven development (TDD) and code review, emphasizing software engineering fundamentals like modular design and feedback loops.",
+  "three_act": {
+    "background": "The talk addresses working with LLMs for coding, highlighting constraints like the 'smart zone' and 'dumb zone' (performance degrades as context grows) and LLMs' tendency to forget between sessions. The speaker argues software engineering fundamentals remain relevant for AI-assisted development.",
+    "core_argument": "Effective AI coding requires aligning on a 'design concept' before implementation, using techniques like grilling (iterative questioning) and vertical slicing (thin cross-layer features) to stay within the smart zone and get early feedback. Agents can then execute tasks autonomously via loops, but humans must handle planning, QA, and code review.",
+    "conclusion": "By retaining classic software engineering practices (small tasks, deep modules, TDD, feedback loops), developers can harness AI efficiently without losing control. Investments in testing and codebase architecture are crucial, and old programming books remain valuable resources."
+  },
+  "usefulness": null,
+  "chapters": [
+    {
+      "idx": 0,
+      "title": "Introduction and Thesis",
+      "start_ms": 14980,
+      "end_ms": 614980,
+      "key_points": [
+        "Speaker introduces himself as Matt, a teacher now teaching AI.",
+        "The workshop is about two hours.",
+        "The thesis: AI is a new paradigm, but software engineering fundamentals work super well with AI.",
+        "Audience poll: coding with AI, coding daily, frustration with AI."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "My name is Matt, uh, I'm a teacher, and I suppose now I teach AI.",
+          "takeaway": null,
+          "start_ms": 25230
+        },
+        {
+          "text": "How many of you guys, um, are coding, have ever coded with AI? Raise your hand if you've ever coded with AI.",
+          "takeaway": null,
+          "start_ms": 97631
+        }
+      ]
+    },
+    {
+      "idx": 1,
+      "title": "LLM Constraints: Smart Zone and Dumb Zone",
+      "start_ms": 614980,
+      "end_ms": 1214980,
+      "key_points": [
+        "LLMs have a 'smart zone' when starting fresh; performance degrades as context grows.",
+        "Attention relationships scale quadratically with tokens.",
+        "Around 100K tokens, the LLM enters the 'dumb zone'.",
+        "Advice: size tasks to stay within the smart zone."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "When you're working with LLMs, they have a smart zone and a dumb zone.",
+          "takeaway": null,
+          "start_ms": 197605
+        },
+        {
+          "text": "Every time you add a token to an LLM, it's kind of like you're adding a team to a football league.",
+          "takeaway": null,
+          "start_ms": 218624
+        }
+      ]
+    },
+    {
+      "idx": 2,
+      "title": "Compacting and Memento-like Memory",
+      "start_ms": 1214980,
+      "end_ms": 1814980,
+      "key_points": [
+        "LLMs forget like the guy from Memento; clearing context resets to base state.",
+        "System prompt should be minimal to avoid entering the dumb zone.",
+        "Compacting squeezes conversation into a smaller space, but speaker prefers clearing context.",
+        "Token count monitoring is essential."
+      ],
+      "summary": null,
+      "quotes": []
+    },
+    {
+      "idx": 3,
+      "title": "Grill Me Skill: Achieving Alignment",
+      "start_ms": 1814980,
+      "end_ms": 2414980,
+      "key_points": [
+        "The grill me skill starts by exploring codebase and asking questions to reach shared understanding.",
+        "Frederick P. Brooks' design concept: shared idea among participants.",
+        "Speaker uses sub-agents to explore and bring back summaries.",
+        "The skill prevents misalignment and produces a conversation history as an asset."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "It's the grill me skill. And this grill me skill is wonderfully small.",
+          "takeaway": null,
+          "start_ms": 781226
+        },
+        {
+          "text": "Interview me relentlessly about every aspect of this plan until we reach a shared understanding.",
+          "takeaway": null,
+          "start_ms": 1019839
+        }
+      ]
+    },
+    {
+      "idx": 4,
+      "title": "Creating a PRD (Destination Document)",
+      "start_ms": 2414980,
+      "end_ms": 3014980,
+      "key_points": [
+        "After grilling, summarize into a Product Requirements Document (PRD).",
+        "PRD includes problem statement, solution, user stories, implementation and testing decisions.",
+        "Speaker does not review the PRD because LMs are good at summarization and alignment was already achieved.",
+        "PRD acts as a destination document for the team."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "The reason I don't look at these is because what am I testing at this point?",
+          "takeaway": null,
+          "start_ms": 2133950
+        }
+      ]
+    },
+    {
+      "idx": 5,
+      "title": "Trace Bullets and Vertical Slices",
+      "start_ms": 3014980,
+      "end_ms": 3614980,
+      "key_points": [
+        "AI tends to code horizontally (layer by layer), which delays feedback.",
+        "Instead, use vertical slices (trace bullets) that cut through all layers.",
+        "This provides instant feedback on the entire flow.",
+        "Speaker adjusts the PRD to issues skill to enforce vertical slices."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "What I noticed is that AI loves to code horizontally. So it loves to code layer by layer.",
+          "takeaway": null,
+          "start_ms": 2580814
+        }
+      ]
+    },
+    {
+      "idx": 6,
+      "title": "Kanban Board and Parallelization",
+      "start_ms": 3614980,
+      "end_ms": 4214980,
+      "key_points": [
+        "Break PRD into independently grabable issues with blocking dependencies (a kanban board).",
+        "This enables parallelization: multiple agents can work simultaneously.",
+        "Sequential plans can only be handled by one agent at a time.",
+        "Issues are created as local markdown files."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "This means that you can start to parallelize. You can start to get agents working at the same time on these tasks.",
+          "takeaway": null,
+          "start_ms": 3027548
+        }
+      ]
+    },
+    {
+      "idx": 7,
+      "title": "AFK Implementation with Ralph Loop",
+      "start_ms": 4214980,
+      "end_ms": 4814980,
+      "key_points": [
+        "Once planning is done, human leaves the loop (AFK - away from keyboard).",
+        "A Ralph loop script picks tasks from the backlog and implements them sequentially.",
+        "The agent uses TDD and runs feedback loops (tests and type checks).",
+        "Speaker demos a simple script that passes issues to Claude Code."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "We can think of this is kind of like the day shift and the night shift.",
+          "takeaway": null,
+          "start_ms": 3188050
+        }
+      ]
+    },
+    {
+      "idx": 8,
+      "title": "TDD and Automated Code Review",
+      "start_ms": 4814980,
+      "end_ms": 5414980,
+      "key_points": [
+        "TDD (test-driven development) is essential for AI to produce good code.",
+        "AI writes a failing test first, then implements to pass.",
+        "AI should review its own code in a fresh context (smart zone) to catch bugs.",
+        "Feedback loops like tests and type checks are crucial for AI performance."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "TDD, I found is absolutely essential for getting the most out of agents.",
+          "takeaway": null,
+          "start_ms": 4010025
+        }
+      ]
+    },
+    {
+      "idx": 9,
+      "title": "Deep Modules and Codebase Architecture",
+      "start_ms": 5414980,
+      "end_ms": 5769390,
+      "key_points": [
+        "Codebases with shallow modules are hard for AI to navigate and test.",
+        "Deep modules (small interface, large internal logic) are easier to test and maintain.",
+        "AI unaided tends to produce shallow code; careful direction is needed.",
+        "Speaker uses a skill 'improve codebase architecture' to deepen modules and improve testability."
+      ],
+      "summary": null,
+      "quotes": []
+    },
+    {
+      "idx": 10,
+      "title": "Sandcastle: Parallel Agent Orchestration",
+      "start_ms": 5414980,
+      "end_ms": 5769390,
+      "key_points": [
+        "Sandcastle is a TypeScript library for running AFK agents in parallel.",
+        "It creates a work tree, sandboxes in Docker, and runs implementations.",
+        "A planner chooses issues to parallelize based on dependencies.",
+        "Reviewer agent pushes coding standards; implementer pulls them."
+      ],
+      "summary": null,
+      "quotes": []
+    },
+    {
+      "idx": 11,
+      "title": "QA and Final Recommendations",
+      "start_ms": 5414980,
+      "end_ms": 5769390,
+      "key_points": [
+        "QA is crucial to impose human taste and avoid 'slop'.",
+        "QA phase also creates more issues for the kanban board.",
+        "Speaker recommends reading old software engineering books (Martin Fowler, Pragmatic Programmer, etc.).",
+        "The overall process: Idea -> Grilling -> PRD -> Kanban -> AFK implementation -> QA -> Iterate."
+      ],
+      "summary": null,
+      "quotes": [
+        {
+          "text": "QA is how I then um impose my uh opinions back onto the code base, how I impose my taste.",
+          "takeaway": null,
+          "start_ms": 4364312
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "name": "Design of Design",
+      "kind": "book",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "The Philosophy of Software Design",
+      "kind": "book",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Dex Horday",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Frederick P. Brooks",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "John Ousterhout",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Martin Fowler",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Matt",
+      "kind": "person",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Mike",
+      "kind": "person",
+      "count": 2,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Ralph Wigam",
+      "kind": "person",
+      "count": 3,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Sarah Chen",
+      "kind": "person",
+      "count": 5,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Steve",
+      "kind": "person",
+      "count": 2,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Claude",
+      "kind": "product",
+      "count": 9,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Clojure",
+      "kind": "product",
+      "count": 2,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "GitHub",
+      "kind": "product",
+      "count": 3,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Human Layer",
+      "kind": "product",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Memento",
+      "kind": "product",
+      "count": 3,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Open Spectre",
+      "kind": "product",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Opus",
+      "kind": "product",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Slido",
+      "kind": "product",
+      "count": 2,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Sonnet",
+      "kind": "product",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "Taskmaster",
+      "kind": "product",
+      "count": 1,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    },
+    {
+      "name": "TypeScript",
+      "kind": "product",
+      "count": 3,
+      "sample_timestamps_ms": [
+        14980
+      ]
+    }
+  ],
+  "artifact_paths": {
+    "markdown": "data/01KRZNBZYAKE6G40GN02EQ1TRC/summary.md",
+    "json": "data/01KRZNBZYAKE6G40GN02EQ1TRC/summary.json",
+    "tts": "data/01KRZNBZYAKE6G40GN02EQ1TRC/digest.mp3"
+  },
+  "created_at": "2026-05-19T08:25:12.565027",
+  "updated_at": "2026-05-19T08:41:36.847103"
+}
