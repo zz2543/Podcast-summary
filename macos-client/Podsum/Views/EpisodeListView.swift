@@ -62,21 +62,26 @@ struct EpisodeListView: View {
             }
             .navigationSplitViewColumnWidth(min: 168, ideal: 188, max: 240)
         } detail: {
-            content
-                .navigationTitle("Podsum")
-                .navigationSubtitle(subtitle)
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            Task { await load() }
-                        } label: {
-                            Label("刷新", systemImage: "arrow.clockwise")
-                        }
-                        .disabled(phase == .loading)
-                        .keyboardShortcut("r", modifiers: .command)
+            NavigationStack {
+                content
+                    .navigationDestination(for: String.self) { id in
+                        EpisodeDetailView(episodeID: id)
                     }
+            }
+            .navigationTitle("Podsum")
+            .navigationSubtitle(subtitle)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        Task { await load() }
+                    } label: {
+                        Label("刷新", systemImage: "arrow.clockwise")
+                    }
+                    .disabled(phase == .loading)
+                    .keyboardShortcut("r", modifiers: .command)
                 }
-                .searchable(text: $query, placement: .toolbar, prompt: "搜索标题或播客")
+            }
+            .searchable(text: $query, placement: .toolbar, prompt: "搜索标题或播客")
         }
         .task { await load() }
     }
@@ -119,10 +124,15 @@ struct EpisodeListView: View {
         case .loaded:
             ScrollView {
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 252), spacing: 16)],
+                    columns: [GridItem(.adaptive(minimum: 278), spacing: 16)],
                     spacing: 16
                 ) {
-                    ForEach(visible) { EpisodeCard(episode: $0) }
+                    ForEach(visible) { episode in
+                        NavigationLink(value: episode.id) {
+                            EpisodeCard(episode: episode)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 .padding(20)
             }

@@ -14,11 +14,20 @@ public protocol EpisodeRepository: Sendable {
 public enum RepositoryError: LocalizedError {
     case fixtureMissing(String)
     case notFound(String)
+    /// 阶段 1 只抓了 5 集详情快照，其余 24 集在 Mock 下打不开。
+    /// 这不是错误，是 Mock 的已知边界——接上后端即消失。
+    case noDetailFixture(String)
 
     public var errorDescription: String? {
         switch self {
-        case .fixtureMissing(let n): return "缺少 fixture：\(n).json"
-        case .notFound(let id): return "找不到剧集：\(id)"
+        case .fixtureMissing(let n):
+            return "缺少 fixture：\(n).json"
+        case .notFound(let id):
+            return "找不到剧集：\(id)"
+        case .noDetailFixture:
+            return "这一集还没有本地详情快照。\n\n"
+                 + "阶段 1 的 Mock 只内置了 5 集详情（覆盖 done / partial / processing / 老数据 / 极短时长）。"
+                 + "接上后端后，29 集全部可以打开。"
         }
     }
 }
@@ -44,8 +53,17 @@ public struct MockRepository: EpisodeRepository {
                 return d
             }
         }
-        throw RepositoryError.notFound(id)
+        throw RepositoryError.noDetailFixture(id)
     }
+
+    /// 有详情快照的 5 集，列表页据此标出哪些现在点得开
+    public static let availableDetailIDs: Set<String> = [
+        "01M2FKVC8GT40083QZHH6VRSMW",   // done + 评分 62 + takeaway 齐全
+        "01M24YD0Y31GTCCNDCYN19KV1R",   // partial + tts failed_after_retries
+        "01M2519A4VN17APQPWS86FYERW",   // processing + chapter.summary
+        "01KS40ADBZE4Y9ES3G88N9YQYF",   // 28 秒极短
+        "01KRZNBZYAKE6G40GN02EQ1TRC",   // 老数据：takeaway / usefulness 全 nil
+    ]
 
     static let detailFixtures = [
         "detail-done-full", "detail-partial-tts-failed", "detail-processing",

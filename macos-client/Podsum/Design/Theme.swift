@@ -33,6 +33,36 @@ extension Color {
     }
 }
 
+// MARK: - 排版标度
+//
+// 不用 .callout / .caption 这类语义字体：macOS 上它们分别只有 12pt 和 10pt，
+// 是为密集控件设计的，用在阅读型内容上偏小。这里给出显式尺寸。
+
+public enum Typo {
+    public static let pageTitle    = Font.system(size: 30, weight: .semibold)
+    public static let hook         = Font.system(size: 20, weight: .medium)
+    public static let cardTitle    = Font.system(size: 16, weight: .semibold)
+    public static let sectionLabel = Font.system(size: 12, weight: .semibold)
+
+    /// 正文阅读尺寸——要点、引用、论述都用它
+    public static let body      = Font.system(size: 15)
+    public static let secondary = Font.system(size: 13)
+    public static let meta      = Font.system(size: 12)
+
+    public static let mono      = Font.system(size: 12, design: .monospaced)
+    public static let monoSmall = Font.system(size: 11, design: .monospaced)
+
+    public static let score      = Font.system(size: 34, weight: .semibold, design: .rounded)
+    public static let scoreSmall = Font.system(size: 17, weight: .semibold, design: .rounded)
+    public static let band       = Font.system(size: 12, weight: .medium)
+    public static let bandSmall  = Font.system(size: 10, weight: .medium)
+}
+
+public extension View {
+    /// 阅读型段落的行距
+    func readable() -> some View { self.lineSpacing(3.5) }
+}
+
 // MARK: - 格式化
 
 public enum Fmt {
@@ -43,6 +73,11 @@ public enum Fmt {
         return h > 0
             ? String(format: "%d:%02d:%02d", h, m, sec)
             : String(format: "%d:%02d", m, sec)
+    }
+
+    /// 930000 → "15:30"，5790000 → "1:36:30"
+    public static func timestamp(_ ms: Int) -> String {
+        duration(ms / 1000)
     }
 
     private static let relativeFormatter: RelativeDateTimeFormatter = {

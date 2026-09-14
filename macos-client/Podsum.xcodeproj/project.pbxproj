@@ -7,14 +7,17 @@
 
 /* Begin PBXBuildFile section */
 		90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E733266F9C650F76AFF5D1 /* PodsumModels.swift */; };
-		28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D188A94553A47960929830 /* PodsumApp.swift */; };
 		C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */; };
 		C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB12AE3CAC840162AAA4B90 /* Theme.swift */; };
-		B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D56B16760883D43CB7B341 /* EpisodeListView.swift */; };
+		28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D188A94553A47960929830 /* PodsumApp.swift */; };
+		DAF63507C136D674174BF526 /* ChapterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD174423BAF07482C8CA0375 /* ChapterRow.swift */; };
 		F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */; };
+		B7C262D1834AA40FD0A71CCC /* EpisodeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */; };
+		B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D56B16760883D43CB7B341 /* EpisodeListView.swift */; };
+		0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */; };
 		98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143600DE5EDA544CDDB9302D /* ScoreBadge.swift */; };
 		88C7DE6CC3DDD0091554AF8D /* StatusDot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */; };
-		0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */; };
+		8F8DEAF19698D894697158D3 /* UsefulnessCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16951FEC441DCCF18F70E0F8 /* UsefulnessCard.swift */; };
 		FE703CA0A6DD78B88FFA0115 /* detail-done-28s.json in Resources */ = {isa = PBXBuildFile; fileRef = A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */; };
 		62FC544D587D022FD8CC73E8 /* detail-done-full.json in Resources */ = {isa = PBXBuildFile; fileRef = 97E0FFF884C250F8086210D9 /* detail-done-full.json */; };
 		0E3FDB6A174CCAF7BD002AEA /* detail-done-legacy-null.json in Resources */ = {isa = PBXBuildFile; fileRef = 1508E4EBDAD8CFCAE5218B41 /* detail-done-legacy-null.json */; };
@@ -26,14 +29,17 @@
 /* Begin PBXFileReference section */
 		F5BF48AA40CAD7891EB709FC /* Podsum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podsum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65E733266F9C650F76AFF5D1 /* PodsumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumModels.swift; path = "../specs/002-macos-native/contracts/PodsumModels.swift"; sourceTree = SOURCE_ROOT; };
-		E2D188A94553A47960929830 /* PodsumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumApp.swift; path = "Podsum/PodsumApp.swift"; sourceTree = SOURCE_ROOT; };
 		27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeRepository.swift; path = "Podsum/Data/EpisodeRepository.swift"; sourceTree = SOURCE_ROOT; };
 		0FB12AE3CAC840162AAA4B90 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = "Podsum/Design/Theme.swift"; sourceTree = SOURCE_ROOT; };
-		E6D56B16760883D43CB7B341 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeListView.swift; path = "Podsum/Views/EpisodeListView.swift"; sourceTree = SOURCE_ROOT; };
+		E2D188A94553A47960929830 /* PodsumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumApp.swift; path = "Podsum/PodsumApp.swift"; sourceTree = SOURCE_ROOT; };
+		BD174423BAF07482C8CA0375 /* ChapterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChapterRow.swift; path = "Podsum/Views/ChapterRow.swift"; sourceTree = SOURCE_ROOT; };
 		BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeCard.swift; path = "Podsum/Views/EpisodeCard.swift"; sourceTree = SOURCE_ROOT; };
+		1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeDetailView.swift; path = "Podsum/Views/EpisodeDetailView.swift"; sourceTree = SOURCE_ROOT; };
+		E6D56B16760883D43CB7B341 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeListView.swift; path = "Podsum/Views/EpisodeListView.swift"; sourceTree = SOURCE_ROOT; };
+		5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PreviewFixtures.swift; path = "Podsum/Views/PreviewFixtures.swift"; sourceTree = SOURCE_ROOT; };
 		143600DE5EDA544CDDB9302D /* ScoreBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreBadge.swift; path = "Podsum/Views/ScoreBadge.swift"; sourceTree = SOURCE_ROOT; };
 		C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatusDot.swift; path = "Podsum/Views/StatusDot.swift"; sourceTree = SOURCE_ROOT; };
-		5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PreviewFixtures.swift; path = "Podsum/Views/PreviewFixtures.swift"; sourceTree = SOURCE_ROOT; };
+		16951FEC441DCCF18F70E0F8 /* UsefulnessCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UsefulnessCard.swift; path = "Podsum/Views/UsefulnessCard.swift"; sourceTree = SOURCE_ROOT; };
 		A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-28s.json; path = "../specs/002-macos-native/fixtures/detail-done-28s.json"; sourceTree = SOURCE_ROOT; };
 		97E0FFF884C250F8086210D9 /* detail-done-full.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-full.json; path = "../specs/002-macos-native/fixtures/detail-done-full.json"; sourceTree = SOURCE_ROOT; };
 		1508E4EBDAD8CFCAE5218B41 /* detail-done-legacy-null.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-legacy-null.json; path = "../specs/002-macos-native/fixtures/detail-done-legacy-null.json"; sourceTree = SOURCE_ROOT; };
@@ -77,11 +83,14 @@
 		38DF21AEF4612506D6BE5CBE /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E6D56B16760883D43CB7B341 /* EpisodeListView.swift */,
+				BD174423BAF07482C8CA0375 /* ChapterRow.swift */,
 				BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */,
+				1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */,
+				E6D56B16760883D43CB7B341 /* EpisodeListView.swift */,
+				5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */,
 				143600DE5EDA544CDDB9302D /* ScoreBadge.swift */,
 				C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */,
-				5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */,
+				16951FEC441DCCF18F70E0F8 /* UsefulnessCard.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -205,14 +214,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */,
-				28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */,
 				C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */,
 				C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */,
-				B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */,
+				28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */,
+				DAF63507C136D674174BF526 /* ChapterRow.swift in Sources */,
 				F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */,
+				B7C262D1834AA40FD0A71CCC /* EpisodeDetailView.swift in Sources */,
+				B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */,
+				0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */,
 				98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */,
 				88C7DE6CC3DDD0091554AF8D /* StatusDot.swift in Sources */,
-				0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */,
+				8F8DEAF19698D894697158D3 /* UsefulnessCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

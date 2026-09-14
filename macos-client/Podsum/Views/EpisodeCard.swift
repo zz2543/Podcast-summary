@@ -20,7 +20,7 @@ struct EpisodeCard: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(episode.displayTitle)
-                    .font(.system(.body, weight: .semibold))
+                    .font(Typo.cardTitle)
                     .foregroundStyle(Tone.text)
                     .lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.leading)
@@ -28,7 +28,7 @@ struct EpisodeCard: View {
 
                 if let name = episode.podcastName, !name.isEmpty {
                     Text(name)
-                        .font(.caption)
+                        .font(Typo.meta)
                         .foregroundStyle(Tone.textSubtle)
                         .lineLimit(1)
                 }
@@ -46,13 +46,13 @@ struct EpisodeCard: View {
                 Text(Fmt.relative(episode.updatedAt))
                     .lineLimit(1)
             }
-            .font(.caption)
+            .font(Typo.meta)
             .foregroundStyle(Tone.textMuted)
 
             StatusDot(status: episode.status)
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, minHeight: 176, alignment: .topLeading)
+        .padding(18)
+        .frame(maxWidth: .infinity, minHeight: 194, alignment: .topLeading)
         .background(Tone.surface, in: RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)

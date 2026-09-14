@@ -10,23 +10,23 @@ struct ScoreBadge: View {
         if let u = usefulness {
             VStack(spacing: 0) {
                 Text("\(u.score)")
-                    .font(.system(.headline, design: .rounded))
+                    .font(Typo.scoreSmall)
                     .monospacedDigit()
                 Text(u.band.label)
-                    .font(.system(size: 9, weight: .medium))
+                    .font(Typo.bandSmall)
             }
             .foregroundStyle(u.band.tint)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 5)
             .background(u.band.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
             .help(u.rationale)
             .accessibilityLabel("有用性 \(u.score) 分，\(u.band.label)")
         } else {
             Text("未评分")
-                .font(.system(size: 10, weight: .medium))
+                .font(Typo.band)
                 .foregroundStyle(Tone.textSubtle)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 9)
                 .background(Tone.surfaceElev, in: RoundedRectangle(cornerRadius: 10))
                 .accessibilityLabel("未评分")
         }

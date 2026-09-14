@@ -10,7 +10,7 @@ struct StatusDot: View {
         HStack(spacing: 6) {
             Circle()
                 .fill(status.tint)
-                .frame(width: 7, height: 7)
+                .frame(width: 8, height: 8)
                 .opacity(status.isAnimating && pulsing ? 0.35 : 1)
                 .animation(
                     status.isAnimating
@@ -22,7 +22,7 @@ struct StatusDot: View {
 
             if showLabel {
                 Text(status.label)
-                    .font(.caption)
+                    .font(Typo.meta)
                     .foregroundStyle(Tone.textMuted)
             }
         }

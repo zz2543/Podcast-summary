@@ -29,8 +29,11 @@
 open macos-client/Podsum.xcodeproj
 ```
 
-**阶段 2 — 界面迁移（3–5 天）**
-13 个组件按依赖顺序搬：StatusDot → ScoreBadge → EpisodeCard → HookHero → ThreeActPanel → ChaptersTimeline → AudioPlayer → ChatPanel。liquid-glass 效果换 SwiftUI 原生材质。
+**阶段 2 — 界面迁移** 🚧 进行中
+已完成：StatusDot、ScoreBadge、EpisodeCard、UsefulnessCard、HookHero（并入详情页）、ThreeActPanel、ChaptersTimeline（含关键时刻与 takeaway）、实体标签、溯源信息。
+待做：AudioPlayer（`AVPlayer` 播本地 `file://`）、ChatPanel（`URLSession.bytes` 流式）、提交/重试/删除。
+
+排版说明：不使用 `.callout` / `.caption` 等语义字体——macOS 上它们只有 12pt / 10pt，是为密集控件设计的，用在阅读型内容上偏小。统一走 `Typo` 显式标度（正文 15pt，标题 30pt，钩子 20pt）。
 
 **阶段 3 — 接入与封装（2 天）**
 `LiveRepository` 换掉 Mock（View 一行不改）+ WebSocket 进度 + ChatPanel 流式 + Python 环境打包 + Settings 面板。
@@ -63,6 +66,8 @@ protocol EpisodeRepository {
 | `contracts/api-shapes.md` | **先读这个**。两种响应形状 + 9 条真实数据陷阱 |
 | `contracts/PodsumModels.swift` | Swift `Codable` 模型，317 行，已通过全部 fixture 解码验证 |
 | `verify/main.swift` | 解码验证脚本 |
+
+客户端代码在 `macos-client/`。新增源文件后重跑 `python3 macos-client/gen-project.py` 重新生成工程（自动扫描 `Podsum/**/*.swift`，无需手动登记）。
 | `fixtures/` | 6 份真实 API 响应快照 |
 
 验证：
