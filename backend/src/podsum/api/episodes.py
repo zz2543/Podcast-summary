@@ -239,6 +239,8 @@ async def create_digest(
     episode = EpisodeRepo(session).get(episode_id)
     if episode is None:
         return _api_error(404, "not_found", "episode not found")
+    if not request.app.state.settings.TTS_ENABLED:
+        return _api_error(400, "tts_disabled", "audio digests are turned off in settings")
 
     artifact = SummaryArtifactRepo(session).get_or_create(episode_id)
     if artifact.tts_path and artifact.stage_status.get("tts") == "present" and Path(artifact.tts_path).exists():

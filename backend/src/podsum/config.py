@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     LLM_PROVIDER: LLMProvider = "deepseek"
     TTS_PROVIDER: TTSProvider = "doubao"
 
+    # Audio digests are an opt-in extra: they run in their own pipeline, reached
+    # only through POST /{id}/digest. Turning this off lets someone who has an
+    # LLM and an ASR provider but no speech-synthesis account start the server
+    # at all, instead of being blocked by a credential they will never use.
+    TTS_ENABLED: bool = True
+
     VOLC_ACCESS_KEY_ID: SecretStr | None = None
     VOLC_SECRET_ACCESS_KEY: SecretStr | None = None
 
@@ -171,7 +177,7 @@ class Settings(BaseSettings):
                 if not _present(value)
             )
 
-        if self.TTS_PROVIDER == "doubao":
+        if self.TTS_ENABLED and self.TTS_PROVIDER == "doubao":
             missing.extend(
                 key
                 for key, value in (
@@ -185,7 +191,7 @@ class Settings(BaseSettings):
                 )
                 if not _present(value)
             )
-        elif self.TTS_PROVIDER == "qwen" and not _present(self.DASHSCOPE_API_KEY):
+        elif self.TTS_ENABLED and self.TTS_PROVIDER == "qwen" and not _present(self.DASHSCOPE_API_KEY):
             missing.append("DASHSCOPE_API_KEY")
 
         if missing:

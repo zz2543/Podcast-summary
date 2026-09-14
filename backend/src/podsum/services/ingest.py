@@ -150,6 +150,14 @@ async def ingest_direct_url(
     settings: Settings,
     episode_id: str | None = None,
 ) -> IngestedAudio:
+    # A typo'd or scheme-less link would otherwise surface as an httpx
+    # UnsupportedProtocol deep inside the download, which the API layer does not
+    # catch: the caller got a 500 for what is plainly a bad input. Checking here
+    # also keeps a rejected link from leaving an empty episode directory behind.
+    scheme = urlsplit(url).scheme.lower()
+    if scheme not in {"http", "https"}:
+        raise IngestError("source_ref must be an http:// or https:// URL")
+
     episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
     episode_dir.mkdir(parents=True, exist_ok=False)
