@@ -167,6 +167,15 @@ public final class BackendController {
         }
     }
 
+    #if DEBUG
+    /// 编译这份源码时它所在的仓库根。macos-client/Podsum/Data/ → 上四层。
+    static let sourceTreeRoot = URL(filePath: #filePath)
+        .deletingLastPathComponent()   // Data
+        .deletingLastPathComponent()   // Podsum
+        .deletingLastPathComponent()   // macos-client
+        .deletingLastPathComponent()   // 仓库根
+    #endif
+
     func resolveRuntime() throws -> Runtime {
         let fm = FileManager.default
         let bundled = Bundle.main.bundleURL.appending(path: "Contents/Resources/backend", directoryHint: .isDirectory)
@@ -176,11 +185,16 @@ public final class BackendController {
             rootCandidates.append(URL(filePath: settings.backendRoot, directoryHint: .isDirectory))
         }
         rootCandidates.append(bundled)
-        // 从 Xcode 跑的时候 bundle 在 DerivedData 里，找不到仓库；
-        // scheme 上设了这个环境变量就能直接用工作树，省掉每次手动指目录。
         if let dev = ProcessInfo.processInfo.environment["PODSUM_BACKEND_ROOT"] {
             rootCandidates.append(URL(filePath: dev, directoryHint: .isDirectory))
         }
+        #if DEBUG
+        // 从 Xcode 跑的时候 bundle 在 DerivedData 里，内嵌后端只有 package.py
+        // 打包时才会放进去——于是每次都要手动指目录。但 Debug 构建本来就知道
+        // 自己是从哪棵工作树编出来的：#filePath 指向本文件，往上四层就是仓库根。
+        // 只在 DEBUG 里用，Release 产物里不该留编译机的绝对路径。
+        rootCandidates.append(Self.sourceTreeRoot)
+        #endif
 
         func isBackendRoot(_ url: URL) -> Bool {
             fm.fileExists(atPath: url.appending(path: "backend/src/podsum/main.py").path(percentEncoded: false))

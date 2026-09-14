@@ -182,6 +182,10 @@ Contents/Resources/python/                                   CPython（--with-ru
 - **退出时收子进程走 `AppDelegate.applicationWillTerminate`。** SwiftUI 的 Scene
   没有这个钩子，不接的话 uvicorn 会活过 app——实测确认过：第一版就漏了，
   app 退出后端口上还留着监听进程。
+- **Debug 构建自己找得到工作树。** 内嵌后端只有 `package.py` 打包时才放进
+  `Contents/Resources/backend`，所以从 Xcode 跑的产物里没有那一份。查找顺序是
+  设置里手填的 → 内嵌的 → `PODSUM_BACKEND_ROOT` → **`#filePath` 往上四层**。
+  最后这条只在 `#if DEBUG` 里，Release 产物不该带编译机的绝对路径。
 - **PATH 要手工补。** 从 Finder 启动时 PATH 只有 `/usr/bin:/bin:/usr/sbin:/sbin`，
   yt-dlp 与 ffmpeg 都在 Homebrew 里，不补上抓取阶段必然失败。
   （那个 bash 启动器里也有同一段，原因相同。）
