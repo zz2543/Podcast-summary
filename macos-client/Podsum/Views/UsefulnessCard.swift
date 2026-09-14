@@ -14,6 +14,7 @@ struct UsefulnessCard: View {
     /// 传 animate: false 可跳过动画直接落位——离屏渲染（ImageRenderer）不触发
     /// onAppear，没有这个开关截出来的图会是空条。
     @State private var fill: CGFloat
+    @Environment(\.textScale) private var scale
 
     init(usefulness: Usefulness?,
          stage: Fallback<StageStatus>,
@@ -36,12 +37,12 @@ struct UsefulnessCard: View {
         VStack(alignment: .leading, spacing: Space.l) {
             HStack(alignment: .firstTextBaseline) {
                 Text("有用性评分")
-                    .font(Typo.sectionLabel)
+                    .podsumFont(.sectionLabel)
                     .tracking(0.8)
                     .foregroundStyle(Tone.textSubtle)
                 Spacer(minLength: Space.m)
                 Text(u.band.label)
-                    .font(Typo.band)
+                    .podsumFont(.band)
                     .foregroundStyle(u.band.tint)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
@@ -51,11 +52,11 @@ struct UsefulnessCard: View {
             VStack(alignment: .leading, spacing: Space.m) {
                 HStack(alignment: .firstTextBaseline, spacing: 5) {
                     Text("\(u.score)")
-                        .font(Typo.score)
+                        .podsumFont(.score)
                         .monospacedDigit()
                         .foregroundStyle(Tone.text)
                     Text("/ 100")
-                        .font(Typo.secondary)
+                        .podsumFont(.secondary)
                         .foregroundStyle(Tone.textSubtle)
                 }
 
@@ -63,14 +64,14 @@ struct UsefulnessCard: View {
             }
 
             Text(u.rationale)
-                .font(Typo.body)
+                .podsumFont(.body)
                 .foregroundStyle(Tone.text)
                 .readable()
                 .fixedSize(horizontal: false, vertical: true)
 
             if let v = promptVersion {
                 Text("Prompt 版本 \(v)")
-                    .font(Typo.micro)
+                    .podsumFont(.micro)
                     .foregroundStyle(Tone.textSubtle)
             }
         }
@@ -101,18 +102,19 @@ struct UsefulnessCard: View {
 
                 Capsule()
                     .fill(u.band.tint)
-                    .frame(width: max(7, geo.size.width * fill))
+                    .frame(width: max(7 * scale, geo.size.width * fill))
 
                 ForEach([50, 70, 85], id: \.self) { mark in
                     Rectangle()
-                        .frame(width: 2)
-                        .offset(x: geo.size.width * CGFloat(mark) / 100 - 1)
+                        .frame(width: 2 * scale)
+                        .offset(x: geo.size.width * CGFloat(mark) / 100 - scale)
                         .blendMode(.destinationOut)
                 }
             }
             .compositingGroup()
         }
-        .frame(height: 7)
+        // 条高随字号走，否则字放大后这条会显得过细
+        .frame(height: 7 * scale)
         .accessibilityHidden(true)
     }
 
@@ -124,17 +126,17 @@ struct UsefulnessCard: View {
     private var unrated: some View {
         HStack(alignment: .top, spacing: Space.l) {
             Image(systemName: "minus.circle")
-                .font(.system(size: 17))
+                .font(.system(size: 17 * scale))
                 .foregroundStyle(Tone.textSubtle)
-                .frame(width: 34, height: 34)
+                .frame(width: 34 * scale, height: 34 * scale)
                 .background(Tone.surfaceElev, in: Circle())
 
             VStack(alignment: .leading, spacing: Space.xs) {
                 Text("未评分")
-                    .font(Typo.cardTitle)
+                    .podsumFont(.cardTitle)
                     .foregroundStyle(Tone.text)
                 Text(reason)
-                    .font(Typo.secondary)
+                    .podsumFont(.secondary)
                     .foregroundStyle(Tone.textMuted)
                     .readable()
                     .fixedSize(horizontal: false, vertical: true)

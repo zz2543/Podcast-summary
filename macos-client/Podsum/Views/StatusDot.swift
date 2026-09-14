@@ -22,7 +22,7 @@ struct StatusDot: View {
 
             if showLabel {
                 Text(status.label)
-                    .font(Typo.meta)
+                    .podsumFont(.meta)
                     .foregroundStyle(Tone.textMuted)
             }
         }

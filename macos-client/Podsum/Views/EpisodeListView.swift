@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EpisodeListView: View {
     @Environment(\.episodeRepository) private var repository
+    @Environment(\.textScale) private var scale
 
     @State private var episodes: [EpisodeSummary] = []
     @State private var phase: Phase = .loading
@@ -124,7 +125,7 @@ struct EpisodeListView: View {
         case .loaded:
             ScrollView {
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 278), spacing: 16)],
+                    columns: [GridItem(.adaptive(minimum: 278 * scale), spacing: Space.l)],
                     spacing: 16
                 ) {
                     ForEach(visible) { episode in

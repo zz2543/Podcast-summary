@@ -3,14 +3,15 @@ import SwiftUI
 struct EpisodeCard: View {
     let episode: EpisodeSummary
     @State private var hovering = false
+    @Environment(\.textScale) private var scale
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 Image(systemName: "waveform")
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 15 * scale, weight: .medium))
                     .foregroundStyle(Tone.textMuted)
-                    .frame(width: 34, height: 34)
+                    .frame(width: 34 * scale, height: 34 * scale)
                     .background(Tone.surfaceElev, in: RoundedRectangle(cornerRadius: 10))
 
                 Spacer(minLength: 8)
@@ -20,7 +21,7 @@ struct EpisodeCard: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(episode.displayTitle)
-                    .font(Typo.cardTitle)
+                    .podsumFont(.cardTitle)
                     .foregroundStyle(Tone.text)
                     .lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.leading)
@@ -28,7 +29,7 @@ struct EpisodeCard: View {
 
                 if let name = episode.podcastName, !name.isEmpty {
                     Text(name)
-                        .font(Typo.meta)
+                        .podsumFont(.meta)
                         .foregroundStyle(Tone.textSubtle)
                         .lineLimit(1)
                 }
@@ -46,12 +47,15 @@ struct EpisodeCard: View {
                 Text(Fmt.relative(episode.updatedAt))
                     .lineLimit(1)
             }
-            .font(Typo.meta)
+            .podsumFont(.meta)
             .foregroundStyle(Tone.textMuted)
+            .lineLimit(1)
 
             StatusDot(status: episode.status)
         }
         .padding(18)
+        // minHeight 只是栅格等高的下限，不随字号放大——
+        // 放大后内容本就超过它，再乘 scale 只会在卡片里留出大片空白。
         .frame(maxWidth: .infinity, minHeight: 194, alignment: .topLeading)
         .background(Tone.surface, in: RoundedRectangle(cornerRadius: 16))
         .overlay(

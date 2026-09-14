@@ -9,6 +9,7 @@
 		90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E733266F9C650F76AFF5D1 /* PodsumModels.swift */; };
 		C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */; };
 		C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB12AE3CAC840162AAA4B90 /* Theme.swift */; };
+		74A792FC856B567E12EDB99C /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B3FBBF8D5A9E195947FDA25 /* Typography.swift */; };
 		28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D188A94553A47960929830 /* PodsumApp.swift */; };
 		DAF63507C136D674174BF526 /* ChapterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD174423BAF07482C8CA0375 /* ChapterRow.swift */; };
 		F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */; };
@@ -31,6 +32,7 @@
 		65E733266F9C650F76AFF5D1 /* PodsumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumModels.swift; path = "../specs/002-macos-native/contracts/PodsumModels.swift"; sourceTree = SOURCE_ROOT; };
 		27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeRepository.swift; path = "Podsum/Data/EpisodeRepository.swift"; sourceTree = SOURCE_ROOT; };
 		0FB12AE3CAC840162AAA4B90 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = "Podsum/Design/Theme.swift"; sourceTree = SOURCE_ROOT; };
+		1B3FBBF8D5A9E195947FDA25 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Typography.swift; path = "Podsum/Design/Typography.swift"; sourceTree = SOURCE_ROOT; };
 		E2D188A94553A47960929830 /* PodsumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumApp.swift; path = "Podsum/PodsumApp.swift"; sourceTree = SOURCE_ROOT; };
 		BD174423BAF07482C8CA0375 /* ChapterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChapterRow.swift; path = "Podsum/Views/ChapterRow.swift"; sourceTree = SOURCE_ROOT; };
 		BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeCard.swift; path = "Podsum/Views/EpisodeCard.swift"; sourceTree = SOURCE_ROOT; };
@@ -107,6 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				0FB12AE3CAC840162AAA4B90 /* Theme.swift */,
+				1B3FBBF8D5A9E195947FDA25 /* Typography.swift */,
 			);
 			name = Design;
 			sourceTree = "<group>";
@@ -216,6 +219,7 @@
 				90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */,
 				C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */,
 				C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */,
+				74A792FC856B567E12EDB99C /* Typography.swift in Sources */,
 				28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */,
 				DAF63507C136D674174BF526 /* ChapterRow.swift in Sources */,
 				F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */,

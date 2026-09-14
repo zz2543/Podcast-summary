@@ -7,12 +7,12 @@ struct ChapterRow: View {
         VStack(alignment: .leading, spacing: Space.m) {
             HStack(alignment: .firstTextBaseline) {
                 Text("\(chapter.idx + 1). \(chapter.title)")
-                    .font(Typo.cardTitle)
+                    .podsumFont(.cardTitle)
                     .foregroundStyle(Tone.text)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 12)
                 Text("\(Fmt.timestamp(chapter.startMs)) – \(Fmt.timestamp(chapter.endMs))")
-                    .font(Typo.mono)
+                    .podsumFont(.mono)
                     .foregroundStyle(Tone.textMuted)
             }
 
@@ -25,7 +25,7 @@ struct ChapterRow: View {
                                 .frame(width: 4, height: 4)
                                 .padding(.top, 8)
                             Text(point)
-                                .font(Typo.body)
+                                .podsumFont(.body)
                                 .foregroundStyle(Tone.text)
                                 .readable()
                                 .fixedSize(horizontal: false, vertical: true)
@@ -37,7 +37,7 @@ struct ChapterRow: View {
             // 仅在要点本身丢失因果链时后端才给 summary，多数章节为 nil
             if let summary = chapter.summary, !summary.isEmpty {
                 Text(summary)
-                    .font(Typo.secondary)
+                    .podsumFont(.secondary)
                     .foregroundStyle(Tone.textMuted)
                     .readable()
                     .fixedSize(horizontal: false, vertical: true)
@@ -72,20 +72,20 @@ struct QuoteBlock: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .top, spacing: 8) {
                 Text(Fmt.timestamp(quote.startMs))
-                    .font(Typo.monoSmall)
+                    .podsumFont(.monoSmall)
                     .foregroundStyle(Tone.info)
                     .padding(.horizontal, 6).padding(.vertical, 2)
                     .background(Tone.info.opacity(0.10), in: Capsule())
 
                 Text(quote.text)
-                    .font(Typo.body)
+                    .podsumFont(.body)
                     .italic()
                     .foregroundStyle(Tone.text)
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let t = quote.takeaway, !t.isEmpty {
                 Text(t)
-                    .font(Typo.secondary)
+                    .podsumFont(.secondary)
                     .foregroundStyle(Tone.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.leading, 56)

@@ -10,10 +10,10 @@ struct ScoreBadge: View {
         if let u = usefulness {
             VStack(spacing: 0) {
                 Text("\(u.score)")
-                    .font(Typo.scoreSmall)
+                    .podsumFont(.scoreSmall)
                     .monospacedDigit()
                 Text(u.band.label)
-                    .font(Typo.bandSmall)
+                    .podsumFont(.bandSmall)
             }
             .foregroundStyle(u.band.tint)
             .padding(.horizontal, 9)
@@ -23,7 +23,7 @@ struct ScoreBadge: View {
             .accessibilityLabel("有用性 \(u.score) 分，\(u.band.label)")
         } else {
             Text("未评分")
-                .font(Typo.band)
+                .podsumFont(.band)
                 .foregroundStyle(Tone.textSubtle)
                 .padding(.horizontal, 9)
                 .padding(.vertical, 9)

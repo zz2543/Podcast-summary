@@ -55,7 +55,7 @@ struct EpisodeDetailView: View {
         VStack(alignment: .leading, spacing: Space.m) {
             HStack(spacing: Space.s) {
                 if let name = e.podcastName, !name.isEmpty {
-                    Text(name).font(Typo.secondary.weight(.semibold)).foregroundStyle(Tone.text)
+                    Text(name).podsumFont(.secondary, weight: .semibold).foregroundStyle(Tone.text)
                     Text("·").foregroundStyle(Tone.border)
                 }
                 Text(Fmt.duration(e.durationSeconds)).monospacedDigit()
@@ -64,17 +64,17 @@ struct EpisodeDetailView: View {
                 Text("·").foregroundStyle(Tone.border)
                 StatusDot(status: e.status)
             }
-            .font(Typo.secondary)
+            .podsumFont(.secondary)
             .foregroundStyle(Tone.textMuted)
 
             Text(e.title ?? "未命名剧集")
-                .font(Typo.pageTitle)
+                .podsumFont(.pageTitle)
                 .foregroundStyle(Tone.text)
                 .fixedSize(horizontal: false, vertical: true)
 
             if let hook = e.hook, !hook.isEmpty {
                 Text("“\(hook)”")
-                    .font(Typo.hook)
+                    .podsumFont(.hook)
                     .foregroundStyle(Tone.text)
                     .readable()
                     .fixedSize(horizontal: false, vertical: true)
@@ -103,10 +103,10 @@ struct EpisodeDetailView: View {
     private func actCard(_ label: String, _ body: String) -> some View {
         VStack(alignment: .leading, spacing: Space.s) {
             Text(label)
-                .font(Typo.sectionLabel).textCase(.uppercase)
+                .podsumFont(.sectionLabel).textCase(.uppercase)
                 .foregroundStyle(Tone.textSubtle)
             Text(body)
-                .font(Typo.body)
+                .podsumFont(.body)
                 .foregroundStyle(Tone.text)
                 .readable()
                 .fixedSize(horizontal: false, vertical: true)
@@ -137,7 +137,7 @@ struct EpisodeDetailView: View {
         if e.entities.isEmpty {
             section("提及") {
                 Text("这一集没有抽取到人物、书籍或产品。")
-                    .font(Typo.body).foregroundStyle(Tone.textSubtle)
+                    .podsumFont(.body).foregroundStyle(Tone.textSubtle)
             }
         } else {
             section("提及 · \(e.entities.count)") {
@@ -147,9 +147,9 @@ struct EpisodeDetailView: View {
                             Image(systemName: icon(entity.kind))
                                 .font(.system(size: 11))
                                 .foregroundStyle(Tone.textSubtle)
-                            Text(entity.name).font(Typo.secondary)
+                            Text(entity.name).podsumFont(.secondary)
                             Text("\(entity.count)")
-                                .font(Typo.meta).monospacedDigit()
+                                .podsumFont(.meta).monospacedDigit()
                                 .foregroundStyle(Tone.textSubtle)
                         }
                         .padding(.horizontal, 11).padding(.vertical, 6)
@@ -189,10 +189,10 @@ struct EpisodeDetailView: View {
     private func row(_ label: String, _ value: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Text(label)
-                .font(Typo.micro).foregroundStyle(Tone.textSubtle)
+                .podsumFont(.micro).foregroundStyle(Tone.textSubtle)
                 .frame(width: 82, alignment: .leading)
             Text(value)
-                .font(Typo.micro).foregroundStyle(Tone.textMuted)
+                .podsumFont(.micro).foregroundStyle(Tone.textMuted)
                 .textSelection(.enabled)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -203,7 +203,7 @@ struct EpisodeDetailView: View {
     private func section<C: View>(_ title: String, @ViewBuilder content: () -> C) -> some View {
         VStack(alignment: .leading, spacing: Space.m) {
             Text(title)
-                .font(Typo.sectionLabel).textCase(.uppercase)
+                .podsumFont(.sectionLabel).textCase(.uppercase)
                 .foregroundStyle(Tone.textSubtle)
                 .tracking(0.8)
             content()

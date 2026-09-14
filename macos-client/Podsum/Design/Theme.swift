@@ -33,43 +33,29 @@ extension Color {
     }
 }
 
-// MARK: - 排版标度
+// MARK: - 排版
+//
+// 排版标度已移到 Typography.swift：字号要随 ⌘+ / ⌘- 缩放，
+// 不能再是一组静态常量。那里也记着基准值的来源。
 //
 // 校准依据（本机 macOS 26.5 实测 NSFont.preferredFont 的磅值 / 行高）：
 //   largeTitle 26/32   title1 22/26   title2 17/22   title3 15/20
 //   headline 13/16     body 13/16     callout 12/15  caption 10/13
-// Apple HIG：macOS 默认正文 13pt、最小 10pt，且长段落应使用宽松行距。
-//
-// 所以不直接用 .callout(12) / .caption(10) 承载正文——它们在默认值以下。
-// 阅读正文取 15pt，与系统 title3 的度量一致（15/20），是有依据的阅读尺寸。
+// Apple HIG：macOS 默认正文 13pt、最小 10pt，长段落应使用宽松行距，
+// 且 macOS 不支持 Dynamic Type——所以读者调字号必须由 app 自己实现。
 
-public enum Typo {
-    public static let pageTitle    = Font.system(size: 30, weight: .semibold)
-    public static let hook         = Font.system(size: 20, weight: .medium)
-    public static let cardTitle    = Font.system(size: 16, weight: .semibold)
-    public static let sectionLabel = Font.system(size: 12, weight: .semibold)
-
-    /// 正文阅读尺寸——要点、引用、论述都用它
-    public static let body      = Font.system(size: 15)
-    public static let secondary = Font.system(size: 13)
-    public static let meta      = Font.system(size: 12)
-
-    /// 脚注级：溯源、Prompt 版本这类元信息
-    public static let micro     = Font.system(size: 11)
-
-    public static let mono      = Font.system(size: 12, design: .monospaced)
-    public static let monoSmall = Font.system(size: 11, design: .monospaced)
-
-    public static let score      = Font.system(size: 44, weight: .semibold, design: .rounded)
-    public static let scoreSmall = Font.system(size: 17, weight: .semibold, design: .rounded)
-    public static let band       = Font.system(size: 12, weight: .medium)
-    public static let bandSmall  = Font.system(size: 10, weight: .medium)
+private struct Readable: ViewModifier {
+    @Environment(\.textScale) private var scale
+    func body(content: Content) -> some View {
+        // 行距随字号一起放大，否则字变大后行与行会挤在一起
+        content.lineSpacing(3 * scale)
+    }
 }
 
 public extension View {
-    /// 阅读型段落的行距：15pt 正文默认行高约 18pt，+3 得 21pt，
-    /// 接近系统 title3 的 15/20 并略宽松，符合 HIG 对长段落的建议。
-    func readable() -> some View { self.lineSpacing(3) }
+    /// 阅读型段落的行距。17pt 正文默认行高约 20pt，+3 得 23pt，
+    /// 符合 HIG 对长段落使用宽松行距的建议。
+    func readable() -> some View { modifier(Readable()) }
 }
 
 // MARK: - 间距标度
