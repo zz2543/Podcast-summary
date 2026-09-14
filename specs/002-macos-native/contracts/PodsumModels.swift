@@ -77,12 +77,12 @@ public enum UsefulnessBand: String, Codable, Sendable {
     case skimmable, skippable
 }
 
-public enum SummaryPreset: String, Codable, Sendable {
+public enum SummaryPreset: String, Codable, Sendable, CaseIterable {
     case `default`, studyNotes = "study_notes", businessInsight = "business_insight"
     case debate, quickSkim = "quick_skim"
 }
 
-public enum SummaryDetail: String, Codable, Sendable {
+public enum SummaryDetail: String, Codable, Sendable, CaseIterable {
     case concise, standard, detailed
 }
 
@@ -314,4 +314,231 @@ public extension JSONDecoder {
         d.dateDecodingStrategy = .podsum
         return d
     }
+}
+
+// MARK: - 任务（Job）与实时事件
+//
+// 这一节对应写操作与 WebSocket，schema 里没有——它们是 API 的形状而非
+// 摘要产物的形状。来源：backend/src/podsum/api/episodes.py `_job_payload`
+// 与 api/ws_progress.py 的四种帧。fixtures/ 里没有对应快照，
+// 解码验证用 verify/main.swift 里的内联样本（取自真实响应）。
+
+public enum JobState: String, Codable, Sendable {
+    case queued, fetching, transcribing, summarizing, tts
+    case done, partial, failed
+}
+
+public extension Fallback where T == JobState {
+    var label: String {
+        switch self {
+        case .known(let s):
+            switch s {
+            case .queued:       return "排队中"
+            case .fetching:     return "抓取音频"
+            case .transcribing: return "转写"
+            case .summarizing:  return "生成摘要"
+            case .tts:          return "合成音频"
+            case .done:         return "已完成"
+            case .partial:      return "部分完成"
+            case .failed:       return "失败"
+            }
+        case .unknown(let raw):
+            return raw
+        }
+    }
+
+    /// 流水线里已走过的比例。用于进度条——后端不发百分比，
+    /// 只发当前处在哪个阶段，进度只能由阶段序号推出来。
+    var fraction: Double {
+        let order: [JobState] = [.queued, .fetching, .transcribing, .summarizing, .tts]
+        switch value {
+        case .done, .partial, .failed: return 1
+        case .some(let s):
+            guard let i = order.firstIndex(of: s) else { return 0 }
+            return Double(i) / Double(order.count)
+        case nil: return 0
+        }
+    }
+
+    var isTerminal: Bool {
+        switch value {
+        case .done, .partial, .failed: return true
+        default: return false        // 未知取值按"仍在进行"处理，不会卡死进度条
+        }
+    }
+}
+
+/// 任意 JSON。`stage_progress` 的值是异构的——流水线阶段写的是
+/// `{"status": "running"}` 这样的对象，而 digest 任务写的是
+/// `{"requested_stage": "tts"}`（值为字符串）。用固定结构解会直接失败。
+public enum JSONValue: Codable, Sendable, Hashable {
+    case string(String), number(Double), bool(Bool), null
+    case array([JSONValue]), object([String: JSONValue])
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.singleValueContainer()
+        if c.decodeNil() { self = .null; return }
+        if let v = try? c.decode(Bool.self) { self = .bool(v); return }
+        if let v = try? c.decode(Double.self) { self = .number(v); return }
+        if let v = try? c.decode(String.self) { self = .string(v); return }
+        if let v = try? c.decode([JSONValue].self) { self = .array(v); return }
+        if let v = try? c.decode([String: JSONValue].self) { self = .object(v); return }
+        throw DecodingError.dataCorrupted(
+            .init(codingPath: decoder.codingPath, debugDescription: "无法解析的 JSON 值")
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.singleValueContainer()
+        switch self {
+        case .string(let v): try c.encode(v)
+        case .number(let v): try c.encode(v)
+        case .bool(let v):   try c.encode(v)
+        case .null:          try c.encodeNil()
+        case .array(let v):  try c.encode(v)
+        case .object(let v): try c.encode(v)
+        }
+    }
+
+    public var stringValue: String? { if case .string(let s) = self { return s }; return nil }
+    public subscript(key: String) -> JSONValue? {
+        if case .object(let o) = self { return o[key] }
+        return nil
+    }
+}
+
+/// POST /api/episodes 等返回的任务对象。
+public struct Job: Codable, Sendable, Identifiable, Hashable {
+    public let id: String
+    public let episodeID: String
+    public let state: Fallback<JobState>
+    public let stageProgress: [String: JSONValue]
+    public let attempt: Int
+    public let error: String?
+    public let startedAt: Date?
+    public let finishedAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        case id, state, attempt, error
+        case episodeID = "episode_id"
+        case stageProgress = "stage_progress"
+        case startedAt = "started_at"
+        case finishedAt = "finished_at"
+    }
+
+    /// 正在跑的阶段名，取 stage_progress 里 status == "running" 的那个。
+    public var runningStage: String? {
+        stageProgress.first { $0.value["status"]?.stringValue == "running" }?.key
+    }
+}
+
+/// WS /api/ws/jobs 的帧。五种 type，未知 type 降级为 .other 而不是抛错——
+/// 一条没见过的帧不该让整条连接断掉。
+public enum JobEvent: Decodable, Sendable {
+    case hello(serverVersion: String)
+    case snapshot(jobs: [Job])
+    case jobUpdate(job: Job, episodeStatus: Fallback<EpisodeStatus>)
+    case stageStatusUpdate(episodeID: String, stage: String, status: Fallback<StageStatus>)
+    case error(code: String, message: String)
+    case other(String)
+
+    enum CodingKeys: String, CodingKey {
+        case type, job, jobs, stage, status, code, message
+        case serverVersion = "server_version"
+        case episodeID = "episode_id"
+        case episodeStatus = "episode_status"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        switch try c.decode(String.self, forKey: .type) {
+        case "hello":
+            self = .hello(serverVersion: (try? c.decode(String.self, forKey: .serverVersion)) ?? "")
+        case "snapshot":
+            self = .snapshot(jobs: (try? c.decode([Job].self, forKey: .jobs)) ?? [])
+        case "job_update":
+            self = .jobUpdate(
+                job: try c.decode(Job.self, forKey: .job),
+                episodeStatus: try c.decode(Fallback<EpisodeStatus>.self, forKey: .episodeStatus)
+            )
+        case "stage_status_update":
+            self = .stageStatusUpdate(
+                episodeID: try c.decode(String.self, forKey: .episodeID),
+                stage: try c.decode(String.self, forKey: .stage),
+                status: try c.decode(Fallback<StageStatus>.self, forKey: .status)
+            )
+        case "error":
+            self = .error(
+                code: (try? c.decode(String.self, forKey: .code)) ?? "unknown",
+                message: (try? c.decode(String.self, forKey: .message)) ?? ""
+            )
+        case let other:
+            self = .other(other)
+        }
+    }
+}
+
+// MARK: - 写操作的请求与响应
+
+public struct CreateEpisodeResponse: Codable, Sendable {
+    public let episode: EpisodeSummary
+    public let job: Job
+}
+
+public struct CreateEpisodeBatchResponse: Codable, Sendable {
+    public let items: [CreateEpisodeResponse]
+}
+
+/// POST /{id}/digest 有两种成功响应：已经合成过则直接回路径，
+/// 否则回一个排好队的 Job（202）。
+public enum DigestResponse: Decodable, Sendable {
+    case alreadyPresent(path: String)
+    case queued(Job)
+
+    enum CodingKeys: String, CodingKey { case ttsPath = "tts_path" }
+
+    public init(from decoder: Decoder) throws {
+        if let c = try? decoder.container(keyedBy: CodingKeys.self),
+           let path = try? c.decode(String.self, forKey: .ttsPath) {
+            self = .alreadyPresent(path: path)
+            return
+        }
+        self = .queued(try Job(from: decoder))
+    }
+}
+
+/// 提交时可选的摘要风格。全部留默认时请求体里一个字段都不带——
+/// 与 frontend-v2 的行为一致，避免老请求形状被改动。
+public struct SummaryStyleInput: Sendable, Equatable {
+    public var preset: SummaryPreset = .default
+    public var note: String = ""
+    public var detail: SummaryDetail = .standard
+
+    public init() {}
+
+    public var fields: [String: String] {
+        var out: [String: String] = [:]
+        if preset != .default { out["summary_style"] = preset.rawValue }
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { out["style_note"] = String(trimmed.prefix(200)) }
+        if detail != .standard { out["detail_level"] = detail.rawValue }
+        return out
+    }
+}
+
+/// 只发不收：`/chat` 的请求体带 history，响应是 SSE token 流，
+/// 所以这个类型只需要 Encodable。
+public struct ChatTurn: Encodable, Sendable, Identifiable, Hashable {
+    public enum Role: String, Codable, Sendable { case user, assistant }
+    public let role: Role
+    public var content: String
+    public let id: UUID
+
+    public init(role: Role, content: String, id: UUID = UUID()) {
+        self.role = role
+        self.content = content
+        self.id = id
+    }
+
+    enum CodingKeys: String, CodingKey { case role, content }   // id 只在本地列表里用
 }

@@ -7,17 +7,30 @@
 
 /* Begin PBXBuildFile section */
 		90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E733266F9C650F76AFF5D1 /* PodsumModels.swift */; };
+		0D386D5720B6DCE09B88A672 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8CEAEDED2728CE18C4EAF5 /* AppSettings.swift */; };
+		FC7CCCDCCEBE320EE5B9B58D /* AudioPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175A4F32E791C3A06466A284 /* AudioPlayerModel.swift */; };
+		189BAE092E645110094E03D4 /* BackendController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F91BE209853671A0375A6BA /* BackendController.swift */; };
 		C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */; };
+		9F9F452A004218E3F9000D62 /* JobsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69745C8322D84D2A2D27C5E /* JobsModel.swift */; };
+		961ED75892FAFCF9AE3F4107 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE08CC12E88B20F61CD5FA8C /* Keychain.swift */; };
+		7CBC966EC4A61CE6F434340A /* LiveRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0777F9807C5E42C6EFF83823 /* LiveRepository.swift */; };
+		F619239192553925E8893E24 /* StringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B3B291E07EC9FDEEFFCE83 /* StringUtils.swift */; };
 		C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB12AE3CAC840162AAA4B90 /* Theme.swift */; };
 		74A792FC856B567E12EDB99C /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B3FBBF8D5A9E195947FDA25 /* Typography.swift */; };
 		28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D188A94553A47960929830 /* PodsumApp.swift */; };
+		CE86289F3E172751C3D74A79 /* ActiveJobsStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 740A52E6C6A1B50029406B72 /* ActiveJobsStrip.swift */; };
+		5DDD0BFAE2AD84E7CF7389A8 /* AudioPlayerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D9F17DC0D12A12BED850CE /* AudioPlayerBar.swift */; };
 		DAF63507C136D674174BF526 /* ChapterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD174423BAF07482C8CA0375 /* ChapterRow.swift */; };
+		A060E0952FFDF66508C0B4FE /* ChatPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7774757A9533EB7AAC450BD8 /* ChatPanel.swift */; };
 		F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */; };
 		B7C262D1834AA40FD0A71CCC /* EpisodeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */; };
 		B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D56B16760883D43CB7B341 /* EpisodeListView.swift */; };
 		0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */; };
+		7CD08661A1B2F54D44345FA1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EEAE89FC99879AAFC49CC9 /* RootView.swift */; };
 		98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143600DE5EDA544CDDB9302D /* ScoreBadge.swift */; };
+		F7A8D4F2CEA34AC7026CE339 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4A17854F8B375E0F445974 /* SettingsView.swift */; };
 		88C7DE6CC3DDD0091554AF8D /* StatusDot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */; };
+		79A040106D9214289D4F2176 /* SubmitSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99D0942E14CDFB36CF55E945 /* SubmitSheet.swift */; };
 		8F8DEAF19698D894697158D3 /* UsefulnessCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16951FEC441DCCF18F70E0F8 /* UsefulnessCard.swift */; };
 		FE703CA0A6DD78B88FFA0115 /* detail-done-28s.json in Resources */ = {isa = PBXBuildFile; fileRef = A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */; };
 		62FC544D587D022FD8CC73E8 /* detail-done-full.json in Resources */ = {isa = PBXBuildFile; fileRef = 97E0FFF884C250F8086210D9 /* detail-done-full.json */; };
@@ -30,17 +43,30 @@
 /* Begin PBXFileReference section */
 		F5BF48AA40CAD7891EB709FC /* Podsum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podsum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65E733266F9C650F76AFF5D1 /* PodsumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumModels.swift; path = "../specs/002-macos-native/contracts/PodsumModels.swift"; sourceTree = SOURCE_ROOT; };
+		BC8CEAEDED2728CE18C4EAF5 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppSettings.swift; path = "Podsum/Data/AppSettings.swift"; sourceTree = SOURCE_ROOT; };
+		175A4F32E791C3A06466A284 /* AudioPlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AudioPlayerModel.swift; path = "Podsum/Data/AudioPlayerModel.swift"; sourceTree = SOURCE_ROOT; };
+		9F91BE209853671A0375A6BA /* BackendController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BackendController.swift; path = "Podsum/Data/BackendController.swift"; sourceTree = SOURCE_ROOT; };
 		27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeRepository.swift; path = "Podsum/Data/EpisodeRepository.swift"; sourceTree = SOURCE_ROOT; };
+		D69745C8322D84D2A2D27C5E /* JobsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JobsModel.swift; path = "Podsum/Data/JobsModel.swift"; sourceTree = SOURCE_ROOT; };
+		BE08CC12E88B20F61CD5FA8C /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Keychain.swift; path = "Podsum/Data/Keychain.swift"; sourceTree = SOURCE_ROOT; };
+		0777F9807C5E42C6EFF83823 /* LiveRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LiveRepository.swift; path = "Podsum/Data/LiveRepository.swift"; sourceTree = SOURCE_ROOT; };
+		87B3B291E07EC9FDEEFFCE83 /* StringUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StringUtils.swift; path = "Podsum/Data/StringUtils.swift"; sourceTree = SOURCE_ROOT; };
 		0FB12AE3CAC840162AAA4B90 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = "Podsum/Design/Theme.swift"; sourceTree = SOURCE_ROOT; };
 		1B3FBBF8D5A9E195947FDA25 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Typography.swift; path = "Podsum/Design/Typography.swift"; sourceTree = SOURCE_ROOT; };
 		E2D188A94553A47960929830 /* PodsumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumApp.swift; path = "Podsum/PodsumApp.swift"; sourceTree = SOURCE_ROOT; };
+		740A52E6C6A1B50029406B72 /* ActiveJobsStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActiveJobsStrip.swift; path = "Podsum/Views/ActiveJobsStrip.swift"; sourceTree = SOURCE_ROOT; };
+		50D9F17DC0D12A12BED850CE /* AudioPlayerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AudioPlayerBar.swift; path = "Podsum/Views/AudioPlayerBar.swift"; sourceTree = SOURCE_ROOT; };
 		BD174423BAF07482C8CA0375 /* ChapterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChapterRow.swift; path = "Podsum/Views/ChapterRow.swift"; sourceTree = SOURCE_ROOT; };
+		7774757A9533EB7AAC450BD8 /* ChatPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChatPanel.swift; path = "Podsum/Views/ChatPanel.swift"; sourceTree = SOURCE_ROOT; };
 		BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeCard.swift; path = "Podsum/Views/EpisodeCard.swift"; sourceTree = SOURCE_ROOT; };
 		1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeDetailView.swift; path = "Podsum/Views/EpisodeDetailView.swift"; sourceTree = SOURCE_ROOT; };
 		E6D56B16760883D43CB7B341 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeListView.swift; path = "Podsum/Views/EpisodeListView.swift"; sourceTree = SOURCE_ROOT; };
 		5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PreviewFixtures.swift; path = "Podsum/Views/PreviewFixtures.swift"; sourceTree = SOURCE_ROOT; };
+		15EEAE89FC99879AAFC49CC9 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = "Podsum/Views/RootView.swift"; sourceTree = SOURCE_ROOT; };
 		143600DE5EDA544CDDB9302D /* ScoreBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreBadge.swift; path = "Podsum/Views/ScoreBadge.swift"; sourceTree = SOURCE_ROOT; };
+		8B4A17854F8B375E0F445974 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = "Podsum/Views/SettingsView.swift"; sourceTree = SOURCE_ROOT; };
 		C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatusDot.swift; path = "Podsum/Views/StatusDot.swift"; sourceTree = SOURCE_ROOT; };
+		99D0942E14CDFB36CF55E945 /* SubmitSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SubmitSheet.swift; path = "Podsum/Views/SubmitSheet.swift"; sourceTree = SOURCE_ROOT; };
 		16951FEC441DCCF18F70E0F8 /* UsefulnessCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UsefulnessCard.swift; path = "Podsum/Views/UsefulnessCard.swift"; sourceTree = SOURCE_ROOT; };
 		A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-28s.json; path = "../specs/002-macos-native/fixtures/detail-done-28s.json"; sourceTree = SOURCE_ROOT; };
 		97E0FFF884C250F8086210D9 /* detail-done-full.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-full.json; path = "../specs/002-macos-native/fixtures/detail-done-full.json"; sourceTree = SOURCE_ROOT; };
@@ -85,13 +111,19 @@
 		38DF21AEF4612506D6BE5CBE /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				740A52E6C6A1B50029406B72 /* ActiveJobsStrip.swift */,
+				50D9F17DC0D12A12BED850CE /* AudioPlayerBar.swift */,
 				BD174423BAF07482C8CA0375 /* ChapterRow.swift */,
+				7774757A9533EB7AAC450BD8 /* ChatPanel.swift */,
 				BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */,
 				1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */,
 				E6D56B16760883D43CB7B341 /* EpisodeListView.swift */,
 				5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */,
+				15EEAE89FC99879AAFC49CC9 /* RootView.swift */,
 				143600DE5EDA544CDDB9302D /* ScoreBadge.swift */,
+				8B4A17854F8B375E0F445974 /* SettingsView.swift */,
 				C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */,
+				99D0942E14CDFB36CF55E945 /* SubmitSheet.swift */,
 				16951FEC441DCCF18F70E0F8 /* UsefulnessCard.swift */,
 			);
 			name = Views;
@@ -100,7 +132,14 @@
 		6D073E8790EA5B8BEFB0DD4C /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				BC8CEAEDED2728CE18C4EAF5 /* AppSettings.swift */,
+				175A4F32E791C3A06466A284 /* AudioPlayerModel.swift */,
+				9F91BE209853671A0375A6BA /* BackendController.swift */,
 				27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */,
+				D69745C8322D84D2A2D27C5E /* JobsModel.swift */,
+				BE08CC12E88B20F61CD5FA8C /* Keychain.swift */,
+				0777F9807C5E42C6EFF83823 /* LiveRepository.swift */,
+				87B3B291E07EC9FDEEFFCE83 /* StringUtils.swift */,
 			);
 			name = Data;
 			sourceTree = "<group>";
@@ -217,17 +256,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */,
+				0D386D5720B6DCE09B88A672 /* AppSettings.swift in Sources */,
+				FC7CCCDCCEBE320EE5B9B58D /* AudioPlayerModel.swift in Sources */,
+				189BAE092E645110094E03D4 /* BackendController.swift in Sources */,
 				C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */,
+				9F9F452A004218E3F9000D62 /* JobsModel.swift in Sources */,
+				961ED75892FAFCF9AE3F4107 /* Keychain.swift in Sources */,
+				7CBC966EC4A61CE6F434340A /* LiveRepository.swift in Sources */,
+				F619239192553925E8893E24 /* StringUtils.swift in Sources */,
 				C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */,
 				74A792FC856B567E12EDB99C /* Typography.swift in Sources */,
 				28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */,
+				CE86289F3E172751C3D74A79 /* ActiveJobsStrip.swift in Sources */,
+				5DDD0BFAE2AD84E7CF7389A8 /* AudioPlayerBar.swift in Sources */,
 				DAF63507C136D674174BF526 /* ChapterRow.swift in Sources */,
+				A060E0952FFDF66508C0B4FE /* ChatPanel.swift in Sources */,
 				F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */,
 				B7C262D1834AA40FD0A71CCC /* EpisodeDetailView.swift in Sources */,
 				B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */,
 				0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */,
+				7CD08661A1B2F54D44345FA1 /* RootView.swift in Sources */,
 				98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */,
+				F7A8D4F2CEA34AC7026CE339 /* SettingsView.swift in Sources */,
 				88C7DE6CC3DDD0091554AF8D /* StatusDot.swift in Sources */,
+				79A040106D9214289D4F2176 /* SubmitSheet.swift in Sources */,
 				8F8DEAF19698D894697158D3 /* UsefulnessCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -2,6 +2,10 @@ import SwiftUI
 
 struct ChapterRow: View {
     let chapter: Chapter
+    /// 有音频时时间戳才是可点的。没有音频还画成按钮是骗人。
+    var onSeek: ((Int) -> Void)?
+    /// 播放头是否落在本章内
+    var isCurrent = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.m) {
@@ -11,9 +15,11 @@ struct ChapterRow: View {
                     .foregroundStyle(Tone.text)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 12)
-                Text("\(Fmt.timestamp(chapter.startMs)) – \(Fmt.timestamp(chapter.endMs))")
-                    .podsumFont(.mono)
-                    .foregroundStyle(Tone.textMuted)
+                TimestampButton(
+                    label: "\(Fmt.timestamp(chapter.startMs)) – \(Fmt.timestamp(chapter.endMs))",
+                    ms: chapter.startMs,
+                    onSeek: onSeek
+                )
             }
 
             if !chapter.keyPoints.isEmpty {
@@ -50,7 +56,7 @@ struct ChapterRow: View {
             if !chapter.quotes.isEmpty {
                 VStack(alignment: .leading, spacing: Space.s) {
                     ForEach(Array(chapter.quotes.enumerated()), id: \.offset) { _, q in
-                        QuoteBlock(quote: q)
+                        QuoteBlock(quote: q, onSeek: onSeek)
                     }
                 }
                 .padding(.top, 2)
@@ -59,7 +65,44 @@ struct ChapterRow: View {
         .padding(Space.card)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Tone.surface, in: RoundedRectangle(cornerRadius: Radius.medium))
-        .overlay(RoundedRectangle(cornerRadius: Radius.medium).strokeBorder(Tone.border.opacity(0.5)))
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.medium)
+                .strokeBorder(isCurrent ? Tone.info.opacity(0.75) : Tone.border.opacity(0.5),
+                              lineWidth: isCurrent ? 1.5 : 1)
+        )
+    }
+}
+
+/// 时间戳。能跳就是按钮，不能跳就是一段普通文字——
+/// 外观上必须看得出区别，否则点了没反应会让人以为坏了。
+struct TimestampButton: View {
+    let label: String
+    let ms: Int
+    var onSeek: ((Int) -> Void)?
+    var tint: Color = Tone.textMuted
+
+    var body: some View {
+        if let onSeek {
+            Button { onSeek(ms) } label: {
+                HStack(spacing: 3) {
+                    Image(systemName: "play.fill").font(.system(size: 8))
+                    Text(label).podsumFont(.mono).lineLimit(1)
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                .foregroundStyle(Tone.info)
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(Tone.info.opacity(0.10), in: Capsule())
+                .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .help("从这里开始播放")
+        } else {
+            Text(label)
+                .podsumFont(.mono)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .foregroundStyle(tint)
+        }
     }
 }
 
@@ -67,15 +110,13 @@ struct ChapterRow: View {
 /// 老数据没有 takeaway（5 份 fixture 里 3 份全 nil），那时只显示原文。
 struct QuoteBlock: View {
     let quote: Quote
+    var onSeek: ((Int) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .top, spacing: 8) {
-                Text(Fmt.timestamp(quote.startMs))
-                    .podsumFont(.monoSmall)
-                    .foregroundStyle(Tone.info)
-                    .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(Tone.info.opacity(0.10), in: Capsule())
+                TimestampButton(label: Fmt.timestamp(quote.startMs), ms: quote.startMs,
+                                onSeek: onSeek, tint: Tone.info)
 
                 Text(quote.text)
                     .podsumFont(.body)

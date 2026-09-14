@@ -1,9 +1,40 @@
 import SwiftUI
 
+/// 窗口范围的一点点 UI 状态，只为了让菜单命令能够到视图里的 sheet。
+@MainActor
+@Observable
+final class UIState {
+    var showSubmit = false
+    /// 后端没就绪时，读者可以选择先看打进 bundle 的示例数据
+    var offlineBrowsing = false
+    var refreshToken = 0
+
+    func requestRefresh() { refreshToken &+= 1 }
+}
+
+/// 退出时收掉后端子进程。
+///
+/// SwiftUI 的 Scene 没有"即将退出"的钩子，这件事只能走 AppDelegate——
+/// 不接的话 uvicorn 会活过 app（实测确认：app 退出后端口上还留着监听进程）。
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    @MainActor var backend: BackendController?
+
+    func applicationWillTerminate(_ notification: Notification) {
+        MainActor.assumeIsolated { backend?.stop() }
+    }
+
+    /// 单窗口 app：关掉窗口就是退出，后端也一并停。
+    /// 它取代的那个 bash 启动器也是这个语义。
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+}
+
 @main
 struct PodsumApp: App {
-    /// 阶段 1 注入 Mock；阶段 3 换成 LiveRepository，视图一行不改。
-    @State private var repository: any EpisodeRepository = MockRepository()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @State private var settings = AppSettings.shared
+    @State private var backend = BackendController()
+    @State private var ui = UIState()
+    @State private var jobs = JobsModel()
 
     /// 读者选的字号档位，跨启动保留。
     /// macOS 没有 Dynamic Type（HIG 明说），这件事只能 app 自己做。
@@ -11,15 +42,28 @@ struct PodsumApp: App {
 
     var body: some Scene {
         WindowGroup {
-            EpisodeListView()
-                .environment(\.episodeRepository, repository)
+            RootView()
+                .environment(settings)
+                .environment(backend)
+                .environment(ui)
+                .environment(jobs)
                 .environment(\.textScale, textScale)
                 .frame(minWidth: 880, minHeight: 560)
                 .background(alternateZoomKey)
+                .task {
+                    appDelegate.backend = backend
+                    await backend.start()
+                }
         }
         .windowToolbarStyle(.unified)
         .defaultSize(width: 1120, height: 760)
         .commands {
+            CommandGroup(after: .newItem) {
+                Button("添加剧集…") { ui.showSubmit = true }
+                    .keyboardShortcut("n", modifiers: .command)
+                    .disabled(backend.phase.baseURL == nil)
+            }
+
             // 放进「显示」菜单，与 Safari／邮件／图书的位置一致。
             // 每个动作只出现一次——菜单里重复项会让人以为点错了。
             CommandGroup(after: .toolbar) {
@@ -38,7 +82,19 @@ struct PodsumApp: App {
                 .disabled(abs(textScale - TextScale.standard) < 0.001)
 
                 Divider()
+
+                Button("刷新") { ui.requestRefresh() }
+                    .keyboardShortcut("r", modifiers: .command)
+
+                Divider()
             }
+        }
+
+        Settings {
+            SettingsView()
+                .environment(settings)
+                .environment(backend)
+                .environment(\.textScale, textScale)
         }
     }
 

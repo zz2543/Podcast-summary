@@ -4,6 +4,21 @@ A single-user, loopback-only web app that ingests local audio files, direct audi
 or YouTube links and produces structured podcast summaries with Markdown, JSON, and
 optional TTS audio digest outputs.
 
+## macOS native client
+
+There is also a SwiftUI client that replaces the browser front end and runs the
+backend as its own child process — one `.app`, no dev servers. It ships with no
+API credentials of any kind: you enter your own endpoint, model and keys in
+Settings (⌘,) on first launch, and the keys go to the Keychain rather than a
+plaintext `.env`.
+
+```bash
+open macos-client/Podsum.xcodeproj          # develop
+python3 macos-client/package.py             # build a self-contained .app
+```
+
+See `specs/002-macos-native/README.md`.
+
 ## Prerequisites
 
 - Python 3.11+

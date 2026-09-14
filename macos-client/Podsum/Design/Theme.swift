@@ -96,9 +96,17 @@ public enum Fmt {
             : String(format: "%d:%02d", m, sec)
     }
 
-    /// 930000 → "15:30"，5790000 → "1:36:30"
+    /// 930000 → "15:30"，5790000 → "1:36:30"，0 → "0:00"
+    ///
+    /// 零在这里和在 duration 里不是一回事：时长为 0 表示"不知道多长"，
+    /// 显示成 "—"；而时间戳为 0 就是开头，第 1 章起点恰恰总是 0。
+    /// 这两个语义混用过一次——章节行上的起点显示成了 "—"。
     public static func timestamp(_ ms: Int) -> String {
-        duration(ms / 1000)
+        let seconds = max(0, ms) / 1000
+        let (h, m, s) = (seconds / 3600, (seconds % 3600) / 60, seconds % 60)
+        return h > 0
+            ? String(format: "%d:%02d:%02d", h, m, s)
+            : String(format: "%d:%02d", m, s)
     }
 
     private static let relativeFormatter: RelativeDateTimeFormatter = {
