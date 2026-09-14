@@ -106,7 +106,8 @@ public final class AppSettings {
 
     // MARK: 密钥（钥匙串）
 
-    /// 仅用于 OpenAI 兼容那一支；千问与 Anthropic 各有各的字段，
+    /// 密钥全部写进钥匙串里同一条记录（见 `Keychain`）。
+    /// `llmAPIKey` 只管 OpenAI 兼容那一支；千问与 Anthropic 各有各的字段，
     /// 分开存才不会在切换供应商时互相覆盖。
     public var llmAPIKey: String        { didSet { secret(llmAPIKey, "DEEPSEEK_API_KEY") } }
     public var dashscopeAPIKey: String  { didSet { secret(dashscopeAPIKey, "DASHSCOPE_API_KEY") } }
@@ -117,6 +118,9 @@ public final class AppSettings {
     public var volcSecretKey: String    { didSet { secret(volcSecretKey, "VOLC_SECRET_ACCESS_KEY") } }
     public var doubaoASRToken: String   { didSet { secret(doubaoASRToken, "DOUBAO_ASR_ACCESS_TOKEN") } }
     public var doubaoTTSToken: String   { didSet { secret(doubaoTTSToken, "DOUBAO_TTS_ACCESS_TOKEN") } }
+
+    /// 钥匙串那条记录的内存副本。整份读、整份写。
+    private var secrets: [String: String]
 
     private let defaults = UserDefaults.standard
     private static let prefix = "podsum."
@@ -143,20 +147,26 @@ public final class AppSettings {
         doubaoASRAppID = s("doubaoASRAppID")
         doubaoTTSAppID = s("doubaoTTSAppID")
 
-        llmAPIKey = Keychain.read("DEEPSEEK_API_KEY") ?? ""
-        dashscopeAPIKey = Keychain.read("DASHSCOPE_API_KEY") ?? ""
-        openAIAPIKey = Keychain.read("OPENAI_API_KEY") ?? ""
-        deepgramAPIKey = Keychain.read("DEEPGRAM_API_KEY") ?? ""
-        anthropicAPIKey = Keychain.read("ANTHROPIC_API_KEY") ?? ""
-        volcAccessKeyID = Keychain.read("VOLC_ACCESS_KEY_ID") ?? ""
-        volcSecretKey = Keychain.read("VOLC_SECRET_ACCESS_KEY") ?? ""
-        doubaoASRToken = Keychain.read("DOUBAO_ASR_ACCESS_TOKEN") ?? ""
-        doubaoTTSToken = Keychain.read("DOUBAO_TTS_ACCESS_TOKEN") ?? ""
+        // 一次读完。分成九次读就意味着九次授权提示。
+        let stored = Keychain.load()
+        secrets = stored
+        llmAPIKey = stored["DEEPSEEK_API_KEY"] ?? ""
+        dashscopeAPIKey = stored["DASHSCOPE_API_KEY"] ?? ""
+        openAIAPIKey = stored["OPENAI_API_KEY"] ?? ""
+        deepgramAPIKey = stored["DEEPGRAM_API_KEY"] ?? ""
+        anthropicAPIKey = stored["ANTHROPIC_API_KEY"] ?? ""
+        volcAccessKeyID = stored["VOLC_ACCESS_KEY_ID"] ?? ""
+        volcSecretKey = stored["VOLC_SECRET_ACCESS_KEY"] ?? ""
+        doubaoASRToken = stored["DOUBAO_ASR_ACCESS_TOKEN"] ?? ""
+        doubaoTTSToken = stored["DOUBAO_TTS_ACCESS_TOKEN"] ?? ""
     }
 
     private func put(_ value: String, _ key: String) { defaults.set(value, forKey: Self.prefix + key) }
     private func put(_ value: Bool, _ key: String) { defaults.set(value, forKey: Self.prefix + key) }
-    private func secret(_ value: String, _ account: String) { Keychain.write(value, account: account) }
+    private func secret(_ value: String, _ key: String) {
+        secrets[key] = value
+        Keychain.save(secrets)
+    }
 
     public static var defaultDataDirectory: String {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
