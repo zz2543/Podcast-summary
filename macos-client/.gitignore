@@ -1,0 +1,7 @@
+# Xcode 用户态与构建产物
+xcuserdata/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+DerivedData/
+build/
+.DS_Store

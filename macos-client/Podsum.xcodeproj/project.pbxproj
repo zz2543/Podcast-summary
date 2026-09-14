@@ -1,0 +1,331 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E733266F9C650F76AFF5D1 /* PodsumModels.swift */; };
+		28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D188A94553A47960929830 /* PodsumApp.swift */; };
+		C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */; };
+		C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB12AE3CAC840162AAA4B90 /* Theme.swift */; };
+		B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D56B16760883D43CB7B341 /* EpisodeListView.swift */; };
+		F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */; };
+		98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143600DE5EDA544CDDB9302D /* ScoreBadge.swift */; };
+		88C7DE6CC3DDD0091554AF8D /* StatusDot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */; };
+		0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */; };
+		FE703CA0A6DD78B88FFA0115 /* detail-done-28s.json in Resources */ = {isa = PBXBuildFile; fileRef = A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */; };
+		62FC544D587D022FD8CC73E8 /* detail-done-full.json in Resources */ = {isa = PBXBuildFile; fileRef = 97E0FFF884C250F8086210D9 /* detail-done-full.json */; };
+		0E3FDB6A174CCAF7BD002AEA /* detail-done-legacy-null.json in Resources */ = {isa = PBXBuildFile; fileRef = 1508E4EBDAD8CFCAE5218B41 /* detail-done-legacy-null.json */; };
+		318313C7C5A480365D052683 /* detail-partial-tts-failed.json in Resources */ = {isa = PBXBuildFile; fileRef = AAF68212E98BB40C6670A245 /* detail-partial-tts-failed.json */; };
+		F7144B8B155101E7A443EBD2 /* detail-processing.json in Resources */ = {isa = PBXBuildFile; fileRef = 452EE2C8160CF23B495914CD /* detail-processing.json */; };
+		2C2E18A967BEE4B9C9944587 /* episodes-list.json in Resources */ = {isa = PBXBuildFile; fileRef = 0016476BC8FE2BE90451F7AA /* episodes-list.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F5BF48AA40CAD7891EB709FC /* Podsum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podsum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65E733266F9C650F76AFF5D1 /* PodsumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumModels.swift; path = "../specs/002-macos-native/contracts/PodsumModels.swift"; sourceTree = SOURCE_ROOT; };
+		E2D188A94553A47960929830 /* PodsumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumApp.swift; path = "Podsum/PodsumApp.swift"; sourceTree = SOURCE_ROOT; };
+		27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeRepository.swift; path = "Podsum/Data/EpisodeRepository.swift"; sourceTree = SOURCE_ROOT; };
+		0FB12AE3CAC840162AAA4B90 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = "Podsum/Design/Theme.swift"; sourceTree = SOURCE_ROOT; };
+		E6D56B16760883D43CB7B341 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeListView.swift; path = "Podsum/Views/EpisodeListView.swift"; sourceTree = SOURCE_ROOT; };
+		BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeCard.swift; path = "Podsum/Views/EpisodeCard.swift"; sourceTree = SOURCE_ROOT; };
+		143600DE5EDA544CDDB9302D /* ScoreBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreBadge.swift; path = "Podsum/Views/ScoreBadge.swift"; sourceTree = SOURCE_ROOT; };
+		C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatusDot.swift; path = "Podsum/Views/StatusDot.swift"; sourceTree = SOURCE_ROOT; };
+		5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PreviewFixtures.swift; path = "Podsum/Views/PreviewFixtures.swift"; sourceTree = SOURCE_ROOT; };
+		A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-28s.json; path = "../specs/002-macos-native/fixtures/detail-done-28s.json"; sourceTree = SOURCE_ROOT; };
+		97E0FFF884C250F8086210D9 /* detail-done-full.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-full.json; path = "../specs/002-macos-native/fixtures/detail-done-full.json"; sourceTree = SOURCE_ROOT; };
+		1508E4EBDAD8CFCAE5218B41 /* detail-done-legacy-null.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-done-legacy-null.json; path = "../specs/002-macos-native/fixtures/detail-done-legacy-null.json"; sourceTree = SOURCE_ROOT; };
+		AAF68212E98BB40C6670A245 /* detail-partial-tts-failed.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-partial-tts-failed.json; path = "../specs/002-macos-native/fixtures/detail-partial-tts-failed.json"; sourceTree = SOURCE_ROOT; };
+		452EE2C8160CF23B495914CD /* detail-processing.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-processing.json; path = "../specs/002-macos-native/fixtures/detail-processing.json"; sourceTree = SOURCE_ROOT; };
+		0016476BC8FE2BE90451F7AA /* episodes-list.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = episodes-list.json; path = "../specs/002-macos-native/fixtures/episodes-list.json"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DAF6AA633395B1B76148E35B = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2B731CEFC6751AAE0EC69B98 = {
+			isa = PBXGroup;
+			children = (
+				B023CF354A3CF476AE23A401 /* Podsum */,
+				38DF21AEF4612506D6BE5CBE /* Views */,
+				6D073E8790EA5B8BEFB0DD4C /* Data */,
+				5FDB91368D7DDA2418B6CB65 /* Design */,
+				0A7EFEE30119C79A685A91B7 /* Contracts */,
+				6836E61C95D1697C318F790C /* Fixtures */,
+				0A2C978E52A76F0AA9F68BB5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B023CF354A3CF476AE23A401 /* Podsum */ = {
+			isa = PBXGroup;
+			children = (
+				E2D188A94553A47960929830 /* PodsumApp.swift */,
+			);
+			name = Podsum;
+			sourceTree = "<group>";
+		};
+		38DF21AEF4612506D6BE5CBE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E6D56B16760883D43CB7B341 /* EpisodeListView.swift */,
+				BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */,
+				143600DE5EDA544CDDB9302D /* ScoreBadge.swift */,
+				C7B970BE6D6BE66615D5B2D3 /* StatusDot.swift */,
+				5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		6D073E8790EA5B8BEFB0DD4C /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */,
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		5FDB91368D7DDA2418B6CB65 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				0FB12AE3CAC840162AAA4B90 /* Theme.swift */,
+			);
+			name = Design;
+			sourceTree = "<group>";
+		};
+		0A7EFEE30119C79A685A91B7 /* Contracts */ = {
+			isa = PBXGroup;
+			children = (
+				65E733266F9C650F76AFF5D1 /* PodsumModels.swift */,
+			);
+			name = Contracts;
+			sourceTree = "<group>";
+		};
+		6836E61C95D1697C318F790C /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				A6453BDA2FE3F1BC507DC61B /* detail-done-28s.json */,
+				97E0FFF884C250F8086210D9 /* detail-done-full.json */,
+				1508E4EBDAD8CFCAE5218B41 /* detail-done-legacy-null.json */,
+				AAF68212E98BB40C6670A245 /* detail-partial-tts-failed.json */,
+				452EE2C8160CF23B495914CD /* detail-processing.json */,
+				0016476BC8FE2BE90451F7AA /* episodes-list.json */,
+			);
+			name = Fixtures;
+			sourceTree = "<group>";
+		};
+		0A2C978E52A76F0AA9F68BB5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF48AA40CAD7891EB709FC /* Podsum.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* Podsum */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE2BB50980DFD48FF547D497;
+			buildPhases = (
+				0F78FE532035D122ED352DBA,
+				DAF6AA633395B1B76148E35B,
+				943E4BBD9B51C81965501BA3,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Podsum;
+			productName = Podsum;
+			productReference = F5BF48AA40CAD7891EB709FC /* Podsum.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					42AEFBAE01D2DFD981F7DA7D = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = 01076EBF22530E406F54B419;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B731CEFC6751AAE0EC69B98;
+			productRefGroup = 0A2C978E52A76F0AA9F68BB5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* Podsum */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		943E4BBD9B51C81965501BA3 = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE703CA0A6DD78B88FFA0115 /* detail-done-28s.json in Resources */,
+				62FC544D587D022FD8CC73E8 /* detail-done-full.json in Resources */,
+				0E3FDB6A174CCAF7BD002AEA /* detail-done-legacy-null.json in Resources */,
+				318313C7C5A480365D052683 /* detail-partial-tts-failed.json in Resources */,
+				F7144B8B155101E7A443EBD2 /* detail-processing.json in Resources */,
+				2C2E18A967BEE4B9C9944587 /* episodes-list.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0F78FE532035D122ED352DBA = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */,
+				28EA8BDFAE3B39D583579409 /* PodsumApp.swift in Sources */,
+				C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */,
+				C8BD90B4856850C7B1BC2169 /* Theme.swift in Sources */,
+				B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */,
+				F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */,
+				98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */,
+				88C7DE6CC3DDD0091554AF8D /* StatusDot.swift in Sources */,
+				0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0D80CF2E99CB896F052A672E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6EEC4ADF0F4E8408C45A2117 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = local.podsum.macclient;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+			};
+			name = Debug;
+		};
+		F56E1F73AFB83E721923A128 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		82835AA635DE90C62812A8DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = local.podsum.macclient;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		01076EBF22530E406F54B419 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0D80CF2E99CB896F052A672E /* Debug */,
+				F56E1F73AFB83E721923A128 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE2BB50980DFD48FF547D497 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EEC4ADF0F4E8408C45A2117 /* Debug */,
+				82835AA635DE90C62812A8DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}

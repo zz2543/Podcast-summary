@@ -21,9 +21,13 @@
 
 ## 分阶段
 
-**阶段 1 — 骨架（1 天）**
+**阶段 1 — 骨架** ✅ 已完成，见 `macos-client/`
 单 macOS target 的 Xcode 工程 + `EpisodeRepository` 协议 + 剧集列表页。用 `MockRepository` 读本目录 fixture，**不需要后端在跑**。
-验收：Mac 窗口里出现 29 条真实剧集。
+已验收：窗口渲染 29 条真实剧集，侧栏筛选（全部 29 / 已完成 27 / 进行中 1 / 已评分 3）、搜索、空态、未评分态均实测通过。
+
+```bash
+open macos-client/Podsum.xcodeproj
+```
 
 **阶段 2 — 界面迁移（3–5 天）**
 13 个组件按依赖顺序搬：StatusDot → ScoreBadge → EpisodeCard → HookHero → ThreeActPanel → ChaptersTimeline → AudioPlayer → ChatPanel。liquid-glass 效果换 SwiftUI 原生材质。
