@@ -532,7 +532,7 @@ def _stage_summarize_three_act(
     directive = _style_directive(episode, prompt_assembler)
     prompt = prompt_assembler.render(
         "three_act_summary",
-        "v3",
+        "v4",
         lang=_language_instruction(context, episode),
         style_directive=directive,
         transcript=transcript,
@@ -543,7 +543,7 @@ def _stage_summarize_three_act(
     artifact = SummaryArtifactRepo(context.session).get_or_create(episode.id)
     artifact.three_act = three_act.model_dump()
     artifact.stage_status = {**dict(artifact.stage_status), "three_act": "present"}
-    artifact.prompt_versions = _prompt_versions(artifact, "three_act", "v3", directive)
+    artifact.prompt_versions = _prompt_versions(artifact, "three_act", "v4", directive)
     context.session.add(artifact)
     context.session.flush()
     return {"three_act": artifact.three_act}

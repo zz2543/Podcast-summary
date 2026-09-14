@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { useLiquidGlass } from "@/components/ui/liquid-glass";
 
 export interface DockItem {
   id: string;
@@ -19,18 +20,24 @@ export function FloatingDock({
   className?: string;
 }) {
   const mouseX = useMotionValue(Infinity);
+  const dockRef = useLiquidGlass<HTMLDivElement>({
+    bezel: 22,
+    strength: 0.85,
+    blur: 13
+  });
 
   return (
     <motion.div
+      ref={dockRef}
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       style={{
-        background: "rgba(255,255,255,0.42)",
-        backdropFilter: "blur(28px) saturate(200%)",
-        WebkitBackdropFilter: "blur(28px) saturate(200%)",
-        border: "1px solid rgba(255,255,255,0.5)",
+        background: "rgba(255,255,255,0.38)",
+        backdropFilter: "blur(13px) saturate(2) brightness(1.06) contrast(1.1)",
+        WebkitBackdropFilter: "blur(13px) saturate(2) brightness(1.06) contrast(1.1)",
+        border: "1px solid rgba(255,255,255,0.65)",
         boxShadow:
-          "0 1px 0 rgba(255,255,255,0.8) inset, 0 -1px 0 rgba(0,0,0,0.04) inset, 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)"
+          "0 1px 0 rgba(255,255,255,0.95) inset, 0 -1px 0 rgba(255,255,255,0.45) inset, 0 12px 40px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06)"
       }}
       className={cn(
         "fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-end gap-2 rounded-2xl px-3 py-2",
@@ -70,10 +77,11 @@ function DockButton({
       style={{
         width: size,
         height: size,
-        background: "rgba(255,255,255,0.28)",
-        backdropFilter: "blur(16px) saturate(180%)",
-        WebkitBackdropFilter: "blur(16px) saturate(180%)",
-        border: "1px solid rgba(255,255,255,0.45)"
+        background: "rgba(255,255,255,0.22)",
+        backdropFilter: "blur(6px) saturate(1.9) brightness(1.05)",
+        WebkitBackdropFilter: "blur(6px) saturate(1.9) brightness(1.05)",
+        border: "1px solid rgba(255,255,255,0.55)",
+        boxShadow: "0 1px 0 rgba(255,255,255,0.85) inset"
       }}
       className={cn(
         "group relative flex items-center justify-center rounded-xl text-text transition-colors",

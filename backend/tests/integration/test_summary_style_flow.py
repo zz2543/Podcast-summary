@@ -47,7 +47,7 @@ def test_style_reaches_every_summary_prompt(tmp_path: Path) -> None:
         "detail": "standard",
     }
     assert detail["prompt_versions"]["one_liner"] == "v2"
-    assert detail["prompt_versions"]["three_act"] == "v3"
+    assert detail["prompt_versions"]["three_act"] == "v4"
     assert detail["prompt_versions"]["chapter_outline"] == "v3"
     assert detail["prompt_versions"]["summary_style"] == "v2"
 
