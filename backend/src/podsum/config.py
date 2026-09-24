@@ -68,6 +68,16 @@ class Settings(BaseSettings):
     DOUBAO_ASR_FLASH_URL: str = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash"
     DOUBAO_ASR_POLL_INTERVAL_SECONDS: float = Field(default=3.0, ge=0.2, le=30.0)
     DOUBAO_ASR_TIMEOUT_SECONDS: float = Field(default=1800.0, ge=30.0, le=21600.0)
+    # Uploaded audio longer than this is cut at pauses into pieces of at most
+    # this length and transcribed piece by piece (0 turns it off). One 2-hour
+    # file is a ~30 MB request that a single dropped connection sends back to
+    # zero; pieces are small, retried alone, and survive a stage retry on disk.
+    # Pieces also run side by side, so they set the speed: at 1800 s x 2 a
+    # 2-hour episode waited out three rounds (~12 min); 900 s x 6 is two short
+    # rounds. Each running episode sends this many requests at once, times
+    # MAX_CONCURRENCY episodes — lower it if Doubao starts rejecting them.
+    ASR_CHUNK_SECONDS: int = Field(default=900, ge=0, le=7200)
+    ASR_CHUNK_CONCURRENCY: int = Field(default=6, ge=1, le=6)
 
     DEEPSEEK_API_KEY: SecretStr | None = None
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"

@@ -25,6 +25,7 @@
 		F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */; };
 		B7C262D1834AA40FD0A71CCC /* EpisodeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */; };
 		B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D56B16760883D43CB7B341 /* EpisodeListView.swift */; };
+		29AD41E9DD69530E6358543C /* FailureNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848A11CB1902C1A4D5DB51C4 /* FailureNotice.swift */; };
 		0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */; };
 		7CD08661A1B2F54D44345FA1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EEAE89FC99879AAFC49CC9 /* RootView.swift */; };
 		98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143600DE5EDA544CDDB9302D /* ScoreBadge.swift */; };
@@ -38,6 +39,7 @@
 		318313C7C5A480365D052683 /* detail-partial-tts-failed.json in Resources */ = {isa = PBXBuildFile; fileRef = AAF68212E98BB40C6670A245 /* detail-partial-tts-failed.json */; };
 		F7144B8B155101E7A443EBD2 /* detail-processing.json in Resources */ = {isa = PBXBuildFile; fileRef = 452EE2C8160CF23B495914CD /* detail-processing.json */; };
 		2C2E18A967BEE4B9C9944587 /* episodes-list.json in Resources */ = {isa = PBXBuildFile; fileRef = 0016476BC8FE2BE90451F7AA /* episodes-list.json */; };
+		39DBFC8082DCF3BCB70D879A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F2D06A8864E8F3BDD2D6BCA3 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +63,7 @@
 		BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeCard.swift; path = "Podsum/Views/EpisodeCard.swift"; sourceTree = SOURCE_ROOT; };
 		1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeDetailView.swift; path = "Podsum/Views/EpisodeDetailView.swift"; sourceTree = SOURCE_ROOT; };
 		E6D56B16760883D43CB7B341 /* EpisodeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeListView.swift; path = "Podsum/Views/EpisodeListView.swift"; sourceTree = SOURCE_ROOT; };
+		848A11CB1902C1A4D5DB51C4 /* FailureNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FailureNotice.swift; path = "Podsum/Views/FailureNotice.swift"; sourceTree = SOURCE_ROOT; };
 		5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PreviewFixtures.swift; path = "Podsum/Views/PreviewFixtures.swift"; sourceTree = SOURCE_ROOT; };
 		15EEAE89FC99879AAFC49CC9 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = "Podsum/Views/RootView.swift"; sourceTree = SOURCE_ROOT; };
 		143600DE5EDA544CDDB9302D /* ScoreBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreBadge.swift; path = "Podsum/Views/ScoreBadge.swift"; sourceTree = SOURCE_ROOT; };
@@ -74,6 +77,7 @@
 		AAF68212E98BB40C6670A245 /* detail-partial-tts-failed.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-partial-tts-failed.json; path = "../specs/002-macos-native/fixtures/detail-partial-tts-failed.json"; sourceTree = SOURCE_ROOT; };
 		452EE2C8160CF23B495914CD /* detail-processing.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = detail-processing.json; path = "../specs/002-macos-native/fixtures/detail-processing.json"; sourceTree = SOURCE_ROOT; };
 		0016476BC8FE2BE90451F7AA /* episodes-list.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = episodes-list.json; path = "../specs/002-macos-native/fixtures/episodes-list.json"; sourceTree = SOURCE_ROOT; };
+		F2D06A8864E8F3BDD2D6BCA3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "Podsum/Assets.xcassets"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				E2D188A94553A47960929830 /* PodsumApp.swift */,
+				F2D06A8864E8F3BDD2D6BCA3 /* Assets.xcassets */,
 			);
 			name = Podsum;
 			sourceTree = "<group>";
@@ -118,6 +123,7 @@
 				BF1EDFEBBFBB654CA0B1C8D9 /* EpisodeCard.swift */,
 				1A2842B9D14D22C47A7EB0BF /* EpisodeDetailView.swift */,
 				E6D56B16760883D43CB7B341 /* EpisodeListView.swift */,
+				848A11CB1902C1A4D5DB51C4 /* FailureNotice.swift */,
 				5AFDF840FFC189551F99EA46 /* PreviewFixtures.swift */,
 				15EEAE89FC99879AAFC49CC9 /* RootView.swift */,
 				143600DE5EDA544CDDB9302D /* ScoreBadge.swift */,
@@ -245,6 +251,7 @@
 				318313C7C5A480365D052683 /* detail-partial-tts-failed.json in Resources */,
 				F7144B8B155101E7A443EBD2 /* detail-processing.json in Resources */,
 				2C2E18A967BEE4B9C9944587 /* episodes-list.json in Resources */,
+				39DBFC8082DCF3BCB70D879A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +281,7 @@
 				F92A6D65EE7F51C8ADC62F92 /* EpisodeCard.swift in Sources */,
 				B7C262D1834AA40FD0A71CCC /* EpisodeDetailView.swift in Sources */,
 				B854D209C6C74F2632372A0B /* EpisodeListView.swift in Sources */,
+				29AD41E9DD69530E6358543C /* FailureNotice.swift in Sources */,
 				0C86DFCF52EEDC6A333938A1 /* PreviewFixtures.swift in Sources */,
 				7CD08661A1B2F54D44345FA1 /* RootView.swift in Sources */,
 				98C866D5393812D39604DC6E /* ScoreBadge.swift in Sources */,
@@ -311,6 +319,7 @@
 		6EEC4ADF0F4E8408C45A2117 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -352,6 +361,7 @@
 		82835AA635DE90C62812A8DF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;

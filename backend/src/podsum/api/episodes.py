@@ -36,7 +36,12 @@ from podsum.services.ingest import (
     normalize_video_url,
 )
 from podsum.services.llm_client import create_llm_client
-from podsum.services.pipeline import create_tts_pipeline, create_us1_pipeline
+from podsum.services.pipeline import (
+    create_tts_pipeline,
+    create_us1_pipeline,
+    derive_episode_status,
+    is_digest_job,
+)
 
 router = APIRouter(prefix="/api/episodes", tags=["episodes"])
 
@@ -183,7 +188,9 @@ async def get_episode(
     episode = EpisodeRepo(session).get(episode_id)
     if episode is None:
         return _api_error(404, "not_found", "episode not found")
-    return JSONResponse(content=render_json(_episode_detail(session, episode)))
+    payload = render_json(_episode_detail(session, episode))
+    payload["last_failure"] = _last_failure(session, episode.id)
+    return JSONResponse(content=payload)
 
 
 @router.delete("/{episode_id}")
@@ -221,9 +228,15 @@ async def retry_episode(
         episode_id=episode_id,
         state="queued",
         attempt=(latest.attempt + 1) if latest is not None else 1,
-        stage_progress=dict(latest.stage_progress) if latest is not None else {},
+        # Start clean: every stage records its own progress again. Copying the
+        # last job's map carried its failures — and a digest job's
+        # ``requested_stage`` — into a run that had not reached them yet.
+        stage_progress={},
     )
     session.add(job)
+    session.flush()
+    episode.status = derive_episode_status(session, episode_id)
+    session.add(episode)
     session.commit()
     session.refresh(job)
     _enqueue_job(request, job)
@@ -541,8 +554,42 @@ def _episode_summary(session: Session, episode: Episode) -> dict[str, Any]:
             "tts": stage_status.get("tts", "missing"),
         },
         "usefulness": _usefulness_payload(artifact, stage_status),
+        "last_failure": _last_failure(session, episode.id),
         "created_at": _isoformat(episode.created_at),
         "updated_at": _isoformat(episode.updated_at),
+    }
+
+
+def _last_failure(session: Session, episode_id: str) -> dict[str, Any] | None:
+    """Why the latest summary job stopped, or None when it did not fail.
+
+    Kept apart from ``status``: an episode whose re-run failed is still ``done``
+    when the first run's sections are all there, and the reader should see
+    both facts — a readable summary, and that the re-run did not take.
+    """
+    job = next(
+        (
+            job
+            for job in session.scalars(
+                select(Job).where(Job.episode_id == episode_id).order_by(Job.id.desc())
+            )
+            if not is_digest_job(job)
+        ),
+        None,
+    )
+    if job is None or job.state != "failed":
+        return None
+    failed_stages = [
+        name
+        for name, entry in (job.stage_progress or {}).items()
+        if isinstance(entry, dict) and entry.get("status") == "failed_after_retries"
+    ]
+    return {
+        "job_id": job.id,
+        "stage": failed_stages[-1] if failed_stages else None,
+        "error": job.error or "",
+        "attempt": job.attempt,
+        "finished_at": _isoformat(job.finished_at),
     }
 
 

@@ -90,8 +90,11 @@ class JobRepo:
         return list(self.session.scalars(select(Job).where(Job.state.in_(self.ACTIVE_STATES))))
 
     def latest_for_episode(self, episode_id: str) -> Job | None:
+        # ULIDs sort by creation time. ``started_at`` does not work here: a job
+        # gets it only once it runs, so a queued retry would rank below the
+        # finished job it is retrying.
         return self.session.scalars(
-            select(Job).where(Job.episode_id == episode_id).order_by(Job.started_at.desc(), Job.id.desc())
+            select(Job).where(Job.episode_id == episode_id).order_by(Job.id.desc())
         ).first()
 
     def set_state(self, job: Job, state: str, *, error: str | None = None) -> Job:

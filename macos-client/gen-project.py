@@ -26,6 +26,8 @@ for p in sorted((ROOT / "Podsum").rglob("*.swift")):
 
 resources = [(f, f"{FIXDIR}/{f}", "Fixtures")
              for f in sorted(os.listdir(ROOT / FIXDIR)) if f.endswith(".json")]
+# 图标由 icon/make_icon.py 生成
+resources.append(("Assets.xcassets", "Podsum/Assets.xcassets", "Podsum"))
 
 for _, p, _ in sources + resources:
     assert (ROOT / p).exists(), f"缺文件: {p}"
@@ -57,7 +59,7 @@ w(f'\t\t{PRODUCT} /* Podsum.app */ = {{isa = PBXFileReference; explicitFileType 
 for name, p, _ in sources:
     w(f'\t\t{fref(p)} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = {name}; path = "{p}"; sourceTree = SOURCE_ROOT; }};')
 for name, p, _ in resources:
-    w(f'\t\t{fref(p)} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = text.json; name = {name}; path = "{p}"; sourceTree = SOURCE_ROOT; }};')
+    w(f'\t\t{fref(p)} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = {"folder.assetcatalog" if p.endswith(".xcassets") else "text.json"}; name = {name}; path = "{p}"; sourceTree = SOURCE_ROOT; }};')
 w("/* End PBXFileReference section */")
 
 w("\n/* Begin PBXFrameworksBuildPhase section */")
@@ -145,7 +147,8 @@ PROJ_COMMON = """\t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;
 \t\t\t\tMACOSX_DEPLOYMENT_TARGET = 14.0;
 \t\t\t\tSDKROOT = macosx;
 \t\t\t\tSWIFT_VERSION = 5.0;"""
-TGT_COMMON = """\t\t\t\tASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+TGT_COMMON = """\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+\t\t\t\tASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 \t\t\t\tCODE_SIGN_IDENTITY = "-";
 \t\t\t\tCODE_SIGN_STYLE = Automatic;
 \t\t\t\tCOMBINE_HIDPI_IMAGES = YES;

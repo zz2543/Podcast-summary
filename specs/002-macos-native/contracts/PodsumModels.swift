@@ -50,6 +50,10 @@ where T.RawValue == String {
     }
 }
 
+/// 由剧集"有什么"推出来，不再照抄最近一个任务的结局（后端 domain/episode_status.py）：
+/// processing 摘要任务在排队或在跑 · done 一句话/三幕/章节齐全 ·
+/// partial 齐全但评分或提及失败 · failed 摘要任务跑完了却没产出这三样 · pending 还没跑过。
+/// 音频摘要（tts）永远不影响它。
 public enum EpisodeStatus: String, Codable, Sendable {
     case pending, processing, done, partial, failed
 }
@@ -214,6 +218,8 @@ public struct EpisodeSummary: Codable, Sendable, Identifiable, Hashable {
     public let usefulness: Usefulness?     // 29 个真实剧集里仅 3 个非 null
     public let createdAt: Date
     public let updatedAt: Date
+    /// 最近一个摘要任务失败的原因；没失败就是 nil。老后端不发这个键，同样解成 nil。
+    public var lastFailure: JobFailure? = nil
 
     enum CodingKeys: String, CodingKey {
         case id, title, language, status, usefulness
@@ -223,6 +229,23 @@ public struct EpisodeSummary: Codable, Sendable, Identifiable, Hashable {
         case stageStatus = "stage_status"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case lastFailure = "last_failure"
+    }
+}
+
+/// 摘要任务失败在哪一步、为什么。与 status 相互独立：
+/// 重新处理失败了，而上一次的结果还完整，那么 status 仍是 done，这里讲清楚"这次没成"。
+public struct JobFailure: Codable, Sendable, Hashable {
+    public let jobID: String
+    public let stage: String?      // 流水线阶段名：fetch / transcribe / summarize_hook …
+    public let error: String       // 原始报错，给人看之前先过一遍 FailureCopy
+    public let attempt: Int
+    public let finishedAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        case stage, error, attempt
+        case jobID = "job_id"
+        case finishedAt = "finished_at"
     }
 }
 
@@ -260,6 +283,7 @@ public struct EpisodeDetail: Codable, Sendable, Identifiable, Hashable {
     public let artifactPaths: ArtifactPaths?
     public let createdAt: Date
     public let updatedAt: Date
+    public var lastFailure: JobFailure? = nil   // 只在 API 响应里有，summary.json 里没有
 
     enum CodingKeys: String, CodingKey {
         case id, title, guests, hook, chapters, entities, language, status, usefulness
@@ -274,6 +298,7 @@ public struct EpisodeDetail: Codable, Sendable, Identifiable, Hashable {
         case artifactPaths = "artifact_paths"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case lastFailure = "last_failure"
     }
 }
 
@@ -291,14 +316,19 @@ public struct APIErrorEnvelope: Codable, Sendable {
 // MARK: - 解码器
 
 public extension JSONDecoder.DateDecodingStrategy {
-    /// 后端发的是 "2026-09-14T09:27:15.770252"：无时区、6 位小数秒。
+    /// 后端发的多是 "2026-09-14T09:27:15.770252"：无时区、6 位小数秒。
     /// .iso8601 解不了，必须用这个。无小数秒的变体也一并容纳。
+    ///
+    /// 无时区的串是 UTC：后端一律用 datetime.now(timezone.utc) 取时间，
+    /// 只是 SQLite 存盘时丢了时区后缀。早先按本机时区解，东八区的"更新于"整整慢 8 小时。
+    /// 刚在内存里生成、还没回过库的时间（WS 帧里任务的 started_at）会带 +00:00，也要认。
     static let podsum = custom { decoder -> Date in
         let s = try decoder.singleValueContainer().decode(String.self)
-        for fmt in ["yyyy-MM-dd'T'HH:mm:ss.SSSSSS", "yyyy-MM-dd'T'HH:mm:ss"] {
+        for fmt in ["yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXXXX", "yyyy-MM-dd'T'HH:mm:ssXXXXX",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSSSS", "yyyy-MM-dd'T'HH:mm:ss"] {
             let f = DateFormatter()
             f.locale = Locale(identifier: "en_US_POSIX")
-            f.timeZone = TimeZone.current      // 后端写的是本机 naive 时间
+            f.timeZone = TimeZone(identifier: "UTC")   // 仅对无后缀的格式生效
             f.dateFormat = fmt
             if let d = f.date(from: s) { return d }
         }

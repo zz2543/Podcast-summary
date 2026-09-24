@@ -325,3 +325,19 @@ def test_a_login_wall_is_never_retried_even_if_it_mentions_a_timeout(tmp_path: P
         _download_video_audio(YOUTUBE_URL, tmp_path, _settings(tmp_path))
 
     assert len(_FakeYoutubeDL.calls) == 1
+
+
+def test_ingest_reuses_an_existing_episode_dir_and_keeps_its_summary(tmp_path) -> None:
+    from podsum.services.ingest import _claim_episode_dir, _discard_ingest
+
+    episode_dir = tmp_path / "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+    assert _claim_episode_dir(episode_dir) is True
+    (episode_dir / "summary.md").write_text("from the first run")
+    assert _claim_episode_dir(episode_dir) is False
+
+    (episode_dir / "audio.original.webm.part").write_bytes(b"half")
+    _discard_ingest(episode_dir, created_dir=False)
+    assert sorted(p.name for p in episode_dir.iterdir()) == ["summary.md"]
+
+    _discard_ingest(episode_dir, created_dir=True)
+    assert not episode_dir.exists()

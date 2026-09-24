@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// 基于本集转录文稿的问答。做成检查器（inspector）而不是弹窗——
-/// 读者要一边看正文一边问，弹窗会把正文盖掉。
+/// 基于本集转录文稿的问答，与正文并排显示。
 struct ChatPanel: View {
     let episodeID: String
     let episodeTitle: String

@@ -51,8 +51,19 @@ export interface EpisodeSummary {
   status: EpisodeStatus;
   stage_status: StageStatusMap;
   usefulness: Usefulness | null;
+  /** 最近一个摘要任务失败的原因；没失败为 null。与 status 独立：重新处理失败时 status 可以仍是 done。 */
+  last_failure?: JobFailure | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface JobFailure {
+  job_id: string;
+  /** 流水线阶段名：fetch / transcribe / summarize_hook … */
+  stage: string | null;
+  error: string;
+  attempt: number;
+  finished_at: string | null;
 }
 
 export interface ThreeAct {

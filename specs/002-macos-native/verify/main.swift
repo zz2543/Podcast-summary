@@ -99,6 +99,7 @@ do {
         #"{"type":"hello","server_version":"0.1.0","now":"2026-09-14T09:27:15.770252+00:00"}"#,
         #"{"type":"snapshot","jobs":[]}"#,
         #"{"type":"job_update","episode_status":"processing","job":{"id":"J","episode_id":"E","state":"summarizing","stage_progress":{},"attempt":1,"error":null,"started_at":null,"finished_at":null}}"#,
+        #"{"type":"job_update","episode_status":"done","job":{"id":"J","episode_id":"E","state":"failed","stage_progress":{},"attempt":2,"error":"x","started_at":"2026-09-24T05:01:02.123456+00:00","finished_at":"2026-09-24T05:03:04.654321+00:00"}}"#,
         #"{"type":"stage_status_update","episode_id":"E","stage":"chapters","status":"present"}"#,
         #"{"type":"error","code":"internal","message":"boom"}"#,
         #"{"type":"某种将来才有的帧","payload":1}"#,
@@ -113,9 +114,36 @@ do {
         case .other(let type):                  return "other(\(type))"
         }
     }
-    print("✓ JobEvent 六种帧  " + labels.joined(separator: " "))
+    print("✓ JobEvent 各种帧  " + labels.joined(separator: " "))
 } catch {
     print("✗ JobEvent → \(error)")
+    failed += 1
+}
+
+// 失败原因与时区：last_failure 可有可无；无后缀的时间按 UTC，带 +00:00 的也要认
+do {
+    let withFailure = #"""
+    {"id":"X","title":null,"podcast_name":null,"source_type":"youtube",
+     "duration_seconds":7365,"language":null,"status":"failed",
+     "stage_status":{"hook":"pending","three_act":"pending","chapters":"missing",
+                     "entities":"missing","usefulness":"missing","tts":"missing"},
+     "usefulness":null,"created_at":"2026-09-14T12:01:16.052021",
+     "updated_at":"2026-09-14T12:19:03.825892",
+     "last_failure":{"job_id":"J","stage":"transcribe","error":"[Errno 54] Connection reset by peer",
+                     "attempt":1,"finished_at":"2026-09-14T12:19:03.825892+00:00"}}
+    """#
+    let e = try dec.decode(EpisodeSummary.self, from: Data(withFailure.utf8))
+    guard e.lastFailure?.stage == "transcribe", e.lastFailure?.finishedAt == e.updatedAt else {
+        throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "last_failure 或时区没对上"))
+    }
+    let iso = ISO8601DateFormatter()
+    iso.formatOptions = [.withInternetDateTime]
+    guard iso.string(from: e.createdAt) == "2026-09-14T12:01:16Z" else {
+        throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "无后缀时间没按 UTC 解：\(e.createdAt)"))
+    }
+    print("✓ last_failure  stage=\(e.lastFailure!.stage!)；无后缀时间按 UTC，+00:00 同一时刻")
+} catch {
+    print("✗ last_failure / 时区 → \(error)")
     failed += 1
 }
 

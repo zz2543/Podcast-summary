@@ -25,7 +25,11 @@
     "source_ref": { "type": "string" },
     "duration_seconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 21600 },
     "language": { "type": ["string", "null"], "enum": ["zh", "en", "mixed", null] },
-    "status": { "type": "string", "enum": ["pending", "processing", "done", "partial", "failed"] },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "processing", "done", "partial", "failed"],
+      "description": "Derived from what the episode has, not from the last job: processing = a summary job is queued/running; done = hook, three_act and chapters present; partial = those present but usefulness or entities failed; failed = a summary job ended without them; pending = nothing ran yet. The audio digest (tts) never affects it."
+    },
     "stage_status": {
       "type": "object",
       "required": ["hook", "three_act", "chapters", "entities", "usefulness", "tts"],
@@ -103,6 +107,19 @@
         "markdown": { "type": ["string", "null"] },
         "json":     { "type": ["string", "null"] },
         "tts":      { "type": ["string", "null"] }
+      }
+    },
+    "last_failure": {
+      "description": "API only (absent from summary.json). Why the latest summary job failed, or null. Independent of status: a re-run can fail while the earlier sections stay readable.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["job_id", "stage", "error", "attempt", "finished_at"],
+      "properties": {
+        "job_id":      { "type": "string" },
+        "stage":       { "type": ["string", "null"], "description": "Pipeline stage name, e.g. fetch, transcribe, summarize_hook" },
+        "error":       { "type": "string" },
+        "attempt":     { "type": "integer", "minimum": 1 },
+        "finished_at": { "type": ["string", "null"], "format": "date-time" }
       }
     },
     "created_at": { "type": "string", "format": "date-time" },

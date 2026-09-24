@@ -48,6 +48,7 @@ struct PodsumApp: App {
                 .environment(ui)
                 .environment(jobs)
                 .environment(\.textScale, textScale)
+                // 聊天在详情区域内部展开，窗口最小尺寸保持稳定。
                 .frame(minWidth: 880, minHeight: 560)
                 .background(alternateZoomKey)
                 .task {

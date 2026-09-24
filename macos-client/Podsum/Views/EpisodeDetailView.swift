@@ -8,40 +8,44 @@ struct EpisodeDetailView: View {
     @Environment(\.episodeRepository) private var repository
     @Environment(\.dismiss) private var dismiss
 
+    @State private var showChat = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     @State private var episode: EpisodeDetail?
     @State private var failure: String?
     @State private var player = AudioPlayerModel()
-    @State private var showChat = false
     @State private var pendingDelete = false
     @State private var actionNote: String?
     @State private var actionError: String?
     @State private var working = false
 
     var body: some View {
-        Group {
-            if let e = episode {
-                loaded(e)
-            } else if let failure {
-                ContentUnavailableView {
-                    Label("打不开这一集", systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(failure)
-                } actions: {
-                    Button("重试") { Task { await load() } }
+        GeometryReader { geometry in
+            let panelWidth = min(320.0, geometry.size.width * 0.42)
+            let revealedWidth = showChat ? panelWidth : 0
+            HStack(spacing: 0) {
+                detailContent
+                    .frame(width: max(0, geometry.size.width - revealedWidth))
+                    .clipped()
+                if let episode {
+                    ChatPanel(episodeID: episodeID, episodeTitle: episode.title ?? "未命名剧集")
+                        .id(episodeID)
+                        .frame(width: panelWidth)
+                        .overlay(alignment: .leading) { Divider() }
+                        .frame(width: revealedWidth, alignment: .leading)
+                        .clipped()
+                        .allowsHitTesting(showChat)
+                        .disabled(!showChat)
+                        .accessibilityHidden(!showChat)
                 }
-            } else {
-                ProgressView("读取详情…")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.24), value: showChat)
         }
         .background(Tone.bg)
         .task(id: episodeID) { await load() }
-        .onDisappear { player.pause() }
-        .inspector(isPresented: $showChat) {
-            if let e = episode {
-                ChatPanel(episodeID: e.id, episodeTitle: e.title ?? "未命名剧集")
-                    .inspectorColumnWidth(min: 300, ideal: 380, max: 520)
-            }
+        .onDisappear {
+            player.pause()
+            showChat = false
         }
         .toolbar { toolbarContent }
         .alert("删除这一集？", isPresented: $pendingDelete) {
@@ -59,6 +63,26 @@ struct EpisodeDetailView: View {
         }
     }
 
+    @ViewBuilder
+    private var detailContent: some View {
+        Group {
+            if let e = episode {
+                loaded(e)
+            } else if let failure {
+                ContentUnavailableView {
+                    Label("打不开这一集", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(failure)
+                } actions: {
+                    Button("重试") { Task { await load() } }
+                }
+            } else {
+                ProgressView("读取详情…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+
     // MARK: 工具栏
 
     @ToolbarContentBuilder
@@ -67,7 +91,8 @@ struct EpisodeDetailView: View {
             Button { showChat.toggle() } label: {
                 Label("对话", systemImage: "bubble.left.and.bubble.right")
             }
-            .help("基于本集文稿提问")
+            .keyboardShortcut("i", modifiers: [.command, .option])
+            .help("基于本集文稿提问（⌥⌘I）")
             .disabled(episode == nil)
         }
         ToolbarItem(placement: .primaryAction) {
@@ -93,18 +118,31 @@ struct EpisodeDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Space.section) {
                 hero(e)
+                if let failure = e.lastFailure, e.status.value != .processing {
+                    FailureNotice(failure: failure, hasSummary: hasSummary(e), working: working) {
+                        Task { await retry() }
+                    }
+                }
                 playback(e)
                 if let note = actionNote {
                     Label(note, systemImage: "info.circle")
                         .podsumFont(.meta)
                         .foregroundStyle(Tone.info)
                 }
-                UsefulnessCard(usefulness: e.usefulness,
-                               stage: e.stageStatus.usefulness,
-                               promptVersion: e.promptVersions.usefulnessScore)
-                threeAct(e)
-                chapters(e)
-                entities(e)
+                // 没有摘要时，"未评分""没有抽取到提及"这类卡片只会误导——
+                // 它们说的是"这一项是空的"，而实情是"根本还没走到这一步"。
+                if hasSummary(e) {
+                    UsefulnessCard(usefulness: e.usefulness,
+                                   stage: e.stageStatus.usefulness,
+                                   promptVersion: e.promptVersions.usefulnessScore)
+                    threeAct(e)
+                    chapters(e)
+                    entities(e)
+                } else if e.status.value == .processing || e.status.value == .pending {
+                    Label("摘要还在生成，进度见列表页顶部。", systemImage: "hourglass")
+                        .podsumFont(.secondary)
+                        .foregroundStyle(Tone.textMuted)
+                }
                 provenance(e)
             }
             .padding(Space.xxl)
@@ -112,6 +150,11 @@ struct EpisodeDetailView: View {
             .frame(maxWidth: .infinity)
         }
         .navigationTitle(e.title ?? "未命名剧集")
+    }
+
+    /// 一句话、三幕、章节，有任何一样就算有东西可读
+    private func hasSummary(_ e: EpisodeDetail) -> Bool {
+        e.hook?.isEmpty == false || e.threeAct != nil || !e.chapters.isEmpty
     }
 
     // MARK: 播放
@@ -182,29 +225,14 @@ struct EpisodeDetailView: View {
         if let ta = e.threeAct {
             section("三幕摘要") {
                 HStack(alignment: .top, spacing: Space.m) {
-                    actCard("背景", ta.background)
-                    actCard("核心论点", ta.coreArgument)
-                    actCard("结论", ta.conclusion)
+                    ActCard(label: "背景", text: ta.background)
+                    ActCard(label: "核心论点", text: ta.coreArgument)
+                    ActCard(label: "结论", text: ta.conclusion)
                 }
+                // 换集时收起，不把上一集的展开状态带过来
+                .id(e.id)
             }
         }
-    }
-
-    private func actCard(_ label: String, _ body: String) -> some View {
-        VStack(alignment: .leading, spacing: Space.s) {
-            Text(label)
-                .podsumFont(.sectionLabel).textCase(.uppercase)
-                .foregroundStyle(Tone.textSubtle)
-            Text(body)
-                .podsumFont(.body)
-                .foregroundStyle(Tone.text)
-                .readable()
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(Space.l)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(Tone.surface, in: RoundedRectangle(cornerRadius: Radius.medium))
-        .overlay(RoundedRectangle(cornerRadius: Radius.medium).strokeBorder(Tone.border.opacity(0.5)))
     }
 
     // MARK: 章节
@@ -390,6 +418,72 @@ struct EpisodeDetailView: View {
         } catch {
             actionError = error.localizedDescription
         }
+    }
+}
+
+/// 三幕里的一幕。长文默认只露出前几行，超出时给一个展开按钮。
+/// 是否超出靠量出来：背景里放两份隐藏的同款文字，一份截断、一份完整，
+/// 高度不同才说明真被截了——按字数估会被栏宽和字号调节骗到。
+private struct ActCard: View {
+    let label: String
+    let text: String
+
+    static let collapsedLines = 8
+
+    @State private var expanded = false
+    @State private var clippedHeight: CGFloat = 0
+    @State private var fullHeight: CGFloat = 0
+
+    private var isTruncated: Bool { fullHeight > clippedHeight + 1 }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Space.s) {
+            Text(label)
+                .podsumFont(.sectionLabel).textCase(.uppercase)
+                .foregroundStyle(Tone.textSubtle)
+            bodyText(lines: expanded ? nil : Self.collapsedLines)
+                .background(alignment: .topLeading) {
+                    ZStack(alignment: .topLeading) {
+                        bodyText(lines: Self.collapsedLines).measure { clippedHeight = $0 }
+                        bodyText(lines: nil).measure { fullHeight = $0 }
+                    }
+                    .hidden()
+                }
+            if isTruncated {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) { expanded.toggle() }
+                } label: {
+                    Label(expanded ? "收起" : "展开全部",
+                          systemImage: expanded ? "chevron.up" : "chevron.down")
+                }
+                .buttonStyle(.link)
+                .controlSize(.small)
+            }
+        }
+        .padding(Space.l)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(Tone.surface, in: RoundedRectangle(cornerRadius: Radius.medium))
+        .overlay(RoundedRectangle(cornerRadius: Radius.medium).strokeBorder(Tone.border.opacity(0.5)))
+    }
+
+    private func bodyText(lines: Int?) -> some View {
+        Text(text)
+            .podsumFont(.body)
+            .foregroundStyle(Tone.text)
+            .readable()
+            .lineLimit(lines)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+private extension View {
+    /// 把自身高度报出来（首次出现和之后每次变化）
+    func measure(_ report: @escaping (CGFloat) -> Void) -> some View {
+        background(GeometryReader { geo in
+            Color.clear
+                .onAppear { report(geo.size.height) }
+                .onChange(of: geo.size.height) { _, h in report(h) }
+        })
     }
 }
 

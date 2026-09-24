@@ -13,6 +13,7 @@ import {
 import { useJobStream } from "@/ws/useJobStream";
 import { HookHero } from "@/components/HookHero";
 import { UsefulnessCard } from "@/components/UsefulnessCard";
+import { FailureBanner } from "@/components/FailureBanner";
 import { ThreeActPanel } from "@/components/ThreeActPanel";
 import { ChaptersTimeline } from "@/components/ChaptersTimeline";
 import { EpisodeDock } from "@/components/EpisodeDock";
@@ -117,6 +118,7 @@ export default function EpisodeDetailPage() {
     );
   }
 
+  const hasSummary = !!episode.hook || !!episode.three_act || episode.chapters.length > 0;
   const digestReady = episode.stage_status.tts === "present";
   const digestFailed = episode.stage_status.tts === "failed_after_retries";
 
@@ -132,7 +134,17 @@ export default function EpisodeDetailPage() {
 
       <HookHero episode={episode} />
 
-      <UsefulnessCard episode={episode} onRetry={handleRetry} />
+      {episode.last_failure && episode.status !== "processing" && (
+        <FailureBanner
+          failure={episode.last_failure}
+          hasSummary={hasSummary}
+          busy={busy}
+          onRetry={handleRetry}
+        />
+      )}
+
+      {/* 没有摘要时评分卡只会误导：它说"这一项是空的"，实情是"还没走到这一步" */}
+      {hasSummary && <UsefulnessCard episode={episode} onRetry={handleRetry} />}
 
       <section className="flex flex-wrap items-center gap-3">
         <IridescentButton onClick={handleDigest} disabled={busy}>

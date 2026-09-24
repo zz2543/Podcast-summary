@@ -4,7 +4,7 @@ import asyncio
 from typing import Any
 
 from podsum.persistence.repo import JobRepo
-from podsum.services.pipeline import create_us1_pipeline
+from podsum.services.pipeline import create_tts_pipeline, create_us1_pipeline, is_digest_job
 
 
 class JobQueue:
@@ -48,11 +48,22 @@ class JobQueue:
                 job = JobRepo(session).get(job_id)
                 if job is None:
                     return
-                pipeline = create_us1_pipeline(
-                    session,
-                    self.app.state.settings,
-                    asr_client=getattr(self.app.state, "asr_client", None),
-                    llm_client=getattr(self.app.state, "llm_client", None),
-                )
+                # Startup recovery puts digest jobs back on this same queue; run
+                # as a summary job, a digest re-bills every LLM stage and — when
+                # that fails — marks a finished episode failed.
+                if is_digest_job(job):
+                    pipeline = create_tts_pipeline(
+                        session,
+                        self.app.state.settings,
+                        tts_client=getattr(self.app.state, "tts_client", None),
+                        llm_client=getattr(self.app.state, "llm_client", None),
+                    )
+                else:
+                    pipeline = create_us1_pipeline(
+                        session,
+                        self.app.state.settings,
+                        asr_client=getattr(self.app.state, "asr_client", None),
+                        llm_client=getattr(self.app.state, "llm_client", None),
+                    )
                 await pipeline.run(job)
                 session.commit()

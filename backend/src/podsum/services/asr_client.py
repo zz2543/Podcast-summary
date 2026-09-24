@@ -11,7 +11,13 @@ from pathlib import Path
 from typing import Any, Protocol
 
 import httpx
-from tenacity import AsyncRetrying, Retrying, stop_after_attempt
+from tenacity import (
+    AsyncRetrying,
+    Retrying,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from podsum.config import ASRProvider, Settings
 from podsum.persistence.models import TranscriptSegment
@@ -68,9 +74,13 @@ class DoubaoASR:
         *,
         retry_attempts: int = 3,
         client: httpx.Client | None = None,
+        retry_wait: Any = None,
     ) -> None:
         self.settings = settings
         self.retry_attempts = retry_attempts
+        # Back-to-back retries all land in the same bad minute of the network;
+        # spacing them out is what gives the second and third a real chance.
+        self.retry_wait = retry_wait if retry_wait is not None else wait_exponential(multiplier=2, min=2, max=30)
         self.client = client or httpx.Client(timeout=120.0)
         self.sdk_api = _build_volcengine_speech_api(settings)
 
@@ -80,7 +90,12 @@ class DoubaoASR:
         language_hint: str | None,
         audio_url: str | None = None,
     ) -> list[TranscriptSegment]:
-        for attempt in Retrying(stop=stop_after_attempt(self.retry_attempts), reraise=True):
+        for attempt in Retrying(
+            stop=stop_after_attempt(self.retry_attempts),
+            wait=self.retry_wait,
+            retry=retry_if_exception(_worth_retrying),
+            reraise=True,
+        ):
             with attempt:
                 raw_response = self._request_file_submit(audio_path, language_hint, audio_url=audio_url)
         self._persist_raw_response(audio_path, raw_response)
@@ -392,12 +407,30 @@ class QwenASR:
         raise ASRResponseError("Qwen ASR transcription did not return")
 
 
+def _worth_retrying(exc: BaseException) -> bool:
+    """Missing credentials and a query that ran past its deadline stay that way."""
+    if isinstance(exc, httpx.TimeoutException):
+        return True  # one slow request, not the whole task
+    return not isinstance(exc, (ValueError, TimeoutError))
+
+
 def create_asr_client(settings: Settings) -> ASRClient:
+    from podsum.services.asr_chunking import ChunkedASR
+
     provider: ASRProvider = settings.ASR_PROVIDER
+    # Both take the audio in the request body, so long files are sent in pieces.
     if provider == "doubao":
-        return DoubaoASR(settings)
+        return ChunkedASR(
+            DoubaoASR(settings),
+            chunk_seconds=settings.ASR_CHUNK_SECONDS,
+            concurrency=settings.ASR_CHUNK_CONCURRENCY,
+        )
     if provider == "openai_whisper":
-        return WhisperASR(settings)
+        return ChunkedASR(
+            WhisperASR(settings),
+            chunk_seconds=settings.ASR_CHUNK_SECONDS,
+            concurrency=settings.ASR_CHUNK_CONCURRENCY,
+        )
     if provider == "qwen":
         return QwenASR(settings)
     return UnimplementedASRClient(provider)

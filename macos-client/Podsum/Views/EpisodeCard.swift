@@ -16,7 +16,10 @@ struct EpisodeCard: View {
 
                 Spacer(minLength: 8)
 
-                ScoreBadge(usefulness: episode.usefulness)
+                // "未评分"只对有摘要的剧集有意义；失败或还在跑的，谈不上评没评分
+                if episode.usefulness != nil || [.done, .partial].contains(episode.status.value) {
+                    ScoreBadge(usefulness: episode.usefulness)
+                }
             }
 
             VStack(alignment: .leading, spacing: 3) {
@@ -51,7 +54,16 @@ struct EpisodeCard: View {
             .foregroundStyle(Tone.textMuted)
             .lineLimit(1)
 
-            StatusDot(status: episode.status)
+            HStack(spacing: 6) {
+                StatusDot(status: episode.status)
+                // 失败时说清卡在哪一步，免得每个红点都得点进去看
+                if episode.status.value == .failed, let failure = episode.lastFailure {
+                    Text("· 卡在\(FailureCopy.stage(failure.stage))")
+                        .podsumFont(.meta)
+                        .foregroundStyle(Tone.textSubtle)
+                        .lineLimit(1)
+                }
+            }
         }
         .padding(18)
         // minHeight 只是栅格等高的下限，不随字号放大——

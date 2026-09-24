@@ -117,7 +117,7 @@ async def ingest_local_file(
 ) -> IngestedAudio:
     episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
-    episode_dir.mkdir(parents=True, exist_ok=False)
+    created_dir = _claim_episode_dir(episode_dir)
     original_tmp = episode_dir / "audio.original.upload"
 
     try:
@@ -141,7 +141,7 @@ async def ingest_local_file(
             detected_ext=detected_ext,
         )
     except Exception:
-        shutil.rmtree(episode_dir, ignore_errors=True)
+        _discard_ingest(episode_dir, created_dir)
         raise
 
 
@@ -160,7 +160,7 @@ async def ingest_direct_url(
 
     episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
-    episode_dir.mkdir(parents=True, exist_ok=False)
+    created_dir = _claim_episode_dir(episode_dir)
     original_tmp = episode_dir / "audio.original.download"
 
     try:
@@ -208,8 +208,35 @@ async def ingest_direct_url(
             detected_ext=detected_ext,
         )
     except Exception:
-        shutil.rmtree(episode_dir, ignore_errors=True)
+        _discard_ingest(episode_dir, created_dir)
         raise
+
+
+def _claim_episode_dir(episode_dir: Path) -> bool:
+    """Create the episode directory; return whether this call created it.
+
+    A re-run reaches fetch with the directory already there whenever the
+    normalized audio is missing — an earlier download died half-way, say. That
+    used to be a hard ``FileExistsError`` which no retry could get past.
+    """
+    try:
+        episode_dir.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        return False
+    return True
+
+
+def _discard_ingest(episode_dir: Path, created_dir: bool) -> None:
+    """Undo a failed ingest without touching what an earlier run left behind.
+
+    A directory this call created goes whole. One that already existed may hold
+    a finished summary, so only the audio this call was writing is removed.
+    """
+    if created_dir:
+        shutil.rmtree(episode_dir, ignore_errors=True)
+        return
+    for path in episode_dir.glob("audio.*"):
+        path.unlink(missing_ok=True)
 
 
 def extract_url(text: str) -> str:
@@ -241,7 +268,7 @@ async def ingest_video(
 ) -> IngestedAudio:
     episode_id = episode_id or new_ulid()
     episode_dir = settings.DATA_DIR / episode_id
-    episode_dir.mkdir(parents=True, exist_ok=False)
+    created_dir = _claim_episode_dir(episode_dir)
 
     try:
         info, original_path = await asyncio.to_thread(
@@ -270,10 +297,10 @@ async def ingest_video(
             source_ref=info.get("webpage_url") or url,
         )
     except yt_dlp.utils.DownloadError as exc:
-        shutil.rmtree(episode_dir, ignore_errors=True)
+        _discard_ingest(episode_dir, created_dir)
         raise UnsupportedMedia(_video_error_message(exc)) from exc
     except Exception:
-        shutil.rmtree(episode_dir, ignore_errors=True)
+        _discard_ingest(episode_dir, created_dir)
         raise
 
 

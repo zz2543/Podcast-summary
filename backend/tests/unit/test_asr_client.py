@@ -7,6 +7,7 @@ from typing import Any
 import httpx
 
 from podsum.config import Settings
+from podsum.services.asr_chunking import ChunkedASR
 from podsum.services.asr_client import (
     DoubaoASR,
     QwenASR,
@@ -174,7 +175,38 @@ def test_parse_segments_accepts_openai_second_offsets() -> None:
 
 
 def test_create_asr_client_selects_registered_providers() -> None:
-    assert isinstance(create_asr_client(settings_for(asr_provider="doubao")), DoubaoASR)
-    assert isinstance(create_asr_client(settings_for(asr_provider="openai_whisper")), WhisperASR)
+    doubao = create_asr_client(settings_for(asr_provider="doubao"))
+    whisper = create_asr_client(settings_for(asr_provider="openai_whisper"))
+    assert isinstance(doubao, ChunkedASR) and isinstance(doubao.inner, DoubaoASR)
+    assert isinstance(whisper, ChunkedASR) and isinstance(whisper.inner, WhisperASR)
     assert isinstance(create_asr_client(settings_for(asr_provider="qwen")), QwenASR)
     assert isinstance(create_asr_client(settings_for(asr_provider="deepgram")), UnimplementedASRClient)
+
+
+def test_doubao_retries_a_dropped_upload_but_not_missing_credentials(tmp_path: Path) -> None:
+    from tenacity import wait_none
+
+    audio_path = tmp_path / "audio.normalized.mp3"
+    audio_path.write_bytes(b"fake")
+
+    class DropsOnce(FakeDoubaoHTTPClient):
+        def post(self, url, *, headers, json):
+            if not self.calls:
+                self.calls.append({"url": url})
+                raise httpx.WriteError("[Errno 54] Connection reset by peer")
+            return super().post(url, headers=headers, json=json)
+
+    client = DropsOnce()
+    asr = DoubaoASR(settings_for(), retry_attempts=3, client=client, retry_wait=wait_none())
+    assert asr.transcribe(audio_path, "zh")[0].text == "完整长音频识别"
+
+    settings = settings_for().model_copy(update={"DOUBAO_ASR_APP_ID": None})
+    counting = FakeDoubaoHTTPClient()
+    no_key = DoubaoASR(settings, retry_attempts=3, client=counting, retry_wait=wait_none())
+    try:
+        no_key.transcribe(audio_path, "zh")
+    except ValueError:
+        pass
+    else:  # pragma: no cover
+        raise AssertionError("expected ValueError")
+    assert counting.calls == []

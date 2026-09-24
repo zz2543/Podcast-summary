@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -10,7 +11,16 @@ from sqlalchemy.orm import Session
 
 from podsum.config import Settings
 from podsum.main import create_app
-from podsum.persistence.models import Base, Chapter, Episode, SummaryArtifact
+from podsum.persistence.models import Base, Chapter, Episode, SummaryArtifact, TranscriptSegment
+
+
+class FakeLLMClient:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def complete_json(self, prompt: str, schema: Any) -> dict[str, Any]:
+        self.calls += 1
+        return {"script": "Hook: a focused hook. Then the argument and the ending."}
 
 
 class FakeTTSClient:
@@ -31,6 +41,7 @@ def test_digest_endpoint_returns_200_on_second_call(tmp_path: Path) -> None:
     db_path, episode_id = _seed_episode(tmp_path)
     app = create_app(_settings(tmp_path, db_path))
     app.state.tts_client = FakeTTSClient()
+    app.state.llm_client = FakeLLMClient()
 
     with TestClient(app) as client:
         first = client.post(f"/api/episodes/{episode_id}/digest")
@@ -52,6 +63,7 @@ def test_digest_failure_marks_tts_failed_after_retries(tmp_path: Path) -> None:
     fake_tts = FakeTTSClient(fail=True)
     app = create_app(_settings(tmp_path, db_path))
     app.state.tts_client = fake_tts
+    app.state.llm_client = FakeLLMClient()
 
     with TestClient(app) as client:
         response = client.post(f"/api/episodes/{episode_id}/digest")
@@ -103,7 +115,15 @@ def _seed_episode(tmp_path: Path) -> tuple[Path, str]:
             end_ms=60_000,
             key_points=["Point one", "Point two"],
         )
-        session.add_all([episode, artifact, chapter])
+        segment = TranscriptSegment(
+            episode_id=episode_id,
+            idx=0,
+            start_ms=0,
+            end_ms=60_000,
+            text="Opening remarks with a focused hook.",
+            language="en",
+        )
+        session.add_all([episode, artifact, chapter, segment])
         session.commit()
     engine.dispose()
     return db_path, episode_id

@@ -9,12 +9,14 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from tenacity import AsyncRetrying, RetryError, stop_after_attempt
 
-from podsum.api.ws_progress import Broadcaster
+from podsum.api.ws_progress import TERMINAL_JOB_STATES, Broadcaster
 from podsum.api.ws_progress import broadcaster as default_broadcaster
 from podsum.config import Settings
+from podsum.domain import episode_status as episode_status_rules
 from podsum.domain import language as language_rules
 from podsum.domain.chapter_segmenter import ChapterSpan
 from podsum.domain.chapter_segmenter import segment as segment_chapters
@@ -37,7 +39,7 @@ from podsum.domain.summary_style import (
     build_directive,
 )
 from podsum.domain.transcript_postprocess import normalize
-from podsum.persistence.models import Chapter, Entity, Episode, Job, TranscriptSegment
+from podsum.persistence.models import Chapter, Entity, Episode, Job, TranscriptSegment, utc_now
 from podsum.persistence.repo import (
     ChapterRepo,
     EntityRepo,
@@ -59,6 +61,8 @@ from podsum.services.llm_client import LLMClient, create_llm_client
 from podsum.services.tts_client import TTSClient, create_tts_client
 
 StageResult = dict[str, Any] | None
+#: ``requested_stage`` a digest job carries in its ``stage_progress``.
+DIGEST_STAGE = "tts"
 StageRun = Callable[["PipelineContext"], StageResult | Awaitable[StageResult]]
 
 
@@ -84,10 +88,14 @@ class Pipeline:
         *,
         retry_attempts: int = 3,
         broadcaster: Broadcaster = default_broadcaster,
+        owns_episode_status: bool = True,
     ) -> None:
         self.session = session
         self.retry_attempts = retry_attempts
         self.broadcaster = broadcaster
+        # The digest pipeline is an add-on to a finished summary: running it,
+        # or failing it, says nothing about whether the summary is readable.
+        self.owns_episode_status = owns_episode_status
         self._stages: list[Stage] = []
 
     @property
@@ -98,6 +106,8 @@ class Pipeline:
         self._stages.append(Stage(name=name, required=required, run=run))
 
     async def run(self, job: Job) -> Job:
+        job.started_at = utc_now()
+        job.finished_at = None
         optional_failed = False
         for stage in self._stages:
             await self._set_state(job, self._state_for_stage(stage.name))
@@ -157,13 +167,30 @@ class Pipeline:
                 reraise=True,
             ):
                 with attempt:
-                    result = stage.run(context)
-                    if inspect.isawaitable(result):
-                        result = await result
-                    return result
+                    return await self._invoke(stage, context)
         except RetryError as exc:
             raise exc.last_attempt.exception() from exc
         return None
+
+    @staticmethod
+    async def _invoke(stage: Stage, context: PipelineContext) -> StageResult:
+        """在工作线程上调用 stage，不占着事件循环。
+
+        summarize 那几个 stage 是同步函数，里面用同步 httpx 打 LLM——一次调用
+        几十秒。放在循环上跑，这几十秒里整个进程什么都做不了：作业恢复发生在
+        lifespan 结束的那一刻，uvicorn 连监听套接字都还没绑上，于是端口上空无
+        一物，客户端探测三十次全是"连接被拒绝"，最后报"后端起不来"。
+
+        对异步 stage（fetch/transcribe）来说，线程里只是把协程对象造出来，
+        真正的执行仍然回到循环上——它们内部本来就用 to_thread 包了阻塞部分。
+
+        session 跨线程是安全的：同一时刻只有一个线程在用它（这里 await 着），
+        且 SQLAlchemy 给文件型 SQLite 的连接带了 check_same_thread=False。
+        """
+        result = await asyncio.to_thread(stage.run, context)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
 
     async def _record_progress(self, job: Job, stage: str, payload: dict[str, Any]) -> None:
         progress = dict(job.stage_progress or {})
@@ -176,16 +203,23 @@ class Pipeline:
     async def _set_state(self, job: Job, state: str, *, error: str | None = None) -> None:
         job.state = state
         job.error = error
-        episode_status = self._episode_status_for_job(state)
-        episode = EpisodeRepo(self.session).get(job.episode_id)
-        if episode is not None:
-            episode.status = episode_status
-            self.session.add(episode)
+        if state in TERMINAL_JOB_STATES:
+            job.finished_at = utc_now()
         self.session.add(job)
+        # Flush first so the derivation below sees this job's new state.
+        self.session.flush()
+        if self.owns_episode_status:
+            episode = EpisodeRepo(self.session).get(job.episode_id)
+            if episode is not None:
+                status = derive_episode_status(self.session, job.episode_id)
+                if episode.status != status:
+                    episode.status = status
+                    self.session.add(episode)
         self.session.commit()
         await self._publish_job_update(job)
 
     async def _publish_job_update(self, job: Job) -> None:
+        episode = EpisodeRepo(self.session).get(job.episode_id)
         await self.broadcaster.publish_job_update(
             {
                 "id": job.id,
@@ -197,7 +231,7 @@ class Pipeline:
                 "started_at": job.started_at.isoformat() if job.started_at else None,
                 "finished_at": job.finished_at.isoformat() if job.finished_at else None,
             },
-            episode_status=self._episode_status_for_job(job.state),
+            episode_status=episode.status if episode is not None else "failed",
         )
 
     def _stage_status(self, episode_id: str) -> dict[str, str]:
@@ -227,12 +261,6 @@ class Pipeline:
         if stage_name == "tts":
             return "tts"
         return "summarizing"
-
-    @staticmethod
-    def _episode_status_for_job(state: str) -> str:
-        if state in {"done", "partial", "failed"}:
-            return state
-        return "processing"
 
     @staticmethod
     def _artifact_stage_key(stage_name: str) -> str:
@@ -389,7 +417,7 @@ def create_tts_pipeline(
     llm_client: LLMClient | None = None,
     prompt_root: Path = Path("prompts"),
 ) -> Pipeline:
-    pipeline = Pipeline(session, broadcaster=broadcaster)
+    pipeline = Pipeline(session, broadcaster=broadcaster, owns_episode_status=False)
     tts_client = tts_client or create_tts_client(settings)
     llm_client = llm_client or create_llm_client(settings)
     prompt_assembler = PromptAssembler(prompt_root)
@@ -935,3 +963,43 @@ def recover_incomplete_jobs(
         for job in jobs:
             enqueue(job)
     return jobs
+
+
+def is_digest_job(job: Job) -> bool:
+    return (job.stage_progress or {}).get("requested_stage") == DIGEST_STAGE
+
+
+def derive_episode_status(session: Session, episode_id: str) -> str:
+    """What the episode has, see :mod:`podsum.domain.episode_status`."""
+    summary_jobs = [
+        job
+        for job in session.scalars(select(Job).where(Job.episode_id == episode_id))
+        if not is_digest_job(job)
+    ]
+    artifact = SummaryArtifactRepo(session).get(episode_id)
+    return episode_status_rules.derive(
+        artifact.stage_status if artifact is not None else None,
+        summary_job_active=any(job.state in JobRepo.ACTIVE_STATES for job in summary_jobs),
+        summary_job_ran=any(job.state in TERMINAL_JOB_STATES for job in summary_jobs),
+    )
+
+
+def reconcile_episode_statuses(session: Session) -> list[str]:
+    """Re-derive every episode's status; return the ids that changed.
+
+    Run at startup, after job recovery: it repairs rows written under the old
+    "copy the last job's state" rule, and any row a crash left half-written.
+    """
+    changed: list[str] = []
+    for episode_id, current in session.execute(select(Episode.id, Episode.status)).all():
+        status = derive_episode_status(session, episode_id)
+        if current != status:
+            # Keep ``updated_at``: nothing about the episode changed, only the
+            # label we compute for it — the reader's "updated on" must not jump.
+            session.execute(
+                update(Episode)
+                .where(Episode.id == episode_id)
+                .values(status=status, updated_at=Episode.updated_at)
+            )
+            changed.append(episode_id)
+    return changed

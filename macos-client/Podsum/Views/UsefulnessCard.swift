@@ -155,7 +155,7 @@ struct UsefulnessCard: View {
 
     private var reason: String {
         switch stage.value {
-        case .failedAfterRetries: return "评分阶段多次重试后仍失败，其余摘要不受影响。"
+        case .failedAfterRetries: return "评分阶段多次重试后仍失败，其余摘要不受影响；可在「更多」里重新处理。"
         case .pending:            return "评分阶段尚未运行。"
         case .missing:            return "这集入库时评分功能还不存在。"
         default:                  return "这集没有评分记录。"

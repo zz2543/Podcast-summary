@@ -14,7 +14,7 @@ from podsum.api import episodes, jobs, ws_progress
 from podsum.api._logging import configure_logging
 from podsum.config import Settings, get_settings
 from podsum.services.job_queue import JobQueue
-from podsum.services.pipeline import recover_incomplete_jobs
+from podsum.services.pipeline import reconcile_episode_statuses, recover_incomplete_jobs
 
 VERSION = "0.1.0"
 
@@ -38,6 +38,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 session,
                 getattr(app.state, "enqueue_job", None),
             )
+            reconcile_episode_statuses(session)
             session.commit()
     app.state.recovered_jobs = recovered_jobs
     try:
