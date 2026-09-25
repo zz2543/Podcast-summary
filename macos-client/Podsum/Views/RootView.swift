@@ -15,6 +15,7 @@ struct RootView: View {
     @Environment(UIState.self) private var ui
     @Environment(JobsModel.self) private var jobs
     @Environment(\.openSettings) private var openSettings
+    @Environment(OnboardingGuide.self) private var guide
 
     var body: some View {
         Group {
@@ -60,8 +61,9 @@ struct RootView: View {
             HStack(spacing: Space.m) {
                 switch backend.phase {
                 case .needsConfiguration:
-                    Button(tr("打开设置", "Open Settings")) { openSettings() }
+                    Button(tr("开始引导", "Start Setup Guide")) { startGuide() }
                         .keyboardShortcut(.defaultAction)
+                    Button(tr("我自己填", "Fill In Myself")) { openSettings() }
                 case .starting:
                     EmptyView()
                 default:
@@ -76,6 +78,17 @@ struct RootView: View {
         .frame(maxWidth: 620)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Tone.bg)
+        // 第一次打开、什么都没填：直接把设置窗口打开并开始引导（只自动这一次）
+        .onChange(of: backend.phase, initial: true) { _, phase in
+            if case .needsConfiguration = phase, guide.shouldAutoStart(isConfigured: settings.isConfigured) {
+                startGuide()
+            }
+        }
+    }
+
+    private func startGuide() {
+        guide.start()
+        openSettings()
     }
 
     private var icon: String {

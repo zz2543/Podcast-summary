@@ -47,6 +47,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let jobs = JobsModel()
     lazy var quickAdd = QuickAddCenter(backend: backend)
     lazy var components = ComponentUpdater(backend: backend)
+    let onboarding = OnboardingGuide()
+    lazy var webGuide = WebGuideController(settings: settings)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let notifier = QuickAddNotifier.shared
@@ -102,6 +104,7 @@ struct PodsumApp: App {
                 .environment(ui)
                 .environment(jobs)
                 .environment(appDelegate.quickAdd)
+                .environment(appDelegate.onboarding)
                 .environment(\.textScale, textScale)
                 .environment(\.locale, localizer.locale)
                 // 聊天在详情区域内部展开，窗口最小尺寸保持稳定。
@@ -166,6 +169,8 @@ struct PodsumApp: App {
                 .environment(settings)
                 .environment(backend)
                 .environment(appDelegate.components)
+                .environment(appDelegate.onboarding)
+                .environment(appDelegate.webGuide)
                 .environment(\.textScale, textScale)
                 .environment(\.locale, localizer.locale)
         }

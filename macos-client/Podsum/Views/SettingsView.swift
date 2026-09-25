@@ -7,19 +7,32 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(BackendController.self) private var backend
+    @Environment(OnboardingGuide.self) private var guide
 
     var body: some View {
-        TabView {
+        @Bindable var guide = guide
+
+        TabView(selection: $guide.settingsTab) {
             GeneralSettings()
                 .tabItem { Label(tr("通用", "General"), systemImage: "gearshape") }
+                .tag(SettingsTab.general)
             ProviderSettings()
                 .tabItem { Label(tr("接口", "Providers"), systemImage: "key") }
+                .tag(SettingsTab.providers)
             BackendSettings()
                 .tabItem { Label(tr("服务", "Service"), systemImage: "server.rack") }
+                .tag(SettingsTab.service)
             QuickAddSettings()
                 .tabItem { Label(tr("快捷提交", "Quick Add"), systemImage: "bolt") }
+                .tag(SettingsTab.quickAdd)
         }
-        .frame(width: 580, height: 520)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if guide.isActive && guide.settingsTab != .providers {
+                OnboardingReturnBanner()
+            }
+        }
+        // 引导时加高一些：气泡要放在输入框旁边，又不能把下一格全挡住
+        .frame(width: guide.isActive ? 620 : 580, height: guide.isActive ? 700 : 520)
     }
 }
 
@@ -28,6 +41,7 @@ struct SettingsView: View {
 struct GeneralSettings: View {
     @State private var localizer = Localizer.shared
     @State private var updates = AppUpdateChecker()
+    @Environment(OnboardingGuide.self) private var guide
 
     var body: some View {
         Form {
@@ -62,6 +76,13 @@ struct GeneralSettings: View {
                     .disabled(updates.state == .checking)
                     AppUpdateStatus(state: updates.state)
                 }
+            }
+
+            Section {
+                Button(tr("重新开始新手引导", "Restart Setup Guide")) { guide.start() }
+            } footer: {
+                Text(tr("在「接口」页上一格一格带你把 API 填好。", "Walks you through the Providers page one field at a time."))
+                    .podsumFont(.micro).foregroundStyle(Tone.textSubtle)
             }
         }
         .formStyle(.grouped)
@@ -100,6 +121,7 @@ private struct AppUpdateStatus: View {
 struct ProviderSettings: View {
     @Environment(AppSettings.self) private var settings
     @Environment(BackendController.self) private var backend
+    @Environment(OnboardingGuide.self) private var guide
 
     @State private var testResult: String?
     @State private var testPassed = false
@@ -108,17 +130,22 @@ struct ProviderSettings: View {
     var body: some View {
         @Bindable var settings = settings
 
+        ScrollViewReader { proxy in
         Form {
             Section {
                 Picker(tr("供应商", "Provider"), selection: $settings.llmProvider) {
                     ForEach(LLMChoice.allCases) { Text($0.label).tag($0) }
                 }
+                .onboardingTarget(.llmProvider)
 
                 switch settings.llmProvider {
                 case .openAICompatible:
-                    TextField(tr("接口地址", "Base URL"), text: $settings.llmBaseURL, prompt: Text("https://api.example.com/v1"))
-                    TextField(tr("模型名", "Model"), text: $settings.llmModel, prompt: Text(tr("例如 gpt-4o-mini", "e.g. gpt-4o-mini")))
+                    TextField(tr("接口地址", "Base URL"), text: $settings.llmBaseURL, prompt: Text(tr("厂商文档里的 base_url", "base_url from the vendor’s docs")))
+                        .onboardingTarget(.llmBaseURL)
+                    TextField(tr("模型名", "Model"), text: $settings.llmModel, prompt: Text(tr("例如 deepseek-flash", "e.g. deepseek-flash")))
+                        .onboardingTarget(.llmModel)
                     SecureField("API Key", text: $settings.llmAPIKey, prompt: Text("sk-…"))
+                        .onboardingTarget(.llmKey)
                     HStack {
                         Button(testing ? tr("测试中…", "Testing…") : tr("测试连接", "Test Connection")) { test() }
                             .disabled(testing || settings.llmBaseURL.isBlank || settings.llmAPIKey.isBlank)
@@ -129,12 +156,17 @@ struct ProviderSettings: View {
                                 .textSelection(.enabled)
                         }
                     }
+                    .onboardingTarget(.llmTest)
                 case .qwen:
-                    TextField(tr("模型名", "Model"), text: $settings.llmModel, prompt: Text("qwen-max"))
+                    TextField(tr("模型名", "Model"), text: $settings.llmModel, prompt: Text("qwen3.7-plus"))
+                        .onboardingTarget(.llmModel)
                     SecureField("DashScope API Key", text: $settings.dashscopeAPIKey)
+                        .onboardingTarget(.llmKey)
                 case .anthropic:
-                    TextField(tr("模型名", "Model"), text: $settings.llmModel, prompt: Text("claude-sonnet-4-5"))
+                    TextField(tr("模型名", "Model"), text: $settings.llmModel, prompt: Text("claude-sonnet-5"))
+                        .onboardingTarget(.llmModel)
                     SecureField("Anthropic API Key", text: $settings.anthropicAPIKey)
+                        .onboardingTarget(.llmKey)
                 }
             } header: {
                 Text(tr("摘要与对话（LLM）", "Summaries & Chat (LLM)"))
@@ -148,35 +180,50 @@ struct ProviderSettings: View {
                 Picker(tr("供应商", "Provider"), selection: $settings.asrProvider) {
                     ForEach(ASRChoice.allCases) { Text($0.label).tag($0) }
                 }
+                .onboardingTarget(.asrProvider)
                 switch settings.asrProvider {
                 case .doubao:
                     SecureField(tr("火山 Access Key ID", "Volcengine Access Key ID"), text: $settings.volcAccessKeyID)
+                        .onboardingTarget(.asrVolcAK)
                     SecureField(tr("火山 Secret Access Key", "Volcengine Secret Access Key"), text: $settings.volcSecretKey)
+                        .onboardingTarget(.asrVolcSK)
                     TextField(tr("豆包 ASR App ID", "Doubao ASR App ID"), text: $settings.doubaoASRAppID)
+                        .onboardingTarget(.asrAppID)
                     SecureField(tr("豆包 ASR Access Token", "Doubao ASR Access Token"), text: $settings.doubaoASRToken)
+                        .onboardingTarget(.asrToken)
                 case .openaiWhisper:
                     SecureField("OpenAI API Key", text: $settings.openAIAPIKey)
+                        .onboardingTarget(.asrOpenAIKey)
                 case .deepgram:
                     SecureField("Deepgram API Key", text: $settings.deepgramAPIKey)
+                        .onboardingTarget(.asrDeepgramKey)
                 case .qwen:
                     SecureField("DashScope API Key", text: $settings.dashscopeAPIKey)
+                        .onboardingTarget(.asrDashscopeKey)
                 }
             }
 
             Section {
                 Toggle(tr("启用音频摘要", "Enable Audio Summaries"), isOn: $settings.ttsEnabled)
+                    .onboardingTarget(.ttsToggle)
                 if settings.ttsEnabled {
                     Picker(tr("供应商", "Provider"), selection: $settings.ttsProvider) {
                         ForEach(TTSChoice.allCases) { Text($0.label).tag($0) }
                     }
+                    .onboardingTarget(.ttsProvider)
                     switch settings.ttsProvider {
                     case .doubao:
                         SecureField(tr("火山 Access Key ID", "Volcengine Access Key ID"), text: $settings.volcAccessKeyID)
+                            .onboardingTarget(.ttsVolcAK)
                         SecureField(tr("火山 Secret Access Key", "Volcengine Secret Access Key"), text: $settings.volcSecretKey)
+                            .onboardingTarget(.ttsVolcSK)
                         TextField(tr("豆包 TTS App ID", "Doubao TTS App ID"), text: $settings.doubaoTTSAppID)
+                            .onboardingTarget(.ttsAppID)
                         SecureField(tr("豆包 TTS Access Token", "Doubao TTS Access Token"), text: $settings.doubaoTTSToken)
+                            .onboardingTarget(.ttsToken)
                     case .qwen:
                         SecureField("DashScope API Key", text: $settings.dashscopeAPIKey)
+                            .onboardingTarget(.ttsDashscopeKey)
                     }
                 }
             } header: {
@@ -199,9 +246,29 @@ struct ProviderSettings: View {
                 }
                 Button(tr("应用并重启后端", "Apply & Restart Backend")) { Task { await backend.restart() } }
                     .disabled(!settings.isConfigured || backend.phase.isBusy)
+                    .onboardingTarget(.apply)
             }
         }
         .formStyle(.grouped)
+        .overlay {
+            if guide.isActive { OnboardingOverlay() }
+        }
+        // 引导换到下一格时，先把那一格滚进视野中间
+        .onChange(of: currentGuideTarget, initial: true) { _, target in
+            guard guide.isActive, let target else { return }
+            withAnimation(.easeInOut(duration: 0.3)) { proxy.scrollTo(target, anchor: .center) }
+        }
+        // 地址、模型、key 任何一个改了，上一次的测试结果就不算数了
+        .onChange(of: [settings.llmBaseURL, settings.llmModel, settings.llmAPIKey]) { _, _ in
+            if guide.llmTest != .untested { guide.llmTest = .untested }
+        }
+        }
+    }
+
+    private var currentGuideTarget: OnboardingTarget? {
+        guard guide.isActive else { return nil }
+        let steps = OnboardingScript.steps(settings)
+        return steps[guide.clampedIndex(stepCount: steps.count)].target
     }
 
     /// 直接打用户填的那个地址。地址和 key 都是手输的，最容易错的就是这里——
@@ -214,8 +281,12 @@ struct ProviderSettings: View {
         let model = settings.llmModel.trimmed
         let key = settings.llmAPIKey.trimmed
 
+        guide.llmTest = .testing
         Task {
-            defer { testing = false }
+            defer {
+                testing = false
+                guide.llmTest = testPassed ? .passed : .failed(testResult ?? tr("测试失败", "Test failed"))
+            }
             guard var url = URL(string: base) else { testResult = tr("地址不合法", "Invalid URL"); return }
             url.append(path: "chat/completions")
 
