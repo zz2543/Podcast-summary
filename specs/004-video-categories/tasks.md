@@ -215,7 +215,7 @@ description: "Task list for 004 video categories"
 - [x] T042 按 quickstart §2 在真实库的副本上验证迁移的升级、降级、再升级，并确认 31 条剧集完好。
 - [x] T043 按 quickstart §3 在 fakeroot 后端（端口 8765，假 LLM）上走一遍接口脚本，结果记入 plan.md 新增的「已验证」表。
 - [x] T044 在 plan.md 末尾补「未验证 —— 需要在真机上手动过一遍」清单（照 003 的格式，内容取 quickstart §5）。
-- [ ] T045 **需要用户同意后再做**：按 quickstart §4，用复制的库和真 LLM 跑一次 AI 分类，只看方案不应用，把分类数、每类条数、耗时和需要改动的比例（SC-005）记入 plan.md。
+- [x] T045 **（2026-09-25 已跑，结果见 plan.md）**：按 quickstart §4，用复制的库和真 LLM 跑一次 AI 分类，只看方案不应用，把分类数、每类条数、耗时和需要改动的比例（SC-005）记入 plan.md。
 
 ---
 
