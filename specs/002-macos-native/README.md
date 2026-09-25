@@ -196,6 +196,10 @@ Contents/Resources/python/                                   CPython（--with-ru
 - **退出时收子进程走 `AppDelegate.applicationWillTerminate`。** SwiftUI 的 Scene
   没有这个钩子，不接的话 uvicorn 会活过 app——实测确认过：第一版就漏了，
   app 退出后端口上还留着监听进程。
+- **关掉主窗口不等于退出（003 起）。** 原来是关窗即退出、后端跟着窗口的 `.task` 起；
+  003 快捷提交要求全局快捷键随时可用，于是 Podsum 改为常驻菜单栏：后端在
+  `applicationDidFinishLaunching` 启动，模型挂在 `AppDelegate` 上而不是窗口上，
+  主窗口换成单实例的 `Window` 场景，⌘Q 或菜单栏「退出」才停后端。见 `specs/003-video-quick-add/`。
 - **Debug 构建自己找得到工作树。** 内嵌后端只有 `package.py` 打包时才放进
   `Contents/Resources/backend`，所以从 Xcode 跑的产物里没有那一份。查找顺序是
   设置里手填的 → 内嵌的 → `PODSUM_BACKEND_ROOT` → **`#filePath` 往上四层**。

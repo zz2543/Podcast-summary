@@ -220,9 +220,15 @@ public struct EpisodeSummary: Codable, Sendable, Identifiable, Hashable {
     public let updatedAt: Date
     /// 最近一个摘要任务失败的原因；没失败就是 nil。老后端不发这个键，同样解成 nil。
     public var lastFailure: JobFailure? = nil
+    /// 后端存了视频封面（`/files/cover`）。老后端不发这个键，解成 nil，当作没有。
+    public var hasCover: Bool? = nil
+    /// 所在分类（004）。nil = 未分类；老后端不发这个键，同样解成 nil。
+    public var category: CategoryRef? = nil
+    /// manual = 用户放的、锁定；auto = AI 管理；nil = 从没分过类。
+    public var categoryOrigin: Fallback<CategoryOrigin>? = nil
 
     enum CodingKeys: String, CodingKey {
-        case id, title, language, status, usefulness
+        case id, title, language, status, usefulness, category
         case podcastName = "podcast_name"
         case sourceType = "source_type"
         case durationSeconds = "duration_seconds"
@@ -230,6 +236,8 @@ public struct EpisodeSummary: Codable, Sendable, Identifiable, Hashable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case lastFailure = "last_failure"
+        case hasCover = "has_cover"
+        case categoryOrigin = "category_origin"
     }
 }
 
@@ -284,9 +292,12 @@ public struct EpisodeDetail: Codable, Sendable, Identifiable, Hashable {
     public let createdAt: Date
     public let updatedAt: Date
     public var lastFailure: JobFailure? = nil   // 只在 API 响应里有，summary.json 里没有
+    public var category: CategoryRef? = nil        // 同上（004）
+    public var categoryOrigin: Fallback<CategoryOrigin>? = nil
 
     enum CodingKeys: String, CodingKey {
-        case id, title, guests, hook, chapters, entities, language, status, usefulness
+        case id, title, guests, hook, chapters, entities, language, status, usefulness, category
+        case categoryOrigin = "category_origin"
         case podcastName = "podcast_name"
         case sourceType = "source_type"
         case sourceRef = "source_ref"
@@ -302,6 +313,174 @@ public struct EpisodeDetail: Codable, Sendable, Identifiable, Hashable {
     }
 }
 
+// MARK: - 分类（004，specs/004-video-categories/contracts/http-api.md）
+
+/// 一条视频的分类归属从哪来。manual 即锁定：AI 分类永远不碰它。
+public enum CategoryOrigin: String, Codable, Sendable {
+    case manual, auto
+}
+
+/// 列表 / 详情里内嵌的分类引用
+public struct CategoryRef: Codable, Sendable, Hashable {
+    public let id: String
+    public let name: String
+}
+
+/// GET /api/categories 的单项
+public struct EpisodeCategory: Codable, Sendable, Identifiable, Hashable {
+    public let id: String
+    public let name: String
+    public let position: Int
+    public let origin: String          // user / ai
+    public let episodeCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, position, origin
+        case episodeCount = "episode_count"
+    }
+}
+
+public struct CategoryList: Codable, Sendable, Hashable {
+    public let items: [EpisodeCategory]
+    public let uncategorizedCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case items
+        case uncategorizedCount = "uncategorized_count"
+    }
+}
+
+/// PUT /api/episodes/{id}/category 与 …/category/release 的响应
+public struct CategoryAssignment: Codable, Sendable, Hashable {
+    public let category: CategoryRef?
+    public let categoryOrigin: Fallback<CategoryOrigin>?
+
+    enum CodingKeys: String, CodingKey {
+        case category
+        case categoryOrigin = "category_origin"
+    }
+}
+
+/// GET /api/categorize/{run_id}
+public struct CategorizeRun: Codable, Sendable, Hashable {
+    public enum State: String, Codable, Sendable { case running, ready, failed, cancelled }
+    public enum Phase: String, Codable, Sendable { case taxonomy, assign }
+
+    public struct Progress: Codable, Sendable, Hashable {
+        public let done: Int
+        public let total: Int
+    }
+
+    public let runID: String
+    public let state: Fallback<State>
+    public let phase: Fallback<Phase>?
+    public let progress: Progress?
+    public let error: String?
+    public let proposal: CategorizeProposal?
+
+    enum CodingKeys: String, CodingKey {
+        case state, phase, progress, error, proposal
+        case runID = "run_id"
+    }
+}
+
+/// AI 给的分类方案。只存在于预览期间，用户确认前库里什么都没变。
+/// 只处理还在「未分类」里的视频：放进已有分类，或放进它提议的新分类。
+public struct CategorizeProposal: Codable, Sendable, Hashable {
+    public struct ProposedCategory: Codable, Sendable, Hashable, Identifiable {
+        public let key: String             // "c:<id>" 已有分类；"n:<k>" 新分类
+        public let categoryID: String?
+        public let name: String
+        public let isNew: Bool
+        public var reason: String? = nil
+        public var id: String { key }
+
+        enum CodingKeys: String, CodingKey {
+            case key, name, reason
+            case categoryID = "category_id"
+            case isNew = "is_new"
+        }
+    }
+
+    public struct Change: Codable, Sendable, Hashable, Identifiable {
+        public let episodeID: String
+        public let title: String?
+        public let toKey: String
+        public var id: String { episodeID }
+
+        enum CodingKeys: String, CodingKey {
+            case title
+            case episodeID = "episode_id"
+            case toKey = "to_key"
+        }
+    }
+
+    /// 没参与这次运行的视频，按原因计数
+    public struct Skipped: Codable, Sendable, Hashable {
+        public let categorized: Int      // 已经在某个分类里（不论谁放的）
+        public let locked: Int           // 被你手动移出、留在未分类
+        public let noSummary: Int
+        public let noSuggestion: Int     // AI 觉得都不合适，或那一批失败了
+
+        enum CodingKeys: String, CodingKey {
+            case categorized, locked
+            case noSummary = "no_summary"
+            case noSuggestion = "no_suggestion"
+        }
+    }
+
+    public let categories: [ProposedCategory]
+    public let changes: [Change]
+    public let skipped: Skipped
+    public let failedBatches: Int
+
+    enum CodingKeys: String, CodingKey {
+        case categories, changes, skipped
+        case failedBatches = "failed_batches"
+    }
+}
+
+/// POST /api/categories/apply 的请求体：用户在预览里留下、改过的结果
+public struct CategorizeApply: Sendable, Hashable {
+    public struct NewCategory: Sendable, Hashable {
+        public let key: String
+        public let name: String
+    }
+    public struct Assignment: Sendable, Hashable {
+        public let episodeID: String
+        public let fromCategoryID: String?
+        public let toKey: String
+    }
+    public var newCategories: [NewCategory]
+    public var assignments: [Assignment]
+}
+
+public struct CategorizeApplyResult: Codable, Sendable, Hashable {
+    public struct Created: Codable, Sendable, Hashable {
+        public let key: String
+        public let categoryID: String
+        public let name: String
+        public let reused: Bool
+
+        enum CodingKeys: String, CodingKey {
+            case key, name, reused
+            case categoryID = "category_id"
+        }
+    }
+    public struct SkippedRow: Codable, Sendable, Hashable {
+        public let episodeID: String
+        public let reason: String      // locked / changed / episode_gone / category_gone
+
+        enum CodingKeys: String, CodingKey {
+            case reason
+            case episodeID = "episode_id"
+        }
+    }
+    public let created: [Created]
+    public let applied: Int
+    public let skipped: [SkippedRow]
+}
+
 // MARK: - API 错误
 
 /// 后端错误体：{"error": {"code": ..., "message": ..., "details": {...}}}
@@ -309,6 +488,9 @@ public struct APIErrorEnvelope: Codable, Sendable {
     public struct Payload: Codable, Sendable {
         public let code: String        // not_found / bad_input / conflict / payload_too_large / unsupported_media
         public let message: String
+        /// 附加信息。重复链接的 409 在这里带 `episode_id`（003 快捷提交用它打开已有的那一集）；
+        /// 其余错误为空对象，老后端不发时解成 nil。
+        public var details: [String: JSONValue]? = nil
     }
     public let error: Payload
 }

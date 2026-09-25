@@ -116,6 +116,7 @@ w(f"""\t\t{PROJ} /* Project object */ = {{
 \t\t\thasScannedForEncodings = 0;
 \t\t\tknownRegions = (
 \t\t\t\ten,
+\t\t\t\t"zh-Hans",
 \t\t\t\tBase,
 \t\t\t);
 \t\t\tmainGroup = {MAIN};
@@ -156,6 +157,7 @@ TGT_COMMON = """\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 \t\t\t\tENABLE_HARDENED_RUNTIME = NO;
 \t\t\t\tENABLE_PREVIEWS = YES;
 \t\t\t\tGENERATE_INFOPLIST_FILE = YES;
+\t\t\t\tINFOPLIST_FILE = Podsum/Info.plist;
 \t\t\t\tINFOPLIST_KEY_NSHumanReadableCopyright = "";
 \t\t\t\tLD_RUNPATH_SEARCH_PATHS = (
 \t\t\t\t\t"$(inherited)",

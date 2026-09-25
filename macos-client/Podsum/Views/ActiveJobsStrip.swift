@@ -29,11 +29,11 @@ struct ActiveJobsStrip: View {
                     .foregroundStyle(Tone.text)
                     .lineLimit(1)
                 Spacer(minLength: Space.s)
-                Text(job.state.label)
+                Text(job.state.localizedLabel)
                     .podsumFont(.meta)
                     .foregroundStyle(Tone.textMuted)
                 if job.attempt > 1 {
-                    Text("第 \(job.attempt) 次")
+                    Text(tr("第 \(job.attempt) 次", "Attempt \(job.attempt)"))
                         .podsumFont(.micro)
                         .foregroundStyle(Tone.warn)
                 }

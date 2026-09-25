@@ -16,6 +16,7 @@ from podsum.services.ingest import (
     _video_error_message,
     extract_url,
     normalize_video_url,
+    video_identity,
 )
 
 BILIBILI_URL = "https://www.bilibili.com/video/BV1XV411o7ra"
@@ -341,3 +342,32 @@ def test_ingest_reuses_an_existing_episode_dir_and_keeps_its_summary(tmp_path) -
 
     _discard_ingest(episode_dir, created_dir=True)
     assert not episode_dir.exists()
+
+
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [
+        # Address bar vs share button vs a row stored before normalisation
+        (f"{BILIBILI_URL}/?spm_id_from=333.1007&vd_source=abc", f"【标题】{BILIBILI_URL}?vd_source=e352aac"),
+        (f"{BILIBILI_URL}?p=1", "https://m.bilibili.com/video/BV1XV411o7ra"),
+        ("https://www.bilibili.com/list/watchlater?oid=1&bvid=BV1XV411o7ra", BILIBILI_URL),
+        ("https://youtu.be/dQw4w9WgXcQ?si=abc", YOUTUBE_URL),
+        (f"{YOUTUBE_URL}&list=PL1&index=2&t=30s", "https://m.youtube.com/shorts/dQw4w9WgXcQ"),
+    ],
+)
+def test_video_identity_ignores_how_a_link_is_written(first: str, second: str) -> None:
+    assert video_identity(first) is not None
+    assert video_identity(first) == video_identity(second)
+
+
+def test_video_identity_keeps_parts_and_videos_apart() -> None:
+    assert video_identity(f"{BILIBILI_URL}?p=2") != video_identity(BILIBILI_URL)
+    assert video_identity("https://www.youtube.com/watch?v=aaaaaaaaaaa") != video_identity(YOUTUBE_URL)
+
+
+@pytest.mark.parametrize(
+    "link",
+    ["https://b23.tv/AbCdEfG", "https://space.bilibili.com/1", "https://www.youtube.com/playlist?list=PL1"],
+)
+def test_video_identity_is_unknown_when_the_link_cannot_be_pinned_down(link: str) -> None:
+    assert video_identity(link) is None

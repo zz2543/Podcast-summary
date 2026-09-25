@@ -16,6 +16,7 @@ import yt_dlp
 from podsum.config import Settings
 from podsum.persistence.models import new_ulid
 from podsum.services import _bilibili_session
+from podsum.services import cover as cover_images
 
 MAX_FILE_BYTES = 1_000_000_000
 MAX_DURATION_SECONDS = 21_600
@@ -261,6 +262,54 @@ def normalize_video_url(text: str) -> str:
     return urlunsplit(parts._replace(query=urlencode(kept)))
 
 
+_YOUTUBE_ID = re.compile(r"[A-Za-z0-9_-]{11}")
+_BILIBILI_ID = re.compile(r"(BV[0-9A-Za-z]{10}|av\d+)", re.IGNORECASE)
+
+
+def video_identity(text: str) -> tuple[str, ...] | None:
+    """Which video a link points at, however it is written.
+
+    The same Bilibili video arrives as ``/video/BV1xx/?spm_id_from=...`` from the
+    address bar and ``/video/BV1xx?vd_source=...`` from a share button, and old
+    rows were stored before tracking parameters were dropped at all. Comparing
+    identities instead of strings is what lets a duplicate be recognised.
+    ``None`` means the link can't be pinned down offline (e.g. a b23.tv short link).
+    """
+    parts = urlsplit(extract_url(text))
+    host = (parts.hostname or "").lower()
+    query = dict(parse_qsl(parts.query))
+    segments = [segment for segment in parts.path.split("/") if segment]
+
+    def on(domain: str) -> bool:
+        return host == domain or host.endswith(f".{domain}")
+
+    if host == "youtu.be":
+        if segments and _YOUTUBE_ID.fullmatch(segments[0]):
+            return ("youtube", segments[0])
+        return None
+    if on("youtube.com"):
+        if segments[:1] == ["watch"] and _YOUTUBE_ID.fullmatch(query.get("v", "")):
+            return ("youtube", query["v"])
+        if len(segments) >= 2 and segments[0] in {"shorts", "live", "embed"} and _YOUTUBE_ID.fullmatch(segments[1]):
+            return ("youtube", segments[1])
+        return None
+    if on("bilibili.com"):
+        page = query.get("p", "1")
+        page = page if page.isdigit() and int(page) > 1 else "1"
+        if len(segments) >= 2 and segments[0] == "video" and _BILIBILI_ID.fullmatch(segments[1]):
+            return ("bilibili", _bilibili_key(segments[1]), page)
+        if len(segments) >= 3 and segments[:2] == ["bangumi", "play"]:
+            return ("bilibili-bangumi", segments[2].lower())
+        if _BILIBILI_ID.fullmatch(query.get("bvid", "")):
+            return ("bilibili", _bilibili_key(query["bvid"]), page)
+    return None
+
+
+def _bilibili_key(video_id: str) -> str:
+    # BV ids are case-sensitive base58 after the prefix; av ids are just numbers.
+    return "BV" + video_id[2:] if video_id[:2].lower() == "bv" else video_id.lower()
+
+
 async def ingest_video(
     url: str,
     settings: Settings,
@@ -285,6 +334,7 @@ async def ingest_video(
 
         normalized_path = episode_dir / "audio.normalized.mp3"
         await _run_ffmpeg_normalize(original_path, normalized_path)
+        await asyncio.to_thread(_save_video_cover, info, url, episode_dir)
         return IngestedAudio(
             episode_id=episode_id,
             original_path=original_path,
@@ -302,6 +352,41 @@ async def ingest_video(
     except Exception:
         _discard_ingest(episode_dir, created_dir)
         raise
+
+
+def fetch_video_cover(url: str, episode_dir: Path, settings: Settings) -> Path | None:
+    """Look a video up again and save only its cover; for episodes fetched before covers."""
+    # Some early episodes were stored as "bilibili.com/video/…" with no scheme,
+    # which yt-dlp hands to its generic extractor and finds no video in.
+    if "://" not in url:
+        url = "https://" + url.lstrip("/")
+    cookiefile, cookiefile_is_temporary = _prepare_cookiefile(url, episode_dir, settings)
+    options: dict[str, object] = {
+        "noplaylist": True,
+        "quiet": True,
+        "no_warnings": True,
+        "skip_download": True,
+        "remote_components": {"ejs:github"},
+    }
+    if cookiefile is not None:
+        options["cookiefile"] = str(cookiefile)
+    if _is_bilibili(url):
+        options["http_headers"] = {"Referer": _bilibili_session.REFERER}
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(url, download=False, process=False)
+    finally:
+        if cookiefile is not None and cookiefile_is_temporary:
+            cookiefile.unlink(missing_ok=True)
+    return _save_video_cover(info or {}, url, episode_dir)
+
+
+def _save_video_cover(info: dict[str, object], url: str, episode_dir: Path) -> Path | None:
+    # Bilibili's image CDN turns away hotlinks that do not come from the site.
+    referer = _bilibili_session.REFERER if _is_bilibili(url) else None
+    return cover_images.save_first_cover(
+        cover_images.thumbnail_urls(info), episode_dir, referer=referer
+    )
 
 
 def _download_video_audio(

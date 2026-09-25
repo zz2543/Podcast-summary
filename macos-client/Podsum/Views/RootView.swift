@@ -60,16 +60,16 @@ struct RootView: View {
             HStack(spacing: Space.m) {
                 switch backend.phase {
                 case .needsConfiguration:
-                    Button("打开设置") { openSettings() }
+                    Button(tr("打开设置", "Open Settings")) { openSettings() }
                         .keyboardShortcut(.defaultAction)
                 case .starting:
                     EmptyView()
                 default:
-                    Button("重试") { Task { await backend.restart() } }
+                    Button(tr("重试", "Retry")) { Task { await backend.restart() } }
                         .keyboardShortcut(.defaultAction)
-                    Button("打开设置") { openSettings() }
+                    Button(tr("打开设置", "Open Settings")) { openSettings() }
                 }
-                Button("先看离线示例") { ui.offlineBrowsing = true }
+                Button(tr("先看离线示例", "Browse Offline Samples")) { ui.offlineBrowsing = true }
             }
         }
         .padding(Space.section)
@@ -89,12 +89,12 @@ struct RootView: View {
 
     private var headline: String {
         switch backend.phase {
-        case .idle:               return "后端还没启动"
-        case .needsConfiguration: return "先填你自己的 API"
+        case .idle:               return tr("后端还没启动", "Backend not started")
+        case .needsConfiguration: return tr("先填你自己的 API", "Add your own API keys first")
         case .starting(let step): return step
-        case .noRuntime:          return "找不到运行环境"
-        case .failed:             return "后端起不来"
-        case .ready:              return "就绪"
+        case .noRuntime:          return tr("找不到运行环境", "No runtime found")
+        case .failed:             return tr("后端起不来", "Backend failed to start")
+        case .ready:              return tr("就绪", "Ready")
         }
     }
 
@@ -103,10 +103,11 @@ struct RootView: View {
         switch backend.phase {
         case .needsConfiguration(let missing):
             VStack(spacing: Space.s) {
-                Text("这个 app 不内置任何人的 API 凭据，默认全为空。缺的是：")
+                Text(tr("这个 app 不内置任何人的 API 凭据，默认全为空。缺的是：",
+                        "This app ships with no API credentials — every field starts empty. Still missing:"))
                     .podsumFont(.secondary)
                     .foregroundStyle(Tone.textMuted)
-                Text(missing.joined(separator: "、"))
+                Text(missing.joined(separator: tr("、", ", ")))
                     .podsumFont(.body)
                     .foregroundStyle(Tone.text)
                     .multilineTextAlignment(.center)

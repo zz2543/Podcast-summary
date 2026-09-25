@@ -55,12 +55,13 @@ public final class BackendController {
 
         if settings.backendMode == .external {
             let url = URL(string: settings.externalBaseURL.trimmed) ?? URL(string: "http://127.0.0.1:8000")!
-            phase = .starting("连接 \(url.absoluteString)…")
+            phase = .starting(tr("连接 \(url.absoluteString)…", "Connecting to \(url.absoluteString)…"))
             if await Self.healthy(url) {
                 attachedToExisting = true
                 phase = .ready(url)
             } else {
-                phase = .failed("连不上 \(url.absoluteString)。确认那个后端还在跑。")
+                phase = .failed(tr("连不上 \(url.absoluteString)。确认那个后端还在跑。",
+                                  "Can’t reach \(url.absoluteString). Make sure that backend is still running."))
             }
             return
         }
@@ -75,7 +76,7 @@ public final class BackendController {
 
         // 端口上已经有一个健康的 podsum：可能是上次退出没收干净的孤儿，
         // 也可能是终端里的 `make run`。两种情况都该用它，而不是再起一个。
-        phase = .starting("检查 \(settings.port) 端口…")
+        phase = .starting(tr("检查 \(settings.port) 端口…", "Checking port \(settings.port)…"))
         if await Self.healthy(url) {
             attachedToExisting = true
             phase = .ready(url)
@@ -91,10 +92,10 @@ public final class BackendController {
             try FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
             let env = environment(resolved, dataDir: dataDir)
 
-            phase = .starting("应用数据库迁移…")
+            phase = .starting(tr("应用数据库迁移…", "Applying database migrations…"))
             try await runMigrations(resolved, env: env)
 
-            phase = .starting("启动后端…")
+            phase = .starting(tr("启动后端…", "Starting backend…"))
             try launch(resolved, env: env)
         } catch {
             phase = .failed(error.localizedDescription)
@@ -106,7 +107,8 @@ public final class BackendController {
         for _ in 0..<60 {
             if process?.isRunning == false {
                 logTail = Self.tail(of: Self.logURL)
-                phase = .failed("后端进程退出了（code \(process?.terminationStatus ?? -1)）。")
+                phase = .failed(tr("后端进程退出了（code \(process?.terminationStatus ?? -1)）。",
+                                   "The backend process exited (code \(process?.terminationStatus ?? -1))."))
                 return
             }
             if await Self.healthy(url) {
@@ -117,7 +119,7 @@ public final class BackendController {
             try? await Task.sleep(for: .milliseconds(500))
         }
         logTail = Self.tail(of: Self.logURL)
-        phase = .failed("后端 30 秒内没有就绪。")
+        phase = .failed(tr("后端 30 秒内没有就绪。", "The backend wasn’t ready within 30 seconds."))
     }
 
     /// 改完设置后重来一遍
@@ -158,11 +160,16 @@ public final class BackendController {
         var errorDescription: String? {
             switch self {
             case .noBackendRoot(let tried):
-                return "找不到后端目录（需要含 backend/ 与 prompts/）。找过：\n" + tried.joined(separator: "\n")
-                     + "\n\n在「设置 › 后端」里手动指定即可。"
+                return tr("找不到后端目录（需要含 backend/ 与 prompts/）。找过：\n",
+                          "Can’t find the backend folder (it must contain backend/ and prompts/). Looked in:\n")
+                     + tried.joined(separator: "\n")
+                     + tr("\n\n在「设置 › 后端」里手动指定即可。",
+                          "\n\nSet it by hand in Settings › Service.")
             case .noPython(let tried):
-                return "找不到 Python 解释器。找过：\n" + tried.joined(separator: "\n")
-                     + "\n\n在「设置 › 后端」里手动指定，或用 package.py 打一个内嵌运行时。"
+                return tr("找不到 Python 解释器。找过：\n", "Can’t find a Python interpreter. Looked in:\n")
+                     + tried.joined(separator: "\n")
+                     + tr("\n\n在「设置 › 后端」里手动指定，或用 package.py 打一个内嵌运行时。",
+                          "\n\nSet it by hand in Settings › Service, or build an embedded runtime with package.py.")
             }
         }
     }
@@ -267,7 +274,7 @@ public final class BackendController {
         if p.terminationStatus != 0 {
             let text = String(data: output, encoding: .utf8) ?? ""
             throw NSError(domain: "Podsum", code: 1, userInfo: [
-                NSLocalizedDescriptionKey: "数据库迁移失败：\n" + Self.lastLines(text, 12),
+                NSLocalizedDescriptionKey: tr("数据库迁移失败：\n", "Database migration failed:\n") + Self.lastLines(text, 12),
             ])
         }
     }

@@ -3,11 +3,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, delete, select
+from sqlalchemy import Select, delete, func, select, update
 from sqlalchemy.orm import Session
 
+from podsum.domain.categorizer import name_key, validate_name
 from podsum.domain.quote_verifier import verify
 from podsum.persistence.models import (
+    Category,
     Chapter,
     Entity,
     Episode,
@@ -15,6 +17,7 @@ from podsum.persistence.models import (
     Quote,
     SummaryArtifact,
     TranscriptSegment,
+    utc_now,
 )
 
 
@@ -71,6 +74,120 @@ class EpisodeRepo:
             return False
         self.session.delete(episode)
         return True
+
+
+class DuplicateCategory(ValueError):
+    def __init__(self, existing_id: str) -> None:
+        self.existing_id = existing_id
+        super().__init__("a category with this name already exists")
+
+
+class CategoryRepo:
+    """Categories and the episode columns that point at them (feature 004).
+
+    Assignment changes go through Core UPDATEs that keep `episode.updated_at`:
+    filing a video away is not a change to the episode itself.
+    """
+
+    def __init__(self, session: Session) -> None:
+        self.session = session
+
+    def list_ordered(self) -> list[Category]:
+        return list(self.session.scalars(select(Category).order_by(Category.position, Category.created_at)))
+
+    def counts(self) -> dict[str, int]:
+        rows = self.session.execute(
+            select(Episode.category_id, func.count())
+            .where(Episode.category_id.is_not(None))
+            .group_by(Episode.category_id)
+        )
+        return {category_id: count for category_id, count in rows}
+
+    def uncategorized_count(self) -> int:
+        return self.session.scalar(
+            select(func.count()).select_from(Episode).where(Episode.category_id.is_(None))
+        ) or 0
+
+    def get(self, category_id: str) -> Category | None:
+        return self.session.get(Category, category_id)
+
+    def get_by_key(self, key: str) -> Category | None:
+        return self.session.scalar(select(Category).where(Category.name_key == key))
+
+    def create(self, name: str, *, origin: str = "user") -> Category:
+        display = validate_name(name)
+        key = name_key(display)
+        existing = self.get_by_key(key)
+        if existing is not None:
+            raise DuplicateCategory(existing.id)
+        last = self.session.scalar(select(func.max(Category.position)))
+        category = Category(
+            name=display,
+            name_key=key,
+            position=(last + 1) if last is not None else 0,
+            origin=origin,
+        )
+        self.session.add(category)
+        self.session.flush()
+        return category
+
+    def rename(self, category: Category, name: str) -> Category:
+        display = validate_name(name)
+        key = name_key(display)
+        existing = self.get_by_key(key)
+        if existing is not None and existing.id != category.id:
+            raise DuplicateCategory(existing.id)
+        category.name = display
+        category.name_key = key
+        self.session.flush()
+        return category
+
+    def delete(self, category: Category) -> int:
+        """Delete a category; its videos go back to Uncategorized, unlocked."""
+        released = self.session.execute(
+            update(Episode)
+            .where(Episode.category_id == category.id)
+            .values(
+                category_id=None,
+                category_origin=None,
+                category_updated_at=utc_now(),
+                updated_at=Episode.updated_at,
+            )
+        ).rowcount
+        self.session.delete(category)
+        self.session.flush()
+        return released or 0
+
+    def reorder(self, ids: list[str]) -> None:
+        categories = {category.id: category for category in self.list_ordered()}
+        if len(ids) != len(set(ids)) or set(ids) != set(categories):
+            raise ValueError("ids must list every category exactly once")
+        for position, category_id in enumerate(ids):
+            categories[category_id].position = position
+        self.session.flush()
+
+    def assign(self, episode_id: str, category_id: str | None, origin: str | None) -> None:
+        self.session.execute(
+            update(Episode)
+            .where(Episode.id == episode_id)
+            .values(
+                category_id=category_id,
+                category_origin=origin,
+                category_updated_at=utc_now(),
+                updated_at=Episode.updated_at,
+            )
+        )
+        self.session.expire_all()
+
+    def set_manual(self, episode_id: str, category_id: str | None) -> None:
+        """The user placed (or took out) this video: lock it against AI changes."""
+        self.assign(episode_id, category_id, "manual")
+
+    def release(self, episode: Episode) -> None:
+        """Hand a manually placed video back to AI categorisation, keeping its place."""
+        if episode.category_origin != "manual":
+            return
+        self.assign(episode.id, episode.category_id, "auto" if episode.category_id else None)
 
 
 class JobRepo:

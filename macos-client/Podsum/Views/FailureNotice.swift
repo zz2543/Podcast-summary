@@ -5,16 +5,16 @@ import SwiftUI
 enum FailureCopy {
     static func stage(_ raw: String?) -> String {
         switch raw {
-        case "fetch":               return "抓取音频"
-        case "transcribe":          return "转写"
-        case "summarize_hook":      return "生成一句话摘要"
-        case "summarize_three_act": return "生成三幕摘要"
-        case "usefulness_score":    return "评分"
-        case "chapter_outline":     return "划分章节"
-        case "quote_verify":        return "核对引文"
-        case "entity_extract":      return "抽取提及"
-        case "export":              return "导出文件"
-        case nil:                   return "处理"
+        case "fetch":               return tr("抓取音频", "fetching audio")
+        case "transcribe":          return tr("转写", "transcription")
+        case "summarize_hook":      return tr("生成一句话摘要", "one-line summary")
+        case "summarize_three_act": return tr("生成三幕摘要", "three-act summary")
+        case "usefulness_score":    return tr("评分", "scoring")
+        case "chapter_outline":     return tr("划分章节", "chapter outline")
+        case "quote_verify":        return tr("核对引文", "quote verification")
+        case "entity_extract":      return tr("抽取提及", "extracting mentions")
+        case "export":              return tr("导出文件", "export")
+        case nil:                   return tr("处理", "processing")
         case let other?:            return other   // 后端新增的阶段：如实显示
         }
     }
@@ -28,23 +28,29 @@ enum FailureCopy {
             codes.contains { e.range(of: "\\b\($0)\\b", options: .regularExpression) != nil }
         }
         if has("insufficient balance") || code("402") {
-            return "模型服务余额不足。充值后点「重新处理」。"
+            return tr("模型服务余额不足。充值后点「重新处理」。",
+                      "The model provider is out of credit. Top up, then click Reprocess.")
         }
         if has("unauthorized", "forbidden", "is required", "invalid api key") || code("401", "403") {
-            return "服务凭证无效或缺失，到设置里检查对应的密钥。"
+            return tr("服务凭证无效或缺失，到设置里检查对应的密钥。",
+                      "A credential is invalid or missing — check the matching key in Settings.")
         }
         if has("too many requests", "rate limit") || code("429") {
-            return "请求太频繁被限流了，过几分钟再重新处理。"
+            return tr("请求太频繁被限流了，过几分钟再重新处理。",
+                      "Rate limited for sending too many requests. Wait a few minutes, then reprocess.")
         }
         if has("connection reset", "connection aborted", "remote end closed", "timed out",
                "timeout", "writeerror", "readerror", "errno 54", "errno 60", "ssl", "eof occurred") {
-            return "网络连接中途断了，通常是临时的，重新处理一般就能过。"
+            return tr("网络连接中途断了，通常是临时的，重新处理一般就能过。",
+                      "The network connection dropped midway. It’s usually temporary — reprocessing normally gets through.")
         }
         if has("file exists") {
-            return "上一次处理留下的文件挡住了这一次，重新处理即可。"
+            return tr("上一次处理留下的文件挡住了这一次，重新处理即可。",
+                      "Files left from the previous run got in the way. Just reprocess.")
         }
         if has("unsupported", "invalid audio", "audio convert failed") {
-            return "音频格式识别不了，换个来源链接或本地文件再试。"
+            return tr("音频格式识别不了，换个来源链接或本地文件再试。",
+                      "The audio format wasn’t recognized. Try a different link or a local file.")
         }
         return nil
     }
@@ -81,7 +87,7 @@ struct FailureNotice: View {
                 }
 
                 if showRaw || FailureCopy.hint(failure.error) == nil {
-                    Text(failure.error.isEmpty ? "（后端没有留下报错信息）" : failure.error)
+                    Text(failure.error.isEmpty ? tr("（后端没有留下报错信息）", "(The backend left no error message)") : failure.error)
                         .podsumFont(.micro)
                         .monospaced()
                         .foregroundStyle(Tone.textSubtle)
@@ -92,13 +98,13 @@ struct FailureNotice: View {
 
                 HStack(spacing: Space.m) {
                     Button(action: onRetry) {
-                        Label("重新处理", systemImage: "arrow.clockwise")
+                        Label(tr("重新处理", "Reprocess"), systemImage: "arrow.clockwise")
                     }
                     .controlSize(.small)
                     .disabled(working)
 
                     if FailureCopy.hint(failure.error) != nil {
-                        Button(showRaw ? "收起原始报错" : "查看原始报错") { showRaw.toggle() }
+                        Button(showRaw ? tr("收起原始报错", "Hide Raw Error") : tr("查看原始报错", "Show Raw Error")) { showRaw.toggle() }
                             .buttonStyle(.link)
                             .controlSize(.small)
                     }
@@ -125,8 +131,10 @@ struct FailureNotice: View {
     private var title: String {
         let step = FailureCopy.stage(failure.stage)
         return hasSummary
-            ? "最近一次重新处理卡在「\(step)」，下面仍是上一次的结果"
-            : "处理卡在「\(step)」这一步，还没有生成摘要"
+            ? tr("最近一次重新处理卡在「\(step)」，下面仍是上一次的结果",
+                 "The latest reprocess got stuck at \(step); below is still the previous result")
+            : tr("处理卡在「\(step)」这一步，还没有生成摘要",
+                 "Processing got stuck at \(step); no summary yet")
     }
 }
 

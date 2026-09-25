@@ -4,7 +4,7 @@ import SwiftUI
 // 离屏渲染组件成 PNG。不启动 app、不需要屏幕解锁，也能看到真实渲染结果。
 //
 //   swiftc -O specs/002-macos-native/contracts/PodsumModels.swift \
-//          macos-client/Podsum/Design/{Theme,Typography}.swift \
+//          macos-client/Podsum/Design/{Theme,Typography,Localization}.swift \
 //          macos-client/Podsum/Data/{StringUtils,AudioPlayerModel}.swift \
 //          macos-client/Podsum/Views/{AudioPlayerBar,ActiveJobsStrip,ChapterRow}.swift \
 //          macos-client/design-check/main.swift -o /tmp/podsum-design \

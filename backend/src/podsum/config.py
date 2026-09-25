@@ -45,6 +45,13 @@ class Settings(BaseSettings):
     YTDLP_RETRY_DELAY_SECONDS: float = Field(default=1.5, ge=0.0, le=30.0)
     BILIBILI_ANONYMOUS_COOKIES: bool = True
 
+    # AI categorisation (feature 004) runs only when the user asks for it. The
+    # batch size bounds one assignment prompt; the caps bound how many new
+    # categories one run may propose, with and without existing ones.
+    CATEGORIZE_BATCH_SIZE: int = Field(default=40, ge=5, le=100)
+    CATEGORIZE_MAX_NEW: int = Field(default=5, ge=0, le=20)
+    CATEGORIZE_MAX_INITIAL: int = Field(default=10, ge=3, le=20)
+
     ASR_PROVIDER: ASRProvider = "doubao"
     LLM_PROVIDER: LLMProvider = "deepseek"
     TTS_PROVIDER: TTSProvider = "doubao"

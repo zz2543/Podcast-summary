@@ -20,15 +20,15 @@ struct ScoreBadge: View {
             .padding(.vertical, 5)
             .background(u.band.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
             .help(u.rationale)
-            .accessibilityLabel("有用性 \(u.score) 分，\(u.band.label)")
+            .accessibilityLabel(tr("有用性 \(u.score) 分，\(u.band.label)", "Usefulness \(u.score), \(u.band.label)"))
         } else {
-            Text("未评分")
+            Text(tr("未评分", "Unrated"))
                 .podsumFont(.band)
                 .foregroundStyle(Tone.textSubtle)
                 .padding(.horizontal, 9)
                 .padding(.vertical, 9)
                 .background(Tone.surfaceElev, in: RoundedRectangle(cornerRadius: 10))
-                .accessibilityLabel("未评分")
+                .accessibilityLabel(tr("未评分", "Unrated"))
         }
     }
 }

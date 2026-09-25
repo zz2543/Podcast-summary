@@ -51,6 +51,11 @@ class Episode(Base):
         ),
         Index("idx_episode_status", "status"),
         Index("idx_episode_created", text("created_at DESC")),
+        CheckConstraint(
+            "category_origin IS NULL OR category_origin IN ('manual', 'auto')",
+            name="ck_episode_category_origin",
+        ),
+        Index("idx_episode_category", "category_id"),
         Index(
             "uq_episode_source_ref_links",
             "source_type",
@@ -79,6 +84,15 @@ class Episode(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
     data_dir: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    # Feature 004. NULL category_id is "Uncategorized". 'manual' means the user
+    # placed it and AI categorisation must leave it alone; 'auto' means AI
+    # manages it. SQLite foreign keys are off, so CategoryRepo.delete clears
+    # these columns itself.
+    category_id: Mapped[str | None] = mapped_column(String(26), ForeignKey("category.id"))
+    category_origin: Mapped[str | None] = mapped_column(String(8))
+    category_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    category: Mapped[Category | None] = relationship(lazy="joined", viewonly=True)
 
     jobs: Mapped[list[Job]] = relationship(
         back_populates="episode",
@@ -106,6 +120,23 @@ class Episode(Base):
         passive_deletes=True,
         uselist=False,
     )
+
+
+class Category(Base):
+    __tablename__ = "category"
+    __table_args__ = (
+        CheckConstraint("origin IN ('user', 'ai')", name="ck_category_origin"),
+        Index("idx_category_position", "position"),
+    )
+
+    id: Mapped[str] = mapped_column(String(26), primary_key=True, default=new_ulid)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    # casefold(strip(NFKC(name))): what "same name" means (FR-002).
+    name_key: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    origin: Mapped[str] = mapped_column(String(8), nullable=False, default="user")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
 
 
 class Job(Base):

@@ -109,15 +109,19 @@ public enum Fmt {
             : String(format: "%d:%02d", m, s)
     }
 
-    private static let relativeFormatter: RelativeDateTimeFormatter = {
-        let f = RelativeDateTimeFormatter()
-        f.unitsStyle = .short
-        f.locale = Locale(identifier: "zh_CN")
-        return f
+    /// 按界面语言各备一个，切换语言不必重建。
+    private static let relativeFormatters: [Bool: RelativeDateTimeFormatter] = {
+        func make(_ id: String) -> RelativeDateTimeFormatter {
+            let f = RelativeDateTimeFormatter()
+            f.unitsStyle = .short
+            f.locale = Locale(identifier: id)
+            return f
+        }
+        return [true: make("zh_CN"), false: make("en_US")]
     }()
 
     public static func relative(_ date: Date) -> String {
-        relativeFormatter.localizedString(for: date, relativeTo: Date())
+        relativeFormatters[Localizer.shared.isChinese]!.localizedString(for: date, relativeTo: Date())
     }
 }
 
@@ -126,7 +130,7 @@ public enum Fmt {
 // Fallback<T> 的未知值在 UI 里必须如实显示，不能悄悄当成某个已知值。
 
 public extension EpisodeSummary {
-    var displayTitle: String { title?.isEmpty == false ? title! : "未命名剧集" }
+    var displayTitle: String { title?.isEmpty == false ? title! : tr("未命名剧集", "Untitled Episode") }
 }
 
 public extension Fallback where T == EpisodeStatus {
@@ -134,11 +138,11 @@ public extension Fallback where T == EpisodeStatus {
         switch self {
         case .known(let s):
             switch s {
-            case .pending:    return "排队中"
-            case .processing: return "处理中"
-            case .done:       return "已完成"
-            case .partial:    return "部分完成"
-            case .failed:     return "失败"
+            case .pending:    return tr("排队中", "Queued")
+            case .processing: return tr("处理中", "Processing")
+            case .done:       return tr("已完成", "Done")
+            case .partial:    return tr("部分完成", "Partial")
+            case .failed:     return tr("失败", "Failed")
             }
         case .unknown(let raw):
             return raw   // 后端新增的取值：如实显示，不猜
@@ -158,15 +162,36 @@ public extension Fallback where T == EpisodeStatus {
     var isAnimating: Bool { value == .processing }
 }
 
+/// 契约里的 `label` 是写死的中文（契约文件要能脱离 app 单独编译），界面上用这一份。
+public extension Fallback where T == JobState {
+    var localizedLabel: String {
+        switch self {
+        case .known(let s):
+            switch s {
+            case .queued:       return tr("排队中", "Queued")
+            case .fetching:     return tr("抓取音频", "Fetching audio")
+            case .transcribing: return tr("转写", "Transcribing")
+            case .summarizing:  return tr("生成摘要", "Summarizing")
+            case .tts:          return tr("合成音频", "Synthesizing audio")
+            case .done:         return tr("已完成", "Done")
+            case .partial:      return tr("部分完成", "Partial")
+            case .failed:       return tr("失败", "Failed")
+            }
+        case .unknown(let raw):
+            return raw
+        }
+    }
+}
+
 public extension Fallback where T == UsefulnessBand {
     var label: String {
         switch self {
         case .known(let b):
             switch b {
-            case .mustListen:     return "必听"
-            case .worthListening: return "值得听"
-            case .skimmable:      return "可跳读"
-            case .skippable:      return "可跳过"
+            case .mustListen:     return tr("必听", "Must Listen")
+            case .worthListening: return tr("值得听", "Worth It")
+            case .skimmable:      return tr("可跳读", "Skimmable")
+            case .skippable:      return tr("可跳过", "Skippable")
             }
         case .unknown(let raw):
             return raw

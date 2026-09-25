@@ -36,7 +36,7 @@ struct UsefulnessCard: View {
     private func scored(_ u: Usefulness) -> some View {
         VStack(alignment: .leading, spacing: Space.l) {
             HStack(alignment: .firstTextBaseline) {
-                Text("有用性评分")
+                Text(tr("有用性评分", "Usefulness Score"))
                     .podsumFont(.sectionLabel)
                     .tracking(0.8)
                     .foregroundStyle(Tone.textSubtle)
@@ -70,7 +70,7 @@ struct UsefulnessCard: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if let v = promptVersion {
-                Text("Prompt 版本 \(v)")
+                Text(tr("Prompt 版本 \(v)", "Prompt version \(v)"))
                     .podsumFont(.micro)
                     .foregroundStyle(Tone.textSubtle)
             }
@@ -132,7 +132,7 @@ struct UsefulnessCard: View {
                 .background(Tone.surfaceElev, in: Circle())
 
             VStack(alignment: .leading, spacing: Space.xs) {
-                Text("未评分")
+                Text(tr("未评分", "Unrated"))
                     .podsumFont(.cardTitle)
                     .foregroundStyle(Tone.text)
                 Text(reason)
@@ -155,10 +155,11 @@ struct UsefulnessCard: View {
 
     private var reason: String {
         switch stage.value {
-        case .failedAfterRetries: return "评分阶段多次重试后仍失败，其余摘要不受影响；可在「更多」里重新处理。"
-        case .pending:            return "评分阶段尚未运行。"
-        case .missing:            return "这集入库时评分功能还不存在。"
-        default:                  return "这集没有评分记录。"
+        case .failedAfterRetries: return tr("评分阶段多次重试后仍失败，其余摘要不受影响；可在「更多」里重新处理。",
+                                             "Scoring still failed after several retries. The rest of the summary is unaffected; reprocess it from “More”.")
+        case .pending:            return tr("评分阶段尚未运行。", "Scoring hasn’t run yet.")
+        case .missing:            return tr("这集入库时评分功能还不存在。", "This episode predates scoring.")
+        default:                  return tr("这集没有评分记录。", "No score recorded for this episode.")
         }
     }
 }

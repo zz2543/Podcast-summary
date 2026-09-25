@@ -11,10 +11,10 @@ public enum ASRChoice: String, CaseIterable, Identifiable, Sendable {
     public var id: String { rawValue }
     public var label: String {
         switch self {
-        case .doubao:        return "豆包 / 火山引擎"
+        case .doubao:        return tr("豆包 / 火山引擎", "Doubao / Volcengine")
         case .openaiWhisper: return "OpenAI Whisper"
         case .deepgram:      return "Deepgram"
-        case .qwen:          return "通义千问（DashScope）"
+        case .qwen:          return tr("通义千问（DashScope）", "Qwen (DashScope)")
         }
     }
 }
@@ -29,8 +29,8 @@ public enum LLMChoice: String, CaseIterable, Identifiable, Sendable {
     public var id: String { rawValue }
     public var label: String {
         switch self {
-        case .openAICompatible: return "OpenAI 兼容接口（自填 URL）"
-        case .qwen:             return "通义千问（DashScope）"
+        case .openAICompatible: return tr("OpenAI 兼容接口（自填 URL）", "OpenAI-compatible (custom URL)")
+        case .qwen:             return tr("通义千问（DashScope）", "Qwen (DashScope)")
         case .anthropic:        return "Anthropic"
         }
     }
@@ -41,8 +41,8 @@ public enum TTSChoice: String, CaseIterable, Identifiable, Sendable {
     public var id: String { rawValue }
     public var label: String {
         switch self {
-        case .doubao: return "豆包 / 火山引擎"
-        case .qwen:   return "通义千问（DashScope）"
+        case .doubao: return tr("豆包 / 火山引擎", "Doubao / Volcengine")
+        case .qwen:   return tr("通义千问（DashScope）", "Qwen (DashScope)")
         }
     }
 }
@@ -56,8 +56,8 @@ public enum BackendMode: String, CaseIterable, Identifiable, Sendable {
     public var id: String { rawValue }
     public var label: String {
         switch self {
-        case .embedded: return "由本 app 启动"
-        case .external: return "连接已在运行的后端"
+        case .embedded: return tr("由本 app 启动", "Started by this app")
+        case .external: return tr("连接已在运行的后端", "Connect to a running backend")
         }
     }
 }
@@ -81,13 +81,41 @@ public final class AppSettings {
 
     public var backendMode: BackendMode { didSet { put(backendMode.rawValue, "backendMode") } }
     public var externalBaseURL: String  { didSet { put(externalBaseURL, "externalBaseURL") } }
-    public var port: Int                { didSet { put(String(port), "port") } }
+    public var port: Int                { didSet { put(port, "port") } }
     /// 含 backend/、prompts/、scripts/ 的目录。留空则用 app 内嵌的那份。
     public var backendRoot: String      { didSet { put(backendRoot, "backendRoot") } }
     /// 留空则按内嵌运行时 → 项目 .venv → Homebrew → /usr/bin 的顺序找
     public var pythonPath: String       { didSet { put(pythonPath, "pythonPath") } }
     /// 音频、文稿、SQLite 的落地位置
     public var dataDirectory: String    { didSet { put(dataDirectory, "dataDirectory") } }
+
+    // MARK: 快捷提交（003）
+
+    /// 全局快捷键开关与组合。组合存成 JSON，里面是 Carbon 要的原始键码。
+    var quickAddHotKeyEnabled: Bool {
+        didSet { put(quickAddHotKeyEnabled, "quickAddHotKeyEnabled"); MainActor.assumeIsolated { applyQuickAddHotKey() } }
+    }
+    var quickAddHotKey: KeyCombo {
+        didSet {
+            if let data = try? JSONEncoder().encode(quickAddHotKey) {
+                defaults.set(data, forKey: Self.prefix + "quickAddHotKey")
+            }
+            MainActor.assumeIsolated { applyQuickAddHotKey() }
+        }
+    }
+    /// 当前组合是否注册成功。不落盘——每次启动重新注册一遍才知道。
+    private(set) var quickAddHotKeyRegistered = true
+
+    /// 按当前设置（重新）注册全局快捷键
+    @MainActor
+    func applyQuickAddHotKey() {
+        if quickAddHotKeyEnabled {
+            quickAddHotKeyRegistered = GlobalHotKey.shared.register(quickAddHotKey)
+        } else {
+            GlobalHotKey.shared.unregister()
+            quickAddHotKeyRegistered = true
+        }
+    }
 
     // MARK: 供应商
 
@@ -132,10 +160,17 @@ public final class AppSettings {
         }
         backendMode = BackendMode(rawValue: s("backendMode")) ?? .embedded
         externalBaseURL = s("externalBaseURL", "http://127.0.0.1:8000")
-        port = d.object(forKey: Self.prefix + "port") as? Int ?? 8756
+        // 早先的版本把端口存成了字符串，而 `as? Int` 认不出字符串，
+        // 改过的端口每次重启都会悄悄退回 8756。两种形态都认，下次写入即转成整数。
+        let storedPort = d.object(forKey: Self.prefix + "port")
+        port = storedPort as? Int ?? (storedPort as? String).flatMap { Int($0) } ?? 8756
         backendRoot = s("backendRoot")
         pythonPath = s("pythonPath")
         dataDirectory = s("dataDirectory", Self.defaultDataDirectory)
+
+        quickAddHotKeyEnabled = d.object(forKey: Self.prefix + "quickAddHotKeyEnabled") as? Bool ?? true
+        quickAddHotKey = (d.data(forKey: Self.prefix + "quickAddHotKey"))
+            .flatMap { try? JSONDecoder().decode(KeyCombo.self, from: $0) } ?? .default
 
         asrProvider = ASRChoice(rawValue: s("asrProvider")) ?? .doubao
         llmProvider = LLMChoice(rawValue: s("llmProvider")) ?? .openAICompatible
@@ -163,6 +198,7 @@ public final class AppSettings {
 
     private func put(_ value: String, _ key: String) { defaults.set(value, forKey: Self.prefix + key) }
     private func put(_ value: Bool, _ key: String) { defaults.set(value, forKey: Self.prefix + key) }
+    private func put(_ value: Int, _ key: String) { defaults.set(value, forKey: Self.prefix + key) }
     private func secret(_ value: String, _ key: String) {
         secrets[key] = value
         Keychain.save(secrets)
@@ -183,23 +219,23 @@ public final class AppSettings {
 
         switch llmProvider {
         case .openAICompatible:
-            if llmBaseURL.isBlank { missing.append("LLM 接口地址") }
-            if llmModel.isBlank { missing.append("LLM 模型名") }
+            if llmBaseURL.isBlank { missing.append(tr("LLM 接口地址", "LLM base URL")) }
+            if llmModel.isBlank { missing.append(tr("LLM 模型名", "LLM model")) }
             if llmAPIKey.isBlank { missing.append("LLM API Key") }
         case .qwen:
-            if llmModel.isBlank { missing.append("LLM 模型名") }
+            if llmModel.isBlank { missing.append(tr("LLM 模型名", "LLM model")) }
             if dashscopeAPIKey.isBlank { missing.append("DashScope API Key") }
         case .anthropic:
-            if llmModel.isBlank { missing.append("LLM 模型名") }
+            if llmModel.isBlank { missing.append(tr("LLM 模型名", "LLM model")) }
             if anthropicAPIKey.isBlank { missing.append("Anthropic API Key") }
         }
 
         switch asrProvider {
         case .doubao:
-            if volcAccessKeyID.isBlank { missing.append("火山 Access Key ID") }
-            if volcSecretKey.isBlank { missing.append("火山 Secret Access Key") }
-            if doubaoASRAppID.isBlank { missing.append("豆包 ASR App ID") }
-            if doubaoASRToken.isBlank { missing.append("豆包 ASR Access Token") }
+            if volcAccessKeyID.isBlank { missing.append(tr("火山 Access Key ID", "Volcengine Access Key ID")) }
+            if volcSecretKey.isBlank { missing.append(tr("火山 Secret Access Key", "Volcengine Secret Access Key")) }
+            if doubaoASRAppID.isBlank { missing.append(tr("豆包 ASR App ID", "Doubao ASR App ID")) }
+            if doubaoASRToken.isBlank { missing.append(tr("豆包 ASR Access Token", "Doubao ASR Access Token")) }
         case .openaiWhisper:
             if openAIAPIKey.isBlank { missing.append("OpenAI API Key") }
         case .deepgram:
@@ -211,10 +247,10 @@ public final class AppSettings {
         if ttsEnabled {
             switch ttsProvider {
             case .doubao:
-                if volcAccessKeyID.isBlank { missing.append("火山 Access Key ID") }
-                if volcSecretKey.isBlank { missing.append("火山 Secret Access Key") }
-                if doubaoTTSAppID.isBlank { missing.append("豆包 TTS App ID") }
-                if doubaoTTSToken.isBlank { missing.append("豆包 TTS Access Token") }
+                if volcAccessKeyID.isBlank { missing.append(tr("火山 Access Key ID", "Volcengine Access Key ID")) }
+                if volcSecretKey.isBlank { missing.append(tr("火山 Secret Access Key", "Volcengine Secret Access Key")) }
+                if doubaoTTSAppID.isBlank { missing.append(tr("豆包 TTS App ID", "Doubao TTS App ID")) }
+                if doubaoTTSToken.isBlank { missing.append(tr("豆包 TTS Access Token", "Doubao TTS Access Token")) }
             case .qwen:
                 if dashscopeAPIKey.isBlank { missing.append("DashScope API Key") }
             }

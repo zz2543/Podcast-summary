@@ -17,6 +17,7 @@ from podsum.domain import summary_style as style_rules
 from podsum.exporters.json_export import render as render_json
 from podsum.persistence.models import Episode, Job, SummaryArtifact
 from podsum.persistence.repo import (
+    CategoryRepo,
     ChapterRepo,
     EntityRepo,
     EpisodeRepo,
@@ -24,6 +25,7 @@ from podsum.persistence.repo import (
     SegmentRepo,
     SummaryArtifactRepo,
 )
+from podsum.services import cover as cover_images
 from podsum.services.ingest import (
     IngestedAudio,
     IngestError,
@@ -34,6 +36,7 @@ from podsum.services.ingest import (
     ingest_local_file,
     ingest_video,
     normalize_video_url,
+    video_identity,
 )
 from podsum.services.llm_client import create_llm_client
 from podsum.services.pipeline import (
@@ -66,6 +69,14 @@ class BatchConflict(ValueError):
     pass
 
 
+class DuplicateSource(ValueError):
+    """The link is already in the library; found before anything is downloaded."""
+
+    def __init__(self, episode_id: str) -> None:
+        super().__init__("episode already exists for this source")
+        self.episode_id = episode_id
+
+
 @router.post("")
 async def create_episode(
     request: Request,
@@ -84,7 +95,10 @@ async def create_episode(
             summary_style_form,
             style_note_form,
             detail_level_form,
+            session,
         )
+    except DuplicateSource as exc:
+        return _api_error(409, "conflict", str(exc), {"episode_id": exc.episode_id})
     except PayloadTooLarge as exc:
         return _api_error(413, "payload_too_large", str(exc))
     except UnsupportedMedia as exc:
@@ -92,9 +106,12 @@ async def create_episode(
     except (IngestError, ValueError) as exc:
         return _api_error(400, "bad_input", str(exc))
 
-    if source_type in {"direct_url", "youtube"} and _existing_link(session, source_type, source_ref):
+    # Checked again after the download: the same link may have been submitted
+    # twice at once, and the first request won while this one was fetching.
+    existing = _existing_episode_id(session, source_type, source_ref)
+    if source_type in {"direct_url", "youtube"} and existing is not None:
         shutil.rmtree(ingested.normalized_path.parent, ignore_errors=True)
-        return _api_error(409, "conflict", "episode already exists for this source")
+        return _api_error(409, "conflict", "episode already exists for this source", {"episode_id": existing})
 
     episode = _episode_from_ingest(source_type, source_ref, ingested, style)
     job = Job(episode_id=episode.id, state="queued", attempt=1)
@@ -111,6 +128,7 @@ async def create_episode(
 
 @router.get("")
 async def list_episodes(
+    request: Request,
     limit: int = 50,
     cursor: str | None = None,
     status: str | None = None,
@@ -133,7 +151,11 @@ async def list_episodes(
         min_score=min_score,
         sort=sort,
     )
-    return {"items": [_episode_summary(session, episode) for episode in items], "next_cursor": None}
+    data_root = request.app.state.settings.DATA_DIR
+    return {
+        "items": [_episode_summary(session, episode, data_root) for episode in items],
+        "next_cursor": None,
+    }
 
 
 @router.post("/batch")
@@ -190,6 +212,7 @@ async def get_episode(
         return _api_error(404, "not_found", "episode not found")
     payload = render_json(_episode_detail(session, episode))
     payload["last_failure"] = _last_failure(session, episode.id)
+    payload.update(_category_payload(episode))
     return JSONResponse(content=payload)
 
 
@@ -206,6 +229,41 @@ async def delete_episode(
     session.commit()
     shutil.rmtree(data_dir, ignore_errors=True)
     return Response(status_code=204)
+
+
+@router.put("/{episode_id}/category")
+async def set_episode_category(
+    episode_id: str,
+    body: dict[str, Any],
+    session: Session = SESSION_DEP,
+) -> JSONResponse:
+    """Place a video in a category by hand, or take it out (null). Locks it (FR-009)."""
+    if "category_id" not in body or not isinstance(body["category_id"], str | None):
+        return _api_error(400, "bad_input", "category_id must be a string or null")
+    category_id = body["category_id"]
+    episode = EpisodeRepo(session).get(episode_id)
+    if episode is None:
+        return _api_error(404, "not_found", "episode not found", {"missing": "episode"})
+    categories = CategoryRepo(session)
+    if category_id is not None and categories.get(category_id) is None:
+        return _api_error(404, "not_found", "category not found", {"missing": "category"})
+    categories.set_manual(episode_id, category_id)
+    session.commit()
+    return JSONResponse(content=_category_payload(EpisodeRepo(session).get(episode_id)))
+
+
+@router.post("/{episode_id}/category/release")
+async def release_episode_category(
+    episode_id: str,
+    session: Session = SESSION_DEP,
+) -> JSONResponse:
+    """"Let AI categorize": unlock a manually placed video without moving it (FR-011)."""
+    episode = EpisodeRepo(session).get(episode_id)
+    if episode is None:
+        return _api_error(404, "not_found", "episode not found", {"missing": "episode"})
+    CategoryRepo(session).release(episode)
+    session.commit()
+    return JSONResponse(content=_category_payload(EpisodeRepo(session).get(episode_id)))
 
 
 @router.post("/{episode_id}/retry")
@@ -317,6 +375,21 @@ async def get_audio_file(
     return _file_response(str(Path(episode.data_dir) / "audio.normalized.mp3"), "audio/mpeg")
 
 
+@router.get("/{episode_id}/files/cover")
+async def get_cover_file(
+    episode_id: str,
+    request: Request,
+    session: Session = SESSION_DEP,
+) -> Response:
+    episode = EpisodeRepo(session).get(episode_id)
+    if episode is None:
+        return _api_error(404, "not_found", "episode not found")
+    path = cover_images.episode_cover_path(
+        episode.data_dir, episode.id, request.app.state.settings.DATA_DIR
+    )
+    return _file_response(str(path), "image/jpeg")
+
+
 @router.get("/{episode_id}/files/transcript")
 async def get_transcript_file(
     episode_id: str,
@@ -392,6 +465,7 @@ async def _ingest_request(
     summary_style_form: str | None,
     style_note_form: str | None,
     detail_level_form: str | None,
+    session: Session,
 ) -> tuple[str, str, IngestedAudio, style_rules.SummaryStyle]:
     settings = request.app.state.settings
     content_type = request.headers.get("content-type", "")
@@ -418,9 +492,13 @@ async def _ingest_request(
         # Only the URL is extracted here: a direct link may be presigned, so its
         # query string has to survive intact.
         source_ref = extract_url(source_ref)
+        _reject_duplicate(session, source_type, source_ref)
         return source_type, source_ref, await ingest_direct_url(source_ref, settings), style
     if source_type == "youtube":
         source_ref = normalize_video_url(source_ref)
+        # A video already in the library answers at once instead of after a
+        # full download that would only be thrown away.
+        _reject_duplicate(session, source_type, source_ref)
         return source_type, source_ref, await ingest_video(source_ref, settings), style
     raise ValueError("source_type must be local_file, direct_url, or youtube")
 
@@ -526,15 +604,35 @@ def _episode_from_ingest(
 
 
 def _existing_link(session: Session, source_type: str, source_ref: str) -> bool:
-    return (
-        session.scalars(
-            select(Episode).where(Episode.source_type == source_type, Episode.source_ref == source_ref)
-        ).first()
-        is not None
+    return _existing_episode_id(session, source_type, source_ref) is not None
+
+
+def _existing_episode_id(session: Session, source_type: str, source_ref: str) -> str | None:
+    exact = session.scalars(
+        select(Episode.id).where(Episode.source_type == source_type, Episode.source_ref == source_ref)
+    ).first()
+    if exact is not None or source_type != "youtube":
+        return exact
+    # The same video written another way (trailing slash, tracking parameters,
+    # youtu.be vs watch?v=), including rows stored before links were normalised.
+    identity = video_identity(source_ref)
+    if identity is None:
+        return None
+    rows = session.execute(
+        select(Episode.id, Episode.source_ref).where(Episode.source_type == "youtube")
     )
+    return next((episode_id for episode_id, ref in rows if video_identity(ref) == identity), None)
 
 
-def _episode_summary(session: Session, episode: Episode) -> dict[str, Any]:
+def _reject_duplicate(session: Session, source_type: str, source_ref: str) -> None:
+    existing = _existing_episode_id(session, source_type, source_ref)
+    if existing is not None:
+        raise DuplicateSource(existing)
+
+
+def _episode_summary(
+    session: Session, episode: Episode, data_root: Path | None = None
+) -> dict[str, Any]:
     artifact = SummaryArtifactRepo(session).get(episode.id)
     stage_status = dict(artifact.stage_status) if artifact else {}
     return {
@@ -555,9 +653,25 @@ def _episode_summary(session: Session, episode: Episode) -> dict[str, Any]:
         },
         "usefulness": _usefulness_payload(artifact, stage_status),
         "last_failure": _last_failure(session, episode.id),
+        "has_cover": _has_cover(episode, data_root),
+        **_category_payload(episode),
         "created_at": _isoformat(episode.created_at),
         "updated_at": _isoformat(episode.updated_at),
     }
+
+
+def _category_payload(episode: Episode) -> dict[str, Any]:
+    category = episode.category
+    return {
+        "category": {"id": category.id, "name": category.name} if category is not None else None,
+        "category_origin": episode.category_origin,
+    }
+
+
+def _has_cover(episode: Episode, data_root: Path | None) -> bool:
+    if not episode.data_dir:
+        return False
+    return cover_images.episode_cover_path(episode.data_dir, episode.id, data_root).is_file()
 
 
 def _last_failure(session: Session, episode_id: str) -> dict[str, Any] | None:
@@ -704,10 +818,12 @@ def _file_response(path_value: str | None, media_type: str) -> FileResponse | JS
     return FileResponse(path, media_type=media_type)
 
 
-def _api_error(status_code: int, code: str, message: str) -> JSONResponse:
+def _api_error(
+    status_code: int, code: str, message: str, details: dict[str, Any] | None = None
+) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
-        content={"error": {"code": code, "message": message, "details": {}}},
+        content={"error": {"code": code, "message": message, "details": details or {}}},
     )
 
 

@@ -10,10 +10,12 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from podsum.api import episodes, jobs, ws_progress
+from podsum.api import categories, episodes, jobs, ws_progress
 from podsum.api._logging import configure_logging
 from podsum.config import Settings, get_settings
+from podsum.services.categorize import CategorizeRunner
 from podsum.services.job_queue import JobQueue
+from podsum.services.llm_client import create_llm_client
 from podsum.services.pipeline import reconcile_episode_statuses, recover_incomplete_jobs
 
 VERSION = "0.1.0"
@@ -41,9 +43,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             reconcile_episode_statuses(session)
             session.commit()
     app.state.recovered_jobs = recovered_jobs
+    app.state.categorize_runner = CategorizeRunner(
+        app.state.session_factory,
+        app.state.settings,
+        # Resolved per run, so a test's app.state.llm_client and a provider
+        # that is missing credentials both surface as the run's own outcome.
+        lambda: getattr(app.state, "llm_client", None) or create_llm_client(app.state.settings),
+    )
     try:
         yield
     finally:
+        await app.state.categorize_runner.shutdown()
         await app.state.job_queue.stop()
         app.state.engine.dispose()
 
@@ -57,6 +67,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok", "version": VERSION}
 
     app.include_router(episodes.router)
+    app.include_router(categories.router)
     app.include_router(jobs.router)
     app.include_router(ws_progress.router)
     _mount_frontend_dist(app)

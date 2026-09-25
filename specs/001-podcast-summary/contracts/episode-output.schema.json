@@ -109,6 +109,20 @@
         "tts":      { "type": ["string", "null"] }
       }
     },
+    "category": {
+      "description": "API only (absent from summary.json). The user folder this episode is filed in, or null for Uncategorized. Feature 004.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id":   { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "category_origin": {
+      "description": "API only. 'manual' = placed by the user and locked against AI categorisation; 'auto' = managed by AI categorisation; null = never categorised. Feature 004.",
+      "enum": ["manual", "auto", null]
+    },
     "last_failure": {
       "description": "API only (absent from summary.json). Why the latest summary job failed, or null. Independent of status: a re-run can fail while the earlier sections stay readable.",
       "type": ["object", "null"],
@@ -121,6 +135,10 @@
         "attempt":     { "type": "integer", "minimum": 1 },
         "finished_at": { "type": ["string", "null"], "format": "date-time" }
       }
+    },
+    "has_cover": {
+      "description": "API only (absent from summary.json). Whether GET /api/episodes/{id}/files/cover serves the video's cover image (a JPEG at most 720 px wide).",
+      "type": "boolean"
     },
     "created_at": { "type": "string", "format": "date-time" },
     "updated_at": { "type": "string", "format": "date-time" }

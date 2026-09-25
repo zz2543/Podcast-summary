@@ -95,7 +95,7 @@ struct TimestampButton: View {
                 .contentShape(Capsule())
             }
             .buttonStyle(.plain)
-            .help("从这里开始播放")
+            .help(tr("从这里开始播放", "Play from here"))
         } else {
             Text(label)
                 .podsumFont(.mono)

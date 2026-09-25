@@ -4,8 +4,12 @@ struct EpisodeDetailView: View {
     let episodeID: String
     /// 删除成功后让列表页重新拉一次
     var onDeleted: (() async -> Void)?
+    /// 在这里改了分类，列表页那张卡跟着改（004）
+    var onCategoryChanged: ((CategoryAssignment) -> Void)?
 
     @Environment(\.episodeRepository) private var repository
+    /// 列表页注入；预览等场合没有时，分类那一行不显示
+    @Environment(CategoryStore.self) private var categoryStore: CategoryStore?
     @Environment(\.dismiss) private var dismiss
 
     @State private var showChat = false
@@ -28,7 +32,7 @@ struct EpisodeDetailView: View {
                     .frame(width: max(0, geometry.size.width - revealedWidth))
                     .clipped()
                 if let episode {
-                    ChatPanel(episodeID: episodeID, episodeTitle: episode.title ?? "未命名剧集")
+                    ChatPanel(episodeID: episodeID, episodeTitle: episode.title ?? tr("未命名剧集", "Untitled Episode"))
                         .id(episodeID)
                         .frame(width: panelWidth)
                         .overlay(alignment: .leading) { Divider() }
@@ -48,16 +52,17 @@ struct EpisodeDetailView: View {
             showChat = false
         }
         .toolbar { toolbarContent }
-        .alert("删除这一集？", isPresented: $pendingDelete) {
-            Button("删除", role: .destructive) { Task { await deleteEpisode() } }
-            Button("取消", role: .cancel) { }
+        .alert(tr("删除这一集？", "Delete This Episode?"), isPresented: $pendingDelete) {
+            Button(tr("删除", "Delete"), role: .destructive) { Task { await deleteEpisode() } }
+            Button(tr("取消", "Cancel"), role: .cancel) { }
         } message: {
-            Text("音频、文稿与摘要都会从磁盘上一并删掉，且无法撤销。")
+            Text(tr("音频、文稿与摘要都会从磁盘上一并删掉，且无法撤销。",
+                    "The audio, transcript, and summary will all be deleted from disk. This can’t be undone."))
         }
-        .alert("操作失败", isPresented: Binding(
+        .alert(tr("操作失败", "Action Failed"), isPresented: Binding(
             get: { actionError != nil }, set: { if !$0 { actionError = nil } }
         )) {
-            Button("好") { actionError = nil }
+            Button(tr("好", "OK")) { actionError = nil }
         } message: {
             Text(actionError ?? "")
         }
@@ -70,14 +75,14 @@ struct EpisodeDetailView: View {
                 loaded(e)
             } else if let failure {
                 ContentUnavailableView {
-                    Label("打不开这一集", systemImage: "exclamationmark.triangle")
+                    Label(tr("打不开这一集", "Couldn’t Open This Episode"), systemImage: "exclamationmark.triangle")
                 } description: {
                     Text(failure)
                 } actions: {
-                    Button("重试") { Task { await load() } }
+                    Button(tr("重试", "Retry")) { Task { await load() } }
                 }
             } else {
-                ProgressView("读取详情…")
+                ProgressView(tr("读取详情…", "Loading details…"))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
@@ -89,25 +94,25 @@ struct EpisodeDetailView: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button { showChat.toggle() } label: {
-                Label("对话", systemImage: "bubble.left.and.bubble.right")
+                Label(tr("对话", "Chat"), systemImage: "bubble.left.and.bubble.right")
             }
             .keyboardShortcut("i", modifiers: [.command, .option])
-            .help("基于本集文稿提问（⌥⌘I）")
+            .help(tr("基于本集文稿提问（⌥⌘I）", "Ask about this episode’s transcript (⌥⌘I)"))
             .disabled(episode == nil)
         }
         ToolbarItem(placement: .primaryAction) {
             Menu {
-                Button("生成音频摘要") { Task { await requestDigest() } }
+                Button(tr("生成音频摘要", "Generate Audio Summary")) { Task { await requestDigest() } }
                     .disabled(episode?.stageStatus.tts.value == .present)
-                Button("重新处理") { Task { await retry() } }
+                Button(tr("重新处理", "Reprocess")) { Task { await retry() } }
                 if let ref = episode?.sourceRef, let url = URL(string: ref) {
                     Divider()
-                    Button("打开来源链接") { NSWorkspace.shared.open(url) }
+                    Button(tr("打开来源链接", "Open Source Link")) { NSWorkspace.shared.open(url) }
                 }
                 Divider()
-                Button("删除…", role: .destructive) { pendingDelete = true }
+                Button(tr("删除…", "Delete…"), role: .destructive) { pendingDelete = true }
             } label: {
-                Label("更多", systemImage: "ellipsis.circle")
+                Label(tr("更多", "More"), systemImage: "ellipsis.circle")
             }
             .disabled(episode == nil || working)
         }
@@ -139,7 +144,7 @@ struct EpisodeDetailView: View {
                     chapters(e)
                     entities(e)
                 } else if e.status.value == .processing || e.status.value == .pending {
-                    Label("摘要还在生成，进度见列表页顶部。", systemImage: "hourglass")
+                    Label(tr("摘要还在生成，进度见列表页顶部。", "The summary is still being generated — progress is shown at the top of the list."), systemImage: "hourglass")
                         .podsumFont(.secondary)
                         .foregroundStyle(Tone.textMuted)
                 }
@@ -149,7 +154,7 @@ struct EpisodeDetailView: View {
             .frame(maxWidth: 900, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle(e.title ?? "未命名剧集")
+        .navigationTitle(e.title ?? tr("未命名剧集", "Untitled Episode"))
     }
 
     /// 一句话、三幕、章节，有任何一样就算有东西可读
@@ -170,9 +175,9 @@ struct EpisodeDetailView: View {
 
     private func playbackUnavailableReason(_ e: EpisodeDetail) -> String {
         switch e.status.value {
-        case .pending, .processing: return "音频还在抓取或转写中，处理完就能播。"
-        case .failed:               return "这一集处理失败了，磁盘上没有可播的音频。"
-        default:                    return "找不到这一集的音频文件。"
+        case .pending, .processing: return tr("音频还在抓取或转写中，处理完就能播。", "The audio is still being fetched or transcribed. It’ll be playable once processing finishes.")
+        case .failed:               return tr("这一集处理失败了，磁盘上没有可播的音频。", "Processing failed for this episode; there’s no playable audio on disk.")
+        default:                    return tr("找不到这一集的音频文件。", "Can’t find this episode’s audio file.")
         }
     }
 
@@ -200,10 +205,12 @@ struct EpisodeDetailView: View {
             .podsumFont(.secondary)
             .foregroundStyle(Tone.textMuted)
 
-            Text(e.title ?? "未命名剧集")
+            Text(e.title ?? tr("未命名剧集", "Untitled Episode"))
                 .podsumFont(.pageTitle)
                 .foregroundStyle(Tone.text)
                 .fixedSize(horizontal: false, vertical: true)
+
+            if let categoryStore { categoryRow(e, categoryStore) }
 
             if let hook = e.hook, !hook.isEmpty {
                 Text("“\(hook)”")
@@ -218,16 +225,90 @@ struct EpisodeDetailView: View {
         }
     }
 
+    // MARK: 分类（004）
+
+    /// 当前分类 + 来源。在这里改就是手动归类（FR-004 / FR-012）。
+    private func categoryRow(_ e: EpisodeDetail, _ store: CategoryStore) -> some View {
+        HStack(spacing: Space.s) {
+            Menu {
+                Button {
+                    Task { await setCategory(nil, store) }
+                } label: {
+                    if e.category == nil { Label(tr("未分类", "Uncategorized"), systemImage: "checkmark") }
+                    else { Text(tr("未分类", "Uncategorized")) }
+                }
+                if !store.items.isEmpty { Divider() }
+                ForEach(store.items) { category in
+                    Button {
+                        Task { await setCategory(category.id, store) }
+                    } label: {
+                        if e.category?.id == category.id { Label(category.name, systemImage: "checkmark") }
+                        else { Text(category.name) }
+                    }
+                }
+            } label: {
+                Label(e.category?.name ?? tr("未分类", "Uncategorized"),
+                      systemImage: e.category == nil ? "tray" : "folder")
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            .disabled(working)
+
+            switch (e.categoryOrigin?.value, e.category == nil) {
+            case (.manual, false):
+                Text(tr("你放的", "Filed by you")).foregroundStyle(Tone.textSubtle)
+            case (.manual, true):
+                // Taken out by hand: AI skips it until it is handed back.
+                Text(tr("你移出的 · AI 不会再分它", "Taken out by you · AI won’t file it"))
+                    .foregroundStyle(Tone.textSubtle)
+                Button(tr("交给 AI 分类", "Let AI Categorize")) { Task { await releaseCategory() } }
+                    .buttonStyle(.link)
+                    .help(tr("交还后，下次 AI 分类会处理它", "The next AI categorization will file it"))
+            case (.auto, _):
+                Label(tr("AI 放的", "Filed by AI"), systemImage: "sparkles")
+                    .foregroundStyle(Tone.textSubtle)
+            default:
+                EmptyView()
+            }
+        }
+        .podsumFont(.meta)
+        .foregroundStyle(Tone.textMuted)
+    }
+
+    private func setCategory(_ categoryID: String?, _ store: CategoryStore) async {
+        do {
+            let assignment = try await store.assign(episodeID, to: categoryID, repository)
+            applyCategory(assignment)
+        } catch {
+            actionError = error.localizedDescription
+        }
+    }
+
+    private func releaseCategory() async {
+        do {
+            let assignment = try await repository.releaseCategory(episodeID: episodeID)
+            applyCategory(assignment)
+        } catch {
+            actionError = error.localizedDescription
+        }
+    }
+
+    private func applyCategory(_ assignment: CategoryAssignment) {
+        episode?.category = assignment.category
+        episode?.categoryOrigin = assignment.categoryOrigin
+        onCategoryChanged?(assignment)
+    }
+
     // MARK: 三幕
 
     @ViewBuilder
     private func threeAct(_ e: EpisodeDetail) -> some View {
         if let ta = e.threeAct {
-            section("三幕摘要") {
+            section(tr("三幕摘要", "Three-Act Summary")) {
                 HStack(alignment: .top, spacing: Space.m) {
-                    ActCard(label: "背景", text: ta.background)
-                    ActCard(label: "核心论点", text: ta.coreArgument)
-                    ActCard(label: "结论", text: ta.conclusion)
+                    ActCard(label: tr("背景", "Background"), text: ta.background)
+                    ActCard(label: tr("核心论点", "Core Argument"), text: ta.coreArgument)
+                    ActCard(label: tr("结论", "Conclusion"), text: ta.conclusion)
                 }
                 // 换集时收起，不把上一集的展开状态带过来
                 .id(e.id)
@@ -240,7 +321,7 @@ struct EpisodeDetailView: View {
     @ViewBuilder
     private func chapters(_ e: EpisodeDetail) -> some View {
         if !e.chapters.isEmpty {
-            section("章节 · \(e.chapters.count)") {
+            section(tr("章节 · \(e.chapters.count)", "Chapters · \(e.chapters.count)")) {
                 VStack(spacing: Space.m) {
                     ForEach(e.chapters) { chapter in
                         ChapterRow(
@@ -266,12 +347,12 @@ struct EpisodeDetailView: View {
     @ViewBuilder
     private func entities(_ e: EpisodeDetail) -> some View {
         if e.entities.isEmpty {
-            section("提及") {
-                Text("这一集没有抽取到人物、书籍或产品。")
+            section(tr("提及", "Mentions")) {
+                Text(tr("这一集没有抽取到人物、书籍或产品。", "No people, books, or products were found in this episode."))
                     .podsumFont(.body).foregroundStyle(Tone.textSubtle)
             }
         } else {
-            section("提及 · \(e.entities.count)") {
+            section(tr("提及 · \(e.entities.count)", "Mentions · \(e.entities.count)")) {
                 FlowRow(spacing: Space.s) {
                     ForEach(e.entities) { entity in
                         entityChip(entity)
@@ -326,14 +407,15 @@ struct EpisodeDetailView: View {
 
     @ViewBuilder
     private func provenance(_ e: EpisodeDetail) -> some View {
-        section("溯源") {
+        section(tr("溯源", "Provenance")) {
             VStack(alignment: .leading, spacing: Space.s) {
-                row("来源", e.sourceRef)
-                row("提示词版本", "one_liner \(e.promptVersions.oneLiner) · three_act \(e.promptVersions.threeAct) · chapters \(e.promptVersions.chapterOutline) · entities \(e.promptVersions.entityExtraction)")
+                row(tr("来源", "Source"), e.sourceRef)
+                row(tr("提示词版本", "Prompts"), "one_liner \(e.promptVersions.oneLiner) · three_act \(e.promptVersions.threeAct) · chapters \(e.promptVersions.chapterOutline) · entities \(e.promptVersions.entityExtraction)")
                 if let s = e.summaryStyle {
-                    row("摘要风格", "\(s.preset.rawValue)\(s.detail.map { " · \($0.rawValue)" } ?? "")")
+                    row(tr("摘要风格", "Style"), "\(s.preset.rawValue)\(s.detail.map { " · \($0.rawValue)" } ?? "")")
                 }
-                row("更新于", e.updatedAt.formatted(date: .abbreviated, time: .shortened))
+                row(tr("更新于", "Updated"), e.updatedAt.formatted(
+                    Date.FormatStyle(date: .abbreviated, time: .shortened).locale(Localizer.shared.locale)))
             }
         }
     }
@@ -385,7 +467,7 @@ struct EpisodeDetailView: View {
         defer { working = false }
         do {
             _ = try await repository.retry(id: episodeID)
-            actionNote = "已排队重新处理，进度在列表页顶部。"
+            actionNote = tr("已排队重新处理，进度在列表页顶部。", "Queued for reprocessing — progress is at the top of the list.")
             await load()
         } catch {
             actionError = error.localizedDescription
@@ -398,10 +480,11 @@ struct EpisodeDetailView: View {
         do {
             switch try await repository.requestDigest(id: episodeID) {
             case .alreadyPresent:
-                actionNote = "音频摘要已经有了。"
+                actionNote = tr("音频摘要已经有了。", "The audio summary already exists.")
                 await load()
             case .queued:
-                actionNote = "已排队合成音频摘要，完成后会出现在播放器的「音频摘要」里。"
+                actionNote = tr("已排队合成音频摘要，完成后会出现在播放器的「音频摘要」里。",
+                               "Audio summary queued. When it’s done, it’ll appear under “Audio Summary” in the player.")
             }
         } catch {
             actionError = error.localizedDescription
@@ -453,7 +536,7 @@ private struct ActCard: View {
                 Button {
                     withAnimation(.easeInOut(duration: 0.2)) { expanded.toggle() }
                 } label: {
-                    Label(expanded ? "收起" : "展开全部",
+                    Label(expanded ? tr("收起", "Show Less") : tr("展开全部", "Show All"),
                           systemImage: expanded ? "chevron.up" : "chevron.down")
                 }
                 .buttonStyle(.link)

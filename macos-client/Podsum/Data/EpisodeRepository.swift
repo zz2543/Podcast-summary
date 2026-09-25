@@ -85,9 +85,29 @@ public protocol EpisodeRepository: Sendable {
     func audioURL(for episode: EpisodeDetail) -> URL?
     /// 合成的音频摘要，没有则 nil
     func digestURL(for episode: EpisodeDetail) -> URL?
+    /// 视频封面。同样本地文件优先；没有封面（本地上传、直链音频、老数据没补抓）则 nil
+    func coverURL(for episode: EpisodeSummary) -> URL?
 
     /// 实时任务事件。Mock 用定时器假装，Live 走 WebSocket。
     func jobEvents() -> AsyncStream<JobEvent>
+
+    // 分类（004）。手动操作一律锁定那条视频；AI 分类只在用户点按钮时跑，
+    // 结果先预览，applyCategorization 才真正写入。
+    func categories() async throws -> CategoryList
+    func createCategory(name: String) async throws -> EpisodeCategory
+    func renameCategory(id: String, name: String) async throws -> EpisodeCategory
+    /// 返回回到「未分类」的视频条数
+    func deleteCategory(id: String) async throws -> Int
+    func reorderCategories(ids: [String]) async throws -> CategoryList
+    /// categoryID 为 nil 即「移出分类」
+    func setCategory(episodeID: String, categoryID: String?) async throws -> CategoryAssignment
+    /// 「交给 AI 分类」：解除锁定，位置不变
+    func releaseCategory(episodeID: String) async throws -> CategoryAssignment
+    /// 返回 run id
+    func startCategorize() async throws -> String
+    func categorizeRun(id: String) async throws -> CategorizeRun
+    func cancelCategorize(id: String) async throws
+    func applyCategorization(_ apply: CategorizeApply) async throws -> CategorizeApplyResult
 }
 
 public enum RepositoryError: LocalizedError {
@@ -98,22 +118,30 @@ public enum RepositoryError: LocalizedError {
     case noDetailFixture(String)
     case mockUnsupported(String)
     case api(code: String, message: String, status: Int)
+    /// 409。重复链接时带着已有剧集的 id（后端在下载前就判定）；
+    /// 任务仍在跑时的 409 没有 id。
+    case conflict(message: String, existingEpisodeID: String?)
     case transport(String)
 
     public var errorDescription: String? {
         switch self {
         case .fixtureMissing(let n):
-            return "缺少 fixture：\(n).json"
+            return tr("缺少 fixture：\(n).json", "Missing fixture: \(n).json")
         case .notFound(let id):
-            return "找不到剧集：\(id)"
+            return tr("找不到剧集：\(id)", "Episode not found: \(id)")
         case .noDetailFixture:
-            return "这一集还没有本地详情快照。\n\n"
-                 + "离线模式只内置了 5 集详情（覆盖 done / partial / processing / 老数据 / 极短时长）。"
-                 + "接上后端后，29 集全部可以打开。"
+            return tr("这一集还没有本地详情快照。\n\n"
+                      + "离线模式只内置了 5 集详情（覆盖 done / partial / processing / 老数据 / 极短时长）。"
+                      + "接上后端后，29 集全部可以打开。",
+                      "There’s no local detail snapshot for this episode.\n\n"
+                      + "Offline mode bundles details for only 5 episodes (covering done / partial / processing / legacy data / very short). "
+                      + "Connect a backend to open all 29.")
         case .mockUnsupported(let what):
-            return "离线模式下不能\(what)——这一步需要真的后端。"
+            return tr("离线模式下不能\(what)——这一步需要真的后端。", "Can’t \(what) in offline mode — this needs a real backend.")
         case .api(let code, let message, _):
-            return "\(message)（\(code)）"
+            return tr("\(message)（\(code)）", "\(message) (\(code))")
+        case .conflict(let message, _):
+            return tr("\(message)（conflict）", "\(message) (conflict)")
         case .transport(let message):
             return message
         }
@@ -133,6 +161,11 @@ public final class MockRepository: EpisodeRepository, @unchecked Sendable {
 
     private let lock = NSLock()
     private var pending: [EpisodeSummary] = []
+    // 分类的内存状态，见 MockCategories.swift
+    let categoryLock = NSLock()
+    var mockCategories: [EpisodeCategory] = []
+    var mockAssignments: [String: CategoryAssignment] = [:]
+    var mockRunPolls: [String: Int] = [:]
     private var continuations: [UUID: AsyncStream<JobEvent>.Continuation] = [:]
 
     public init() {}
@@ -140,13 +173,17 @@ public final class MockRepository: EpisodeRepository, @unchecked Sendable {
     public func list() async throws -> [EpisodeSummary] {
         try? await Task.sleep(for: latency)
         let fixtures = try Self.decode(EpisodeListResponse.self, from: "episodes-list").items
-        return pendingSnapshot() + fixtures
+        return withMockCategories(pendingSnapshot() + fixtures)
     }
 
     public func detail(id: String) async throws -> EpisodeDetail {
         try? await Task.sleep(for: latency)
         for name in Self.detailFixtures {
-            if let d = try? Self.decode(EpisodeDetail.self, from: name), d.id == id {
+            if var d = try? Self.decode(EpisodeDetail.self, from: name), d.id == id {
+                if let assignment = mockAssignment(for: id) {
+                    d.category = assignment.category
+                    d.categoryOrigin = assignment.categoryOrigin
+                }
                 return d
             }
         }
@@ -182,24 +219,26 @@ public final class MockRepository: EpisodeRepository, @unchecked Sendable {
     }
 
     public func retry(id: String) async throws -> Job {
-        throw RepositoryError.mockUnsupported("重试")
+        throw RepositoryError.mockUnsupported(tr("重试", "retry"))
     }
 
     public func delete(id: String) async throws {
         guard removePending(id) else {
-            throw RepositoryError.mockUnsupported("删除后端里的剧集")
+            throw RepositoryError.mockUnsupported(tr("删除后端里的剧集", "delete episodes on the backend"))
         }
     }
 
     public func requestDigest(id: String) async throws -> DigestResponse {
-        throw RepositoryError.mockUnsupported("生成音频摘要")
+        throw RepositoryError.mockUnsupported(tr("生成音频摘要", "generate an audio summary"))
     }
 
     public func chat(id: String, message: String, history: [ChatTurn]) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             Task {
-                let reply = "离线模式没有接 LLM，所以这里只能复述你的问题：「\(message)」。"
-                           + "接上后端后，回答会基于这一集的转录文稿逐字流式返回。"
+                let reply = tr("离线模式没有接 LLM，所以这里只能复述你的问题：「\(message)」。"
+                               + "接上后端后，回答会基于这一集的转录文稿逐字流式返回。",
+                               "Offline mode has no LLM attached, so all it can do is echo your question: “\(message)”. "
+                               + "With a backend connected, answers stream back grounded in this episode’s transcript.")
                 for character in reply {
                     try? await Task.sleep(for: .milliseconds(18))
                     continuation.yield(String(character))
@@ -212,6 +251,7 @@ public final class MockRepository: EpisodeRepository, @unchecked Sendable {
     /// Mock 下不给音频：fixture 是 API 响应快照，磁盘上未必有对应的 mp3。
     public func audioURL(for episode: EpisodeDetail) -> URL? { nil }
     public func digestURL(for episode: EpisodeDetail) -> URL? { nil }
+    public func coverURL(for episode: EpisodeSummary) -> URL? { nil }
 
     public func jobEvents() -> AsyncStream<JobEvent> {
         AsyncStream { continuation in

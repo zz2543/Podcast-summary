@@ -65,10 +65,11 @@ struct ChatPanel: View {
 
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: Space.s) {
-            Text("问这一集")
+            Text(tr("问这一集", "Ask This Episode"))
                 .podsumFont(.cardTitle)
                 .foregroundStyle(Tone.text)
-            Text("回答只依据这一集的转录文稿。没有文稿的剧集（还在处理、或抓取失败）问不了。")
+            Text(tr("回答只依据这一集的转录文稿。没有文稿的剧集（还在处理、或抓取失败）问不了。",
+                    "Answers draw only on this episode’s transcript. Episodes without one (still processing, or failed to fetch) can’t be asked."))
                 .podsumFont(.meta)
                 .foregroundStyle(Tone.textSubtle)
                 .readable()
@@ -85,11 +86,15 @@ struct ChatPanel: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    static let starters = ["这一集最值得记住的一点是什么？", "主持人和嘉宾在哪里有分歧？", "有哪些可以直接用的建议？"]
+    static var starters: [String] {
+        [tr("这一集最值得记住的一点是什么？", "What’s the one thing most worth remembering from this episode?"),
+         tr("主持人和嘉宾在哪里有分歧？", "Where do the host and guest disagree?"),
+         tr("有哪些可以直接用的建议？", "What advice can I put to use right away?")]
+    }
 
     private func bubble(role: ChatTurn.Role, text: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(role == .user ? "你" : "助手")
+            Text(role == .user ? tr("你", "You") : tr("助手", "Assistant"))
                 .podsumFont(.micro)
                 .foregroundStyle(Tone.textSubtle)
             Text(text)
@@ -111,7 +116,7 @@ struct ChatPanel: View {
 
     private var composer: some View {
         VStack(spacing: Space.s) {
-            TextField("问点什么…", text: $draft, axis: .vertical)
+            TextField(tr("问点什么…", "Ask something…"), text: $draft, axis: .vertical)
                 .textFieldStyle(.plain)
                 .podsumFont(.secondary)
                 .lineLimit(1...5)
@@ -123,16 +128,16 @@ struct ChatPanel: View {
 
             HStack {
                 if streaming != nil {
-                    Button("停止") { stop() }
+                    Button(tr("停止", "Stop")) { stop() }
                         .buttonStyle(.plain)
                         .podsumFont(.meta)
                         .foregroundStyle(Tone.err)
                 }
                 Spacer()
-                Text("⏎ 发送")
+                Text(tr("⏎ 发送", "⏎ to send"))
                     .podsumFont(.micro)
                     .foregroundStyle(Tone.textSubtle)
-                Button("发送") { send(draft) }
+                Button(tr("发送", "Send")) { send(draft) }
                     .disabled(draft.isBlank || streaming != nil)
             }
         }

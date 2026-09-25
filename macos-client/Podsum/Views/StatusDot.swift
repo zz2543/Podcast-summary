@@ -28,7 +28,7 @@ struct StatusDot: View {
         }
         // 颜色从不是唯一信号：文字标签始终同行
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("状态：\(status.label)")
+        .accessibilityLabel(tr("状态：\(status.label)", "Status: \(status.label)"))
     }
 }
 

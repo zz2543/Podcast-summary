@@ -55,7 +55,7 @@ are validated before the audio is fetched, and they are reused verbatim on retry
 **400 `bad_input`** unsupported `source_type`, malformed URL, unknown `summary_style` or `detail_level`, or `style_note` longer than 200 characters.
 **413 `payload_too_large`** file > 1 GB OR (after probe) duration > 6 h (FR-024).
 **415 `unsupported_media`** direct URL Content-Type not `audio/*` (FR-002), or YouTube link unresolvable (FR-003), or file extension not in {mp3, m4a, wav} (FR-001).
-**409 `conflict`** an active (non-deleted) episode already exists for the same `(source_type, source_ref)` of types `direct_url` / `youtube`.
+**409 `conflict`** an active (non-deleted) episode already exists for the same `(source_type, source_ref)` of types `direct_url` / `youtube`. The check runs before anything is downloaded, and `error.details.episode_id` names the existing episode (added for 003 quick-add, so a duplicate answers at once and the client can open it).
 
 ---
 
@@ -136,6 +136,24 @@ Stream the cached normalized audio for the in-page player (supports HTTP `Range`
 
 ---
 
+## Categories (feature 004)
+
+User folders for episodes, plus an AI categorization run that only ever files **Uncategorized** episodes and runs only when the user starts it. Full contract: [`specs/004-video-categories/contracts/http-api.md`](../../004-video-categories/contracts/http-api.md).
+
+| Method & path | Purpose |
+|---|---|
+| `GET /api/categories` | Categories in sidebar order with counts, plus `uncategorized_count` |
+| `POST /api/categories` | Create (`400` invalid name, `409` duplicate) |
+| `PATCH /api/categories/{id}` | Rename |
+| `DELETE /api/categories/{id}` | Delete; its episodes go back to Uncategorized |
+| `PUT /api/categories/order` | Reorder |
+| `PUT /api/episodes/{id}/category` | File by hand, or take out (`category_id: null`) |
+| `POST /api/episodes/{id}/category/release` | Hand a taken-out episode back to AI categorization |
+| `POST /api/categorize` · `GET /api/categorize/{run_id}` · `DELETE /api/categorize/{run_id}` | Start, poll, cancel an AI run (proposal only, nothing written) |
+| `POST /api/categories/apply` | Write the proposal the user kept, re-checking every row |
+
+---
+
 ## GET `/api/health`
 
 **200**
@@ -170,10 +188,14 @@ Stream the cached normalized audio for the in-page player (supports HTTP `Range`
     "band": "must_listen | worth_listening | skimmable | skippable",
     "rationale": "string"
   },
+  "category": { "id": "ULID", "name": "string" } | null,
+  "category_origin": "manual | auto | null",
   "created_at": "ISO-8601",
   "updated_at": "ISO-8601"
 }
 ```
+
+`category` / `category_origin` come from feature 004 (user folders): `category` is `null` for Uncategorized; `manual` means the user filed it (or took it out, when `category` is null), `auto` means an AI categorization run filed it.
 
 `usefulness` is `null` (not an object with null fields) whenever `stage_status.usefulness != "present"` — the list view renders "未评分" in that case rather than a zero score.
 

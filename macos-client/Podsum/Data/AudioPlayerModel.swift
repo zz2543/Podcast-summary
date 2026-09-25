@@ -13,7 +13,7 @@ public final class AudioPlayerModel {
     public enum Track: String, CaseIterable, Identifiable, Sendable {
         case original, digest
         public var id: String { rawValue }
-        public var label: String { self == .original ? "原声" : "音频摘要" }
+        public var label: String { self == .original ? tr("原声", "Original") : tr("音频摘要", "Audio Summary") }
     }
 
     public private(set) var track: Track = .original
@@ -94,7 +94,7 @@ public final class AudioPlayerModel {
                     if item.duration.isNumeric { self.durationMs = Int(item.duration.seconds * 1000) }
                 case .failed:
                     self.isReady = false
-                    self.failure = item.error?.localizedDescription ?? "音频打不开"
+                    self.failure = item.error?.localizedDescription ?? tr("音频打不开", "Couldn’t open the audio")
                 default:
                     break
                 }

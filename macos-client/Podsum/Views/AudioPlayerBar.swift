@@ -43,7 +43,7 @@ struct AudioPlayerBar: View {
                 Image(systemName: "gobackward.15").font(.system(size: 16 * scale))
             }
             .buttonStyle(.plain)
-            .help("后退 15 秒（⌥←）")
+            .help(tr("后退 15 秒（⌥←）", "Back 15 seconds (⌥←)"))
 
             Button { player.toggle() } label: {
                 Image(systemName: player.isPlaying ? "pause.circle.fill" : "play.circle.fill")
@@ -51,13 +51,13 @@ struct AudioPlayerBar: View {
                     .foregroundStyle(Tone.info)
             }
             .buttonStyle(.plain)
-            .help(player.isPlaying ? "暂停（⌘K）" : "播放（⌘K）")
+            .help(player.isPlaying ? tr("暂停（⌘K）", "Pause (⌘K)") : tr("播放（⌘K）", "Play (⌘K)"))
 
             Button { player.skip(seconds: 15) } label: {
                 Image(systemName: "goforward.15").font(.system(size: 16 * scale))
             }
             .buttonStyle(.plain)
-            .help("前进 15 秒（⌥→）")
+            .help(tr("前进 15 秒（⌥→）", "Forward 15 seconds (⌥→)"))
         }
         .foregroundStyle(Tone.text)
         .disabled(!player.hasAudio)
@@ -151,7 +151,7 @@ struct AudioPlayerBar: View {
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
-            .help("播放速度")
+            .help(tr("播放速度", "Playback speed"))
         }
         .disabled(!player.hasAudio)
     }
@@ -191,7 +191,7 @@ struct AudioPlayerBar: View {
     private var currentChapterTitle: String? {
         guard player.track == .original else { return nil }
         guard let chapter = chapters.last(where: { $0.startMs <= shownMs }) else { return nil }
-        return "第 \(chapter.idx + 1) 章 · \(chapter.title)"
+        return tr("第 \(chapter.idx + 1) 章 · \(chapter.title)", "Chapter \(chapter.idx + 1) · \(chapter.title)")
     }
 }
 

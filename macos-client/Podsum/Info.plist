@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 与其余自动生成的键合并。声明这两种本地化，AppKit 才会把系统菜单
+	     （编辑、窗口、退出…）按 AppleLanguages 显示成中文或英文；
+	     不声明的话只剩开发语言 en。界面文字本身见 Design/Localization.swift。 -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>zh-Hans</string>
+	</array>
+	<!-- 全局快捷键读前台浏览器当前标签页的地址，每个浏览器首次使用时系统会拿这句话问用户 -->
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Podsum 读取当前标签页的地址，把你正在看的视频送去总结。Podsum reads the current tab’s address to summarize the video you’re watching.</string>
+</dict>
+</plist>

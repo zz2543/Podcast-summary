@@ -19,12 +19,15 @@ public struct LiveRepository: EpisodeRepository {
 
     private let session: URLSession
 
-    public init(baseURL: URL, dataRoot: URL? = nil, backendRoot: URL? = nil) {
+    /// `requestTimeout` 是两段数据之间最长的沉默。视频提交要等后端把音频抓完
+    /// 才回响应，中途一个字节都不发——快捷提交因此要放得很宽，
+    /// 否则客户端先超时报错，后端却照样把这一集建出来了。
+    public init(baseURL: URL, dataRoot: URL? = nil, backendRoot: URL? = nil, requestTimeout: TimeInterval = 30) {
         self.baseURL = baseURL
         self.dataRoot = dataRoot
         self.backendRoot = backendRoot
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForRequest = requestTimeout
         // 抓取一集要几分钟，但那是后端的事；这里只等 HTTP 响应头。
         config.timeoutIntervalForResource = 600
         config.waitsForConnectivity = false
@@ -125,7 +128,7 @@ public struct LiveRepository: EpisodeRepository {
 
                     let (bytes, response) = try await session.bytes(for: request)
                     guard let http = response as? HTTPURLResponse else {
-                        throw RepositoryError.transport("没有拿到 HTTP 响应")
+                        throw RepositoryError.transport(tr("没有拿到 HTTP 响应", "No HTTP response"))
                     }
                     guard http.statusCode == 200 else {
                         // 错误体是一整个 JSON，不是 SSE——要把字节收完再解。
@@ -186,6 +189,15 @@ public struct LiveRepository: EpisodeRepository {
         return baseURL.appending(path: "api/episodes/\(escape(episode.id))/files/digest")
     }
 
+    public func coverURL(for episode: EpisodeSummary) -> URL? {
+        if let local = dataRoot?.appending(path: "\(episode.id)/cover.jpg"),
+           FileManager.default.fileExists(atPath: local.path(percentEncoded: false)) {
+            return local
+        }
+        guard episode.hasCover == true else { return nil }
+        return baseURL.appending(path: "api/episodes/\(escape(episode.id))/files/cover")
+    }
+
     /// artifact_paths 里的路径可能是绝对的（app 传了绝对 DATA_DIR），
     /// 也可能是 "data/<ULID>/summary.md" 这种相对仓库根的老数据。
     private func resolve(_ path: String) -> URL? {
@@ -201,6 +213,68 @@ public struct LiveRepository: EpisodeRepository {
             socket.start()
             continuation.onTermination = { _ in socket.stop() }
         }
+    }
+
+    // MARK: 分类（004）
+
+    public func categories() async throws -> CategoryList {
+        try await get(CategoryList.self, path: "api/categories")
+    }
+
+    public func createCategory(name: String) async throws -> EpisodeCategory {
+        try await send(EpisodeCategory.self, "POST", "api/categories", json: ["name": name])
+    }
+
+    public func renameCategory(id: String, name: String) async throws -> EpisodeCategory {
+        try await send(EpisodeCategory.self, "PATCH", "api/categories/\(escape(id))", json: ["name": name])
+    }
+
+    public func deleteCategory(id: String) async throws -> Int {
+        try await send(Released.self, "DELETE", "api/categories/\(escape(id))").released
+    }
+
+    public func reorderCategories(ids: [String]) async throws -> CategoryList {
+        try await send(CategoryList.self, "PUT", "api/categories/order", jsonAny: ["ids": ids])
+    }
+
+    public func setCategory(episodeID: String, categoryID: String?) async throws -> CategoryAssignment {
+        try await send(CategoryAssignment.self, "PUT", "api/episodes/\(escape(episodeID))/category",
+                       jsonAny: ["category_id": categoryID.map { $0 as Any } ?? NSNull()])
+    }
+
+    public func releaseCategory(episodeID: String) async throws -> CategoryAssignment {
+        try await send(CategoryAssignment.self, "POST", "api/episodes/\(escape(episodeID))/category/release")
+    }
+
+    public func startCategorize() async throws -> String {
+        try await send(RunStarted.self, "POST", "api/categorize").runID
+    }
+
+    public func categorizeRun(id: String) async throws -> CategorizeRun {
+        try await get(CategorizeRun.self, path: "api/categorize/\(escape(id))")
+    }
+
+    public func cancelCategorize(id: String) async throws {
+        _ = try await raw("DELETE", "api/categorize/\(escape(id))")
+    }
+
+    public func applyCategorization(_ apply: CategorizeApply) async throws -> CategorizeApplyResult {
+        let body: [String: Any] = [
+            "new_categories": apply.newCategories.map { ["key": $0.key, "name": $0.name] },
+            "assignments": apply.assignments.map { row -> [String: Any] in
+                ["episode_id": row.episodeID,
+                 "from_category_id": row.fromCategoryID.map { $0 as Any } ?? NSNull(),
+                 "to_key": row.toKey]
+            },
+        ]
+        return try await send(CategorizeApplyResult.self, "POST", "api/categories/apply", jsonAny: body)
+    }
+
+    private struct Released: Decodable { let released: Int }
+
+    private struct RunStarted: Decodable {
+        let runID: String
+        enum CodingKeys: String, CodingKey { case runID = "run_id" }
     }
 
     // MARK: HTTP 脚手架
@@ -250,10 +324,10 @@ public struct LiveRepository: EpisodeRepository {
     private func perform(_ request: URLRequest) async throws -> Data {
         let data: Data, response: URLResponse
         do { (data, response) = try await session.data(for: request) }
-        catch { throw RepositoryError.transport("连不上后端：\(error.localizedDescription)") }
+        catch { throw RepositoryError.transport(tr("连不上后端：\(error.localizedDescription)", "Can’t reach the backend: \(error.localizedDescription)")) }
 
         guard let http = response as? HTTPURLResponse else {
-            throw RepositoryError.transport("没有拿到 HTTP 响应")
+            throw RepositoryError.transport(tr("没有拿到 HTTP 响应", "No HTTP response"))
         }
         guard (200..<300).contains(http.statusCode) else {
             throw Self.decodeError(status: http.statusCode, data: data)
@@ -264,13 +338,18 @@ public struct LiveRepository: EpisodeRepository {
     private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
         if T.self == EmptyResponse.self { return EmptyResponse() as! T }
         do { return try JSONDecoder.podsum.decode(type, from: data) }
-        catch { throw RepositoryError.transport("响应解不开：\(error)") }
+        catch { throw RepositoryError.transport(tr("响应解不开：\(error)", "Couldn’t decode the response: \(error)")) }
     }
 
     struct EmptyResponse: Decodable {}
 
     static func decodeError(status: Int, data: Data) -> RepositoryError {
         if let envelope = try? JSONDecoder().decode(APIErrorEnvelope.self, from: data) {
+            if envelope.error.code == "conflict" {
+                var existing: String?
+                if case .string(let id)? = envelope.error.details?["episode_id"] { existing = id }
+                return .conflict(message: envelope.error.message, existingEpisodeID: existing)
+            }
             return .api(code: envelope.error.code, message: envelope.error.message, status: status)
         }
         return .api(code: "http_\(status)", message: HTTPURLResponse.localizedString(forStatusCode: status), status: status)
