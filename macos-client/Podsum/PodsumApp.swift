@@ -46,6 +46,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let ui = UIState()
     let jobs = JobsModel()
     lazy var quickAdd = QuickAddCenter(backend: backend)
+    lazy var components = ComponentUpdater(backend: backend)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let notifier = QuickAddNotifier.shared
@@ -164,6 +165,7 @@ struct PodsumApp: App {
             SettingsView()
                 .environment(settings)
                 .environment(backend)
+                .environment(appDelegate.components)
                 .environment(\.textScale, textScale)
                 .environment(\.locale, localizer.locale)
         }

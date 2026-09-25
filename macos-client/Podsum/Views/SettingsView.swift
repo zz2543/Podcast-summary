@@ -27,6 +27,7 @@ struct SettingsView: View {
 
 struct GeneralSettings: View {
     @State private var localizer = Localizer.shared
+    @State private var updates = AppUpdateChecker()
 
     var body: some View {
         Form {
@@ -50,8 +51,47 @@ struct GeneralSettings: View {
                         "Changes only the app’s interface. Transcripts and summaries stay in each episode’s own language."))
                     .podsumFont(.micro).foregroundStyle(Tone.textSubtle)
             }
+
+            Section(tr("关于", "About")) {
+                LabeledContent(tr("版本", "Version"),
+                               value: "\(AppUpdateChecker.currentVersion) (build \(AppUpdateChecker.buildNumber))")
+                HStack {
+                    Button(updates.state == .checking ? tr("检查中…", "Checking…") : tr("检查新版本", "Check for Updates")) {
+                        Task { await updates.check() }
+                    }
+                    .disabled(updates.state == .checking)
+                    AppUpdateStatus(state: updates.state)
+                }
+            }
         }
         .formStyle(.grouped)
+    }
+}
+
+private struct AppUpdateStatus: View {
+    let state: AppUpdateChecker.State
+
+    var body: some View {
+        switch state {
+        case .idle, .checking:
+            EmptyView()
+        case .upToDate:
+            Label(tr("已是最新版本", "You’re up to date"), systemImage: "checkmark.circle")
+                .foregroundStyle(Tone.ok)
+        case .available(let version, let page):
+            HStack {
+                Label(tr("有新版本 \(version)", "Version \(version) is available"), systemImage: "arrow.down.circle")
+                    .foregroundStyle(Tone.warn)
+                Button(tr("前往下载", "Download")) { NSWorkspace.shared.open(page) }
+            }
+        case .noReleases:
+            Text(tr("还没有发布过正式版本", "No releases have been published yet"))
+                .foregroundStyle(Tone.textSubtle)
+        case .failed(let message):
+            Label(message, systemImage: "exclamationmark.triangle")
+                .foregroundStyle(Tone.err)
+                .lineLimit(2)
+        }
     }
 }
 
@@ -212,6 +252,7 @@ struct ProviderSettings: View {
 struct BackendSettings: View {
     @Environment(AppSettings.self) private var settings
     @Environment(BackendController.self) private var backend
+    @Environment(ComponentUpdater.self) private var components
 
     var body: some View {
         @Bindable var settings = settings
@@ -244,6 +285,8 @@ struct BackendSettings: View {
                     .podsumFont(.micro).foregroundStyle(Tone.textSubtle)
             }
 
+            ComponentSection(external: settings.backendMode == .external)
+
             Section(tr("状态", "Status")) {
                 BackendStatusLine(phase: backend.phase)
                 HStack {
@@ -266,6 +309,89 @@ struct BackendSettings: View {
             }
         }
         .formStyle(.grouped)
+        .task { await components.refresh() }
+    }
+}
+
+/// 「更新解析组件」。YouTube / B 站改接口后，旧版 yt-dlp 就下不动了——
+/// 用户自己点一下就能升级，不用等重新发包。机制见 `ComponentUpdater`。
+private struct ComponentSection: View {
+    @Environment(ComponentUpdater.self) private var components
+    @Environment(BackendController.self) private var backend
+    let external: Bool
+
+    var body: some View {
+        Section {
+            LabeledContent(tr("视频解析（yt-dlp）", "Video extraction (yt-dlp)")) {
+                if let installed = components.installed {
+                    Text(installed.version + (installed.isUpdated ? tr("（已更新）", " (updated)") : tr("（内置）", " (built in)")))
+                        .textSelection(.enabled)
+                } else {
+                    Text("—").foregroundStyle(Tone.textSubtle)
+                }
+            }
+
+            HStack {
+                Button(tr("检查并更新", "Check & Update")) { Task { await components.update() } }
+                    .disabled(external || components.state.isWorking)
+                if components.installed?.isUpdated == true {
+                    Button(tr("恢复内置版本", "Revert to Built-in")) { Task { await components.revertToBundled() } }
+                        .disabled(external || components.state.isWorking)
+                }
+                Spacer()
+                if components.needsRestart {
+                    Button(tr("重启后端以生效", "Restart Backend to Apply")) { Task { await components.restartBackend() } }
+                        .disabled(backend.phase.isBusy || components.state.isWorking)
+                }
+            }
+
+            status
+
+            if !components.log.isEmpty, case .failed = components.state {
+                ScrollView {
+                    Text(components.log)
+                        .podsumFont(.monoSmall)
+                        .foregroundStyle(Tone.textMuted)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(height: 90)
+            }
+        } header: {
+            Text(tr("解析组件", "Extraction Component"))
+        } footer: {
+            Text(external
+                 ? tr("连接的是外部后端，它用的是自己环境里的 yt-dlp，不归本 app 管。",
+                      "You’re connected to an external backend; it uses the yt-dlp in its own environment.")
+                 : tr("视频网站改版后下载失败时，先点这里更新。更新装在 app 外面，不影响 app 本身；随时可以恢复内置版本。",
+                      "If video downloads start failing after a site change, update here first. Updates live outside the app and can be reverted at any time."))
+                .podsumFont(.micro).foregroundStyle(Tone.textSubtle)
+        }
+    }
+
+    @ViewBuilder private var status: some View {
+        switch components.state {
+        case .idle:
+            EmptyView()
+        case .working(let step):
+            HStack { ProgressView().controlSize(.small); Text(step) }
+                .foregroundStyle(Tone.textMuted)
+        case .upToDate(let version):
+            Label(tr("已是最新（\(version)）", "Already up to date (\(version))"), systemImage: "checkmark.circle")
+                .foregroundStyle(Tone.ok)
+        case .updated(let from, let to):
+            Label(tr("已从 \(from) 更新到 \(to)，重启后端后生效。", "Updated from \(from) to \(to). Restart the backend to apply."),
+                  systemImage: "arrow.down.circle")
+                .foregroundStyle(Tone.ok)
+        case .reverted:
+            Label(tr("已恢复内置版本，重启后端后生效。", "Reverted to the built-in version. Restart the backend to apply."),
+                  systemImage: "arrow.uturn.backward.circle")
+                .foregroundStyle(Tone.textMuted)
+        case .failed(let message):
+            Label(message, systemImage: "exclamationmark.triangle")
+                .foregroundStyle(Tone.err)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
 

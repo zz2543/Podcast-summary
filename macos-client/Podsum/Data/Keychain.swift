@@ -20,7 +20,8 @@ import Security
 /// 也就是说日常使用不会弹；只有 app 升级到新版本时会再问一次。
 /// 开发期反复重编译则每次都问——那是开发期的代价，不是用户的。
 enum Keychain {
-    static let service = "local.podsum.macclient"
+    /// 正式版就是 `local.podsum.macclient`；换了 bundle id 的副本用自己的条目（见 `AppStorageRoot`）
+    static var service: String { AppStorageRoot.bundleID }
     private static let account = "secrets"
 
     /// 合并之前的旧格式，一字段一条。只在迁移时读一次。

@@ -205,8 +205,7 @@ public final class AppSettings {
     }
 
     public static var defaultDataDirectory: String {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return base.appending(path: "Podsum/data", directoryHint: .isDirectory).path(percentEncoded: false)
+        AppStorageRoot.support.appending(path: "data", directoryHint: .isDirectory).path(percentEncoded: false)
     }
 
     // MARK: 校验
@@ -321,4 +320,34 @@ public enum Env {
         "DOUBAO_ASR_APP_ID", "DOUBAO_ASR_ACCESS_TOKEN",
         "DOUBAO_TTS_APP_ID", "DOUBAO_TTS_ACCESS_TOKEN",
     ]
+}
+
+// MARK: - 存储位置
+
+/// app 自己的文件放哪儿，一律跟着 bundle id 走。
+///
+/// 正式的 `local.podsum.macclient` 就是一直以来的位置（`…/Application Support/Podsum`、
+/// `~/Library/Logs/Podsum`、钥匙串 service 同名）。换了 bundle id 的副本——例如验证时复制出来的
+/// `local.podsum.macclient.verify`——自动落到另一套目录与钥匙串条目，不会碰到真数据。
+/// UserDefaults 本来就按 bundle id 分开，这里把其余几处对齐。
+public enum AppStorageRoot {
+    public static let officialBundleID = "local.podsum.macclient"
+
+    public static var bundleID: String { Bundle.main.bundleIdentifier ?? officialBundleID }
+
+    private static var folderName: String {
+        bundleID == officialBundleID ? "Podsum" : bundleID
+    }
+
+    /// ~/Library/Application Support/Podsum
+    public static var support: URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appending(path: folderName, directoryHint: .isDirectory)
+    }
+
+    /// ~/Library/Logs/Podsum
+    public static var logs: URL {
+        FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+            .appending(path: "Logs/\(folderName)", directoryHint: .isDirectory)
+    }
 }

@@ -80,8 +80,7 @@ final class QuickAddCenter {
     }
 
     nonisolated static var defaultStoreURL: URL {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return base.appending(path: "Podsum/quick-add.json")
+        AppStorageRoot.support.appending(path: "quick-add.json")
     }
 
     var pending: [QuickAddItem] { items.filter { !$0.state.isTerminal } }

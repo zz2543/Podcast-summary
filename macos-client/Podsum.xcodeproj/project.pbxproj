@@ -8,10 +8,12 @@
 /* Begin PBXBuildFile section */
 		90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E733266F9C650F76AFF5D1 /* PodsumModels.swift */; };
 		0D386D5720B6DCE09B88A672 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8CEAEDED2728CE18C4EAF5 /* AppSettings.swift */; };
+		828B941D5607E9326658E664 /* AppUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F92A267FA45F6346D1388 /* AppUpdateChecker.swift */; };
 		FC7CCCDCCEBE320EE5B9B58D /* AudioPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175A4F32E791C3A06466A284 /* AudioPlayerModel.swift */; };
 		189BAE092E645110094E03D4 /* BackendController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F91BE209853671A0375A6BA /* BackendController.swift */; };
 		D19C6D8FA533F30663F113F0 /* CategoryName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98DBA01FDA3CCE44515BE56 /* CategoryName.swift */; };
 		50DF0CA8B62D84E6F1D18534 /* CategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79280640B5422865993BEDDB /* CategoryStore.swift */; };
+		C8274BA3EB053545B481773A /* ComponentUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479BAD7EBB5D66637632239 /* ComponentUpdater.swift */; };
 		C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */; };
 		9F9F452A004218E3F9000D62 /* JobsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69745C8322D84D2A2D27C5E /* JobsModel.swift */; };
 		961ED75892FAFCF9AE3F4107 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE08CC12E88B20F61CD5FA8C /* Keychain.swift */; };
@@ -58,10 +60,12 @@
 		F5BF48AA40CAD7891EB709FC /* Podsum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podsum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65E733266F9C650F76AFF5D1 /* PodsumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PodsumModels.swift; path = "../specs/002-macos-native/contracts/PodsumModels.swift"; sourceTree = SOURCE_ROOT; };
 		BC8CEAEDED2728CE18C4EAF5 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppSettings.swift; path = "Podsum/Data/AppSettings.swift"; sourceTree = SOURCE_ROOT; };
+		BE1F92A267FA45F6346D1388 /* AppUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppUpdateChecker.swift; path = "Podsum/Data/AppUpdateChecker.swift"; sourceTree = SOURCE_ROOT; };
 		175A4F32E791C3A06466A284 /* AudioPlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AudioPlayerModel.swift; path = "Podsum/Data/AudioPlayerModel.swift"; sourceTree = SOURCE_ROOT; };
 		9F91BE209853671A0375A6BA /* BackendController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BackendController.swift; path = "Podsum/Data/BackendController.swift"; sourceTree = SOURCE_ROOT; };
 		C98DBA01FDA3CCE44515BE56 /* CategoryName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CategoryName.swift; path = "Podsum/Data/CategoryName.swift"; sourceTree = SOURCE_ROOT; };
 		79280640B5422865993BEDDB /* CategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CategoryStore.swift; path = "Podsum/Data/CategoryStore.swift"; sourceTree = SOURCE_ROOT; };
+		D479BAD7EBB5D66637632239 /* ComponentUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ComponentUpdater.swift; path = "Podsum/Data/ComponentUpdater.swift"; sourceTree = SOURCE_ROOT; };
 		27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EpisodeRepository.swift; path = "Podsum/Data/EpisodeRepository.swift"; sourceTree = SOURCE_ROOT; };
 		D69745C8322D84D2A2D27C5E /* JobsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JobsModel.swift; path = "Podsum/Data/JobsModel.swift"; sourceTree = SOURCE_ROOT; };
 		BE08CC12E88B20F61CD5FA8C /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Keychain.swift; path = "Podsum/Data/Keychain.swift"; sourceTree = SOURCE_ROOT; };
@@ -168,10 +172,12 @@
 			isa = PBXGroup;
 			children = (
 				BC8CEAEDED2728CE18C4EAF5 /* AppSettings.swift */,
+				BE1F92A267FA45F6346D1388 /* AppUpdateChecker.swift */,
 				175A4F32E791C3A06466A284 /* AudioPlayerModel.swift */,
 				9F91BE209853671A0375A6BA /* BackendController.swift */,
 				C98DBA01FDA3CCE44515BE56 /* CategoryName.swift */,
 				79280640B5422865993BEDDB /* CategoryStore.swift */,
+				D479BAD7EBB5D66637632239 /* ComponentUpdater.swift */,
 				27A8F2EA07E322D95E341DA6 /* EpisodeRepository.swift */,
 				D69745C8322D84D2A2D27C5E /* JobsModel.swift */,
 				BE08CC12E88B20F61CD5FA8C /* Keychain.swift */,
@@ -301,10 +307,12 @@
 			files = (
 				90A6EA8342DA3F17D508C293 /* PodsumModels.swift in Sources */,
 				0D386D5720B6DCE09B88A672 /* AppSettings.swift in Sources */,
+				828B941D5607E9326658E664 /* AppUpdateChecker.swift in Sources */,
 				FC7CCCDCCEBE320EE5B9B58D /* AudioPlayerModel.swift in Sources */,
 				189BAE092E645110094E03D4 /* BackendController.swift in Sources */,
 				D19C6D8FA533F30663F113F0 /* CategoryName.swift in Sources */,
 				50DF0CA8B62D84E6F1D18534 /* CategoryStore.swift in Sources */,
+				C8274BA3EB053545B481773A /* ComponentUpdater.swift in Sources */,
 				C89923DBC35F1088A945CAAF /* EpisodeRepository.swift in Sources */,
 				9F9F452A004218E3F9000D62 /* JobsModel.swift in Sources */,
 				961ED75892FAFCF9AE3F4107 /* Keychain.swift in Sources */,
@@ -383,7 +391,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.podsum.macclient;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -426,7 +434,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.podsum.macclient;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;

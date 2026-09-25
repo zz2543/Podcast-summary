@@ -12,6 +12,9 @@ import hashlib, os, pathlib
 ROOT = pathlib.Path(__file__).parent
 CONTRACT = "../specs/002-macos-native/contracts/PodsumModels.swift"
 FIXDIR = "../specs/002-macos-native/fixtures"
+# 版本号只有一份，在仓库根的 VERSION。build 号在 package.py 打包时按提交数覆盖，
+# 这里固定为 1——写进工程的话每次提交都会改动 pbxproj。
+VERSION = (ROOT.parent / "VERSION").read_text().strip()
 
 def uid(seed): return hashlib.md5(seed.encode()).hexdigest()[:24].upper()
 
@@ -163,10 +166,11 @@ TGT_COMMON = """\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 \t\t\t\t\t"$(inherited)",
 \t\t\t\t\t"@executable_path/../Frameworks",
 \t\t\t\t);
-\t\t\t\tMARKETING_VERSION = 0.1;
+\t\t\t\tMARKETING_VERSION = {VERSION};
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = local.podsum.macclient;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = NO;"""
+TGT_COMMON = TGT_COMMON.replace("{VERSION}", VERSION)
 
 w("\n/* Begin XCBuildConfiguration section */")
 for cfg, extra in [

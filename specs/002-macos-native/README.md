@@ -151,19 +151,23 @@ LLM + Whisper 的人必须先去办一个语音合成账号。加了 `TTS_ENABLE
 ## 打包
 
 ```bash
-python3 macos-client/package.py                              # 内嵌 CPython（自包含）
+python3 macos-client/package.py                              # 内嵌 CPython（自包含），出 .app + DMG
 python3 macos-client/package.py --python /usr/local/bin/python3   # 用本机解释器
+python3 macos-client/package.py --skip-build --no-dmg        # 复用 Release 产物、只出 .app
 ```
 
-产出 `macos-client/dist/Podsum.app`。内容：
+只支持 Apple Silicon。版本号在仓库根的 `VERSION`，build 号取 `git rev-list --count HEAD`。
+产出 `macos-client/dist/Podsum.app` 与 `dist/Podsum-<版本>-arm64.dmg`（后者附 `INSTALL.md`）。内容：
 
 ```
 Contents/Resources/backend/{backend,prompts,scripts,specs}   后端源码、提示词、schema
-Contents/Resources/backend/vendor/                           Python 依赖
+Contents/Resources/backend/vendor/                           Python 依赖（含 yt-dlp[default,deno]）
 Contents/Resources/python/                                   CPython（--with-runtime 时）
+Contents/Resources/bin/{ffmpeg,ffprobe,deno}                 外部可执行文件，子进程 PATH 最前面
+Contents/Resources/licenses/                                 随包二进制的许可证声明
 ```
 
-三个踩过的坑，都写进脚本的自检里了：
+踩过的坑，都写进脚本的自检里了：
 
 1. **依赖必须用最终要跑它的解释器装。** `pydantic-core`、`yt-dlp` 带编译扩展，
    按 CPython 版本出 wheel；用 3.13 装的 vendor 在 3.12 上 import 就失败。
@@ -172,8 +176,31 @@ Contents/Resources/python/                                   CPython（--with-ru
    路径是从包所在位置往上数四层算的——装进 vendor 的那份算出来的位置没有 `specs/`。
    脚本装完即删掉 vendor 里的 `podsum`，让源码那份生效（`PYTHONPATH` 里它在前）。
 3. **schema 要一起拷。** 少了它后端连 import 都过不去。
+4. **运行期写字节码会弄坏签名。** 0.1 版跑过之后 bundle 里多出 857 个 `__pycache__`，
+   `codesign --verify` 报 *sealed resource is missing or invalid*——自用无碍，发给别人就是"已损坏"。
+   现在打包时用 `compileall --invalidation-mode unchecked-hash` 预编译，子进程带
+   `PYTHONDONTWRITEBYTECODE=1`，签名后 `codesign --verify --deep --strict` 不过就失败。
+5. **外部程序不能指望宿主机。** ffmpeg / ffprobe（转码、测时长、封面）取
+   ffmpeg.martin-riedl.de 的静态版（只链系统库，自带 Developer ID 签名，`--deep` 重签不会覆盖它），
+   钉版本并核对 sha256；deno 来自 PyPI 的 `deno` wheel。YouTube 在没有 JS 运行时的情况下
+   目前仍能解析，但 yt-dlp 已标为弃用、可能缺格式（2026-09-25 实测）。
+   自检用只含系统目录的 PATH，真的转码一段本地生成的音频。
 
-打完包要重签名（`codesign --sign -`），往 bundle 里塞东西会让原签名失效。
+签名是 ad-hoc（`codesign --sign -`），没有 Developer ID、没有公证——首次打开要在
+「系统设置 › 隐私与安全性」里放行，写在 `INSTALL.md` 里。
+
+### 解析组件更新
+
+YouTube / B 站改接口后，封在 bundle 里的 yt-dlp 就失效了。「设置 › 服务 › 解析组件」
+可以让用户自己升级，机制见 `ComponentUpdater.swift`：更新装进
+`~/Library/Application Support/Podsum/components/yt-dlp-<版本>-<随机>/`，`active` 符号链接指向生效的那份，
+`PYTHONPATH` 顺序为 源码 → 组件 → vendor。每次装进新目录、只在后端启动时解析链接，
+所以正在跑的后端不会被换掉脚下的模块；旧目录在下次启动时清掉。
+
+### 存储位置跟着 bundle id
+
+钥匙串 service、`Application Support/Podsum`、`Logs/Podsum` 都由 `AppStorageRoot` 按 bundle id 决定：
+正式 id 就是原来的位置；改了 bundle id 的副本自动用另一套，验证时复制一份改 id 即可，不碰真数据。
 
 ---
 

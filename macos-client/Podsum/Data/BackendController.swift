@@ -42,8 +42,7 @@ public final class BackendController {
     }
 
     public static let logURL: URL = {
-        let dir = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
-            .appending(path: "Logs/Podsum", directoryHint: .isDirectory)
+        let dir = AppStorageRoot.logs
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appending(path: "backend.log")
     }()
@@ -91,6 +90,14 @@ public final class BackendController {
             let dataDir = URL(filePath: settings.dataDirectory, directoryHint: .isDirectory)
             try FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
             let env = environment(resolved, dataDir: dataDir)
+
+            if let problem = checkTools(env) {
+                phase = .noRuntime(problem)
+                return
+            }
+
+            // 旧的后端已经停了，清掉不再生效的组件版本
+            ComponentUpdater.pruneInactive()
 
             phase = .starting(tr("应用数据库迁移…", "Applying database migrations…"))
             try await runMigrations(resolved, env: env)
@@ -151,7 +158,13 @@ public final class BackendController {
         let python: URL
         let root: URL              // 含 backend/、prompts/、scripts/
         let extraPythonPath: [URL] // 内嵌依赖目录（打包后才有）
+        let toolsDirectory: URL?   // 内嵌的 ffmpeg / ffprobe / deno（打包后才有）
     }
+
+    /// 用户在设置里更新过的解析组件（yt-dlp）。放在 bundle 外面：
+    /// 改它不会弄坏签名，升级 app 也不会被覆盖。见 `ComponentUpdater`。
+    nonisolated public static let componentsDirectory: URL =
+        AppStorageRoot.support.appending(path: "components", directoryHint: .isDirectory)
 
     enum RuntimeError: LocalizedError {
         case noBackendRoot([String])
@@ -227,23 +240,61 @@ public final class BackendController {
 
         let vendored = bundled.appending(path: "vendor", directoryHint: .isDirectory)
         let extras = fm.fileExists(atPath: vendored.path(percentEncoded: false)) ? [vendored] : []
-        return Runtime(python: python, root: root, extraPythonPath: extras)
+        let tools = Bundle.main.bundleURL.appending(path: "Contents/Resources/bin", directoryHint: .isDirectory)
+        return Runtime(python: python, root: root, extraPythonPath: extras,
+                       toolsDirectory: fm.fileExists(atPath: tools.path(percentEncoded: false)) ? tools : nil)
+    }
+
+    /// 给「更新解析组件」用：与后端子进程完全相同的解释器、环境变量与工作目录，
+    /// 这样它装进去、验过的，就是后端下次启动会加载的那一份。
+    func pythonContext() throws -> (python: URL, environment: [String: String], workingDirectory: URL) {
+        let runtime = try resolveRuntime()
+        let dataDir = URL(filePath: settings.dataDirectory, directoryHint: .isDirectory)
+        return (runtime.python, environment(runtime, dataDir: dataDir), runtime.root)
+    }
+
+    /// 抓取阶段要调 ffmpeg / ffprobe（转码、测时长、封面）。缺了它们后端照样起得来，
+    /// 但每一集都会在下载之后失败——不如在启动时就说清楚。
+    /// deno 只给 YouTube 解 JS 挑战用，缺了 yt-dlp 目前仍能退而求其次，所以只记日志。
+    private func checkTools(_ env: [String: String]) -> String? {
+        let dirs = (env["PATH"] ?? "").split(separator: ":").map(String.init)
+        func find(_ tool: String) -> Bool {
+            dirs.contains { FileManager.default.isExecutableFile(atPath: "\($0)/\(tool)") }
+        }
+        if !find("deno") {
+            appendLog("警告：PATH 上没有 deno，YouTube 解析可能缺格式。\n")
+        }
+        let missing = ["ffmpeg", "ffprobe"].filter { !find($0) }
+        guard !missing.isEmpty else { return nil }
+        return tr("找不到 \(missing.joined(separator: "、"))。抓取音频要用它们转码。找过：\n",
+                  "Can’t find \(missing.joined(separator: ", ")), needed to convert downloaded audio. Looked in:\n")
+            + dirs.joined(separator: "\n")
+            + tr("\n\n用 Homebrew 装一个（brew install ffmpeg），或使用打包好的 Podsum.app。",
+                 "\n\nInstall it with Homebrew (brew install ffmpeg), or use the packaged Podsum.app.")
     }
 
     private func environment(_ runtime: Runtime, dataDir: URL) -> [String: String] {
         var env = settings.environment(dataDirectory: dataDir)
 
-        let pythonPath = ([runtime.root.appending(path: "backend/src")] + runtime.extraPythonPath)
+        // 顺序即优先级：源码 → 用户更新过的解析组件 → 内嵌依赖。
+        // 组件目录在这里解析一次符号链接：之后再切版本，这个进程也不受影响。
+        let components = ComponentUpdater.activeDirectory().map { [$0] } ?? []
+        let pythonPath = ([runtime.root.appending(path: "backend/src")] + components + runtime.extraPythonPath)
             .map { $0.path(percentEncoded: false) }
             .joined(separator: ":")
         env["PYTHONPATH"] = pythonPath
         env["PYTHONUNBUFFERED"] = "1"
+        // 不往 .app 里写 __pycache__：包内字节码已在打包时预编译，
+        // 运行期再写会让签名失效（codesign 报 sealed resource invalid）。
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
 
-        // 从 Finder 启动时 PATH 只有 /usr/bin:/bin:/usr/sbin:/sbin，
-        // yt-dlp 与 ffmpeg 都在 Homebrew 里——不补上，抓取阶段必然失败。
+        // 从 Finder 启动时 PATH 只有 /usr/bin:/bin:/usr/sbin:/sbin。
+        // 打包的 app 自带 ffmpeg / ffprobe / deno，放最前面；
+        // 从源码跑时它们在 Homebrew 里——不补上，抓取阶段必然失败。
         let inherited = ProcessInfo.processInfo.environment["PATH"] ?? ""
         let home = FileManager.default.homeDirectoryForCurrentUser.path(percentEncoded: false)
-        let extra = ["/opt/homebrew/bin", "/usr/local/bin", "\(home)/.local/bin"]
+        let bundledTools = runtime.toolsDirectory.map { [$0.path(percentEncoded: false)] } ?? []
+        let extra = bundledTools + ["/opt/homebrew/bin", "/usr/local/bin", "\(home)/.local/bin"]
         var parts = extra + inherited.split(separator: ":").map(String.init)
         parts += ["/usr/bin", "/bin", "/usr/sbin", "/sbin"]
         var seen = Set<String>()
