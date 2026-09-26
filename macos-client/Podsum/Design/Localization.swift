@@ -96,6 +96,18 @@ public func tr(_ zh: String, _ en: String) -> String {
     Localizer.shared.isChinese ? zh : en
 }
 
+// MARK: - 发行名
+
+/// 界面上出现的 app 名字：中文界面叫「懂听」，英文界面叫 GotIt。
+/// 源码、模块、target 仍叫 Podsum；bundle 的显示名由 package.py 写进 Info.plist。
+public enum AppBrand {
+    public static let chinese = "懂听"
+    public static let english = "GotIt"
+    public static var name: String { tr(chinese, english) }
+    /// 主窗口标题可能是其中任一个（取决于切换语言前后）
+    public static let allNames: Set<String> = [chinese, english]
+}
+
 // MARK: - 重启
 
 public enum Relauncher {

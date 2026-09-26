@@ -330,13 +330,21 @@ public enum Env {
 /// `~/Library/Logs/Podsum`、钥匙串 service 同名）。换了 bundle id 的副本——例如验证时复制出来的
 /// `local.podsum.macclient.verify`——自动落到另一套目录与钥匙串条目，不会碰到真数据。
 /// UserDefaults 本来就按 bundle id 分开，这里把其余几处对齐。
+///
+/// 发布版（package.py 打出来的「懂听 / GotIt」）用 `releaseBundleID`，目录叫 `GotIt`。
 public enum AppStorageRoot {
     public static let officialBundleID = "local.podsum.macclient"
+    /// 与 package.py 的 BUNDLE_ID 一致
+    public static let releaseBundleID = "local.gotit.mac"
 
     public static var bundleID: String { Bundle.main.bundleIdentifier ?? officialBundleID }
 
     private static var folderName: String {
-        bundleID == officialBundleID ? "Podsum" : bundleID
+        switch bundleID {
+        case officialBundleID: return "Podsum"
+        case releaseBundleID:  return AppBrand.english
+        default:               return bundleID
+        }
     }
 
     /// ~/Library/Application Support/Podsum
@@ -349,5 +357,11 @@ public enum AppStorageRoot {
     public static var logs: URL {
         FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
             .appending(path: "Logs/\(folderName)", directoryHint: .isDirectory)
+    }
+
+    /// ~/Library/Caches/Podsum —— 可以随时删，删了自动重建（后端的 Python 字节码在这里）
+    public static var caches: URL {
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appending(path: folderName, directoryHint: .isDirectory)
     }
 }

@@ -61,9 +61,9 @@ enum OnboardingScript {
         id: "welcome",
         target: nil,
         symbol: "hand.wave",
-        title: tr("欢迎使用 Podsum", "Welcome to Podsum"),
-        body: tr("接下来几分钟，我会在这个设置页上**一格一格**带你把 API 填好。Podsum 不内置任何人的账号——摘要和转写用的是**你自己的** API，按用量付给你选的厂商；密钥只存在这台 Mac 的钥匙串里。",
-                 "Over the next few minutes I’ll walk you through this settings page **one field at a time**. Podsum ships with no accounts — summaries and transcripts run on **your own** APIs, billed by usage to the vendors you pick, and keys stay in this Mac’s keychain."),
+        title: tr("欢迎使用懂听", "Welcome to GotIt"),
+        body: tr("接下来几分钟，我会在这个设置页上**一格一格**带你把 API 填好。懂听不内置任何人的账号——摘要和转写用的是**你自己的** API，按用量付给你选的厂商；密钥只存在这台 Mac 的钥匙串里。",
+                 "Over the next few minutes I’ll walk you through this settings page **one field at a time**. GotIt ships with no accounts — summaries and transcripts run on **your own** APIs, billed by usage to the vendors you pick, and keys stay in this Mac’s keychain."),
         tips: [
             tr("**必填两样**：写摘要用的大模型（LLM），把音频转成文字的转写服务（ASR）。",
                "**Two required**: a language model (LLM) for summaries, and a transcription service (ASR) that turns audio into text."),
@@ -130,8 +130,8 @@ enum OnboardingScript {
         target: .llmBaseURL,
         symbol: "link",
         title: tr("② 接口地址（Base URL）", "② Base URL"),
-        body: tr("厂商文档里写的 **base_url**。Podsum 会在后面自动拼上 `/chat/completions`，所以不要把它也写进来，也不要填网页控制台的地址。",
-                 "The **base_url** from the vendor’s docs. Podsum appends `/chat/completions` itself — don’t include it, and don’t use the web console address."),
+        body: tr("厂商文档里写的 **base_url**。懂听会在后面自动拼上 `/chat/completions`，所以不要把它也写进来，也不要填网页控制台的地址。",
+                 "The **base_url** from the vendor’s docs. GotIt appends `/chat/completions` itself — don’t include it, and don’t use the web console address."),
         tips: [
             tr("用下面的按钮一键填入常见厂商（地址取自各家官方文档），或者从你所用厂商的文档里复制。",
                "Use a button below for a common vendor (taken from their official docs), or copy it from your vendor’s docs."),
@@ -151,7 +151,7 @@ enum OnboardingScript {
                 return .problem(tr("地址要以 https:// 开头", "The address should start with https://"))
             }
             if url.contains("chat/completions") {
-                return .problem(tr("去掉末尾的 /chat/completions，Podsum 会自己加", "Drop the trailing /chat/completions — Podsum adds it"))
+                return .problem(tr("去掉末尾的 /chat/completions，懂听会自己加", "Drop the trailing /chat/completions — GotIt adds it"))
             }
             return .done(tr("已填好", "Filled in"))
         }
@@ -203,8 +203,8 @@ enum OnboardingScript {
         var walkthrough: WebWalkthrough.ID?
         switch vendor(of: s.llmBaseURL) {
         case .deepseek:
-            tips = [tr("打开 DeepSeek 开放平台 → 左侧「API keys」→「创建 API key」，名字随便起（比如 Podsum）。",
-                       "Open the DeepSeek platform → “API keys” on the left → “Create API key”; any name works (e.g. Podsum)."),
+            tips = [tr("打开 DeepSeek 开放平台 → 左侧「API keys」→「创建 API key」，名字随便起（比如 GotIt）。",
+                       "Open the DeepSeek platform → “API keys” on the left → “Create API key”; any name works (e.g. GotIt)."),
                     tr("账户里要先**充值少量余额**，否则调用会报余额不足。",
                        "Top up a **small balance** first, or calls fail with insufficient balance.")]
             links = [.init(title: tr("打开 DeepSeek 开放平台", "Open DeepSeek Platform"), url: URL(string: "https://platform.deepseek.com/api_keys")!)]
@@ -245,8 +245,8 @@ enum OnboardingScript {
         target: .llmTest,
         symbol: "bolt.horizontal",
         title: tr("⑤ 测一下通不通", "⑤ Test the connection"),
-        body: tr("点高亮的「测试连接」。Podsum 会用你填的地址、模型和 key 发一个极小的请求（花费可以忽略），当场告诉你通不通。",
-                 "Click the highlighted “Test Connection”. Podsum sends one tiny request with your URL, model and key (negligible cost) and tells you right away."),
+        body: tr("点高亮的「测试连接」。懂听会用你填的地址、模型和 key 发一个极小的请求（花费可以忽略），当场告诉你通不通。",
+                 "Click the highlighted “Test Connection”. GotIt sends one tiny request with your URL, model and key (negligible cost) and tells you right away."),
         tips: [
             tr("**401 / invalid api key**：key 复制错了，或者多了空格。", "**401 / invalid api key**: the key was mis-copied or has extra spaces."),
             tr("**404**：接口地址多写或少写了 `/v1`。", "**404**: the base URL has an extra or missing `/v1`."),
@@ -357,8 +357,8 @@ enum OnboardingScript {
                 tr("**OpenAI Whisper**：一个 OpenAI key 即可，中英文都行。注意 OpenAI 已公告 `whisper-1` 将于 **2027-02-26 下线**。",
                    "**OpenAI Whisper**: just one OpenAI key; fine for Chinese and English. Note OpenAI has announced `whisper-1` **shuts down on 2027-02-26**."),
                 tr("**Deepgram**：英文播客又快又准。", "**Deepgram**: fast and accurate for English podcasts."),
-                tr("**通义千问**：暂不建议——Podsum 调用的 `qwen-audio-asr` 已不在百炼当前的模型列表里。",
-                   "**Qwen**: not recommended for now — the `qwen-audio-asr` model Podsum calls is no longer in Bailian’s current model list."),
+                tr("**通义千问**：暂不建议——懂听调用的 `qwen-audio-asr` 已不在百炼当前的模型列表里。",
+                   "**Qwen**: not recommended for now — the `qwen-audio-asr` model GotIt calls is no longer in Bailian’s current model list."),
             ],
             status: { s, _, _ in .done(tr("已选：\(s.asrProvider.label)", "Selected: \(s.asrProvider.label)")) }
         )]
@@ -456,10 +456,10 @@ enum OnboardingScript {
             ]
         } else {
             tips = [
-                tr("新账号打开豆包语音控制台，默认是**新版控制台**——它发的是一个 API Key，而 Podsum 用的是 **APP ID + Access Token** 这一对。先点**左上角的下拉框**，切换到**旧版**控制台。",
-                   "New accounts land in the **new Doubao Speech console**, which issues a single API Key — but Podsum uses the **APP ID + Access Token** pair. Use the **dropdown in the top-left** to switch to the **old console** first."),
-                tr("旧版控制台 →「创建应用」：填应用名称和简介，勾选接入能力 **录音文件识别大模型**，连同它的**极速版**：前者转写网上链接里的音频，极速版转写你上传的本地文件。",
-                   "Old console → “Create App”: give it a name and description, and enable **Recording-file Recognition (large model)** plus its **Turbo** edition — the first handles audio from links, Turbo handles files you upload."),
+                tr("新账号打开豆包语音控制台，默认是**新版控制台**——它发的是一个 API Key，而懂听用的是 **APP ID + Access Token** 这一对。先点**左上角的下拉框**，切换到**旧版**控制台。",
+                   "New accounts land in the **new Doubao Speech console**, which issues a single API Key — but GotIt uses the **APP ID + Access Token** pair. Use the **dropdown in the top-left** to switch to the **old console** first."),
+                tr("旧版控制台 →「创建应用」：填应用名称和简介，勾选接入能力 **豆包录音文件识别模型2.0**（认准 2.0，不是 1.0 的「录音文件识别大模型」），再勾上录音文件识别的**极速版**：前者转写网上链接里的音频，极速版转写你上传的本地文件。",
+                   "Old console → “Create App”: give it a name and description, and enable **豆包录音文件识别模型2.0** (make sure it’s 2.0, not the 1.0 “录音文件识别大模型”) plus the **Turbo (极速版)** recording-file recognition — the first handles audio from links, Turbo handles files you upload."),
                 tr("以后想开音频摘要的话，同一个应用里顺手勾上**语音合成**，APP ID / Token 就能共用（勾过的能力之后不能取消）。",
                    "If you’ll want audio summaries later, also tick **Speech Synthesis** in the same app so the APP ID / Token can be shared (ticked capabilities can’t be removed later)."),
                 tr("新建的应用默认是**试用版**，带一定免费额度，够先跑通；用完再在服务详情里开通正式版（按量后付费）。",
@@ -479,7 +479,7 @@ enum OnboardingScript {
             tips: tips,
             example: tr("一串数字，例如 1234567890", "digits only, e.g. 1234567890"),
             links: [.init(title: tr("打开豆包语音控制台", "Open Doubao Speech console"), url: URL(string: "https://console.volcengine.com/speech/app")!)],
-            walkthrough: forTTS ? nil : .volcApp,
+            walkthrough: forTTS ? .volcTTS : .volcApp,
             status: { s, _, _ in filled(forTTS ? s.doubaoTTSAppID : s.doubaoASRAppID) }
         )
     }
@@ -500,7 +500,7 @@ enum OnboardingScript {
                     : tr("填完这一格，转写就配好了。", "With this filled in, transcription is set up."),
             ],
             links: [.init(title: tr("打开豆包语音控制台", "Open Doubao Speech console"), url: URL(string: "https://console.volcengine.com/speech/app")!)],
-            walkthrough: forTTS ? nil : .volcApp,
+            walkthrough: forTTS ? .volcTTS : .volcApp,
             status: { s, _, _ in filled(forTTS ? s.doubaoTTSToken : s.doubaoASRToken) }
         )
     }
@@ -513,8 +513,8 @@ enum OnboardingScript {
             target: .ttsToggle,
             symbol: "speaker.wave.2",
             title: tr("音频摘要（可选）", "Audio summaries (optional)"),
-            body: tr("打开后，Podsum 可以把摘要合成一段语音，通勤时听。它是**独立的可选功能**，不影响转写与摘要。",
-                     "When on, Podsum can turn a summary into speech for your commute. It’s a **separate, optional** feature that doesn’t affect transcripts or summaries."),
+            body: tr("打开后，懂听可以把摘要合成一段语音，通勤时听。它是**独立的可选功能**，不影响转写与摘要。",
+                     "When on, GotIt can turn a summary into speech for your commute. It’s a **separate, optional** feature that doesn’t affect transcripts or summaries."),
             tips: [
                 tr("**建议先关着**，把主流程跑通了再回来开。", "**Leave it off for now** and come back once the main flow works."),
                 tr("要开的话，拨动高亮的开关，下面会多出它的供应商和凭据。", "To turn it on, flip the highlighted switch — its provider and credentials appear below."),
@@ -563,11 +563,11 @@ enum OnboardingScript {
         target: .apply,
         symbol: "play.circle",
         title: tr("启动后端", "Start the backend"),
-        body: tr("都填好了。点高亮的「应用并重启后端」，Podsum 会用这些配置在后台启动服务，通常几秒钟。",
-                 "All set. Click the highlighted “Apply & Restart Backend” and Podsum starts its background service with this setup — usually a few seconds."),
+        body: tr("都填好了。点高亮的「应用并重启后端」，懂听会用这些配置在后台启动服务，通常几秒钟。",
+                 "All set. Click the highlighted “Apply & Restart Backend” and GotIt starts its background service with this setup — usually a few seconds."),
         tips: [
-            tr("第一次读取钥匙串时，macOS 可能会问是否允许 Podsum 访问——点「始终允许」，以后就不再问了。",
-               "The first time it reads the keychain, macOS may ask whether Podsum can access it — choose “Always Allow” and it won’t ask again."),
+            tr("第一次读取钥匙串时，macOS 可能会问是否允许懂听访问——点「始终允许」，以后就不再问了。",
+               "The first time it reads the keychain, macOS may ask whether GotIt can access it — choose “Always Allow” and it won’t ask again."),
         ],
         status: { s, _, backend in
             let missing = s.missingFields
@@ -617,8 +617,8 @@ enum OnboardingScript {
         [
         tr("打开阿里云百炼的 API Key 页 → 右上角地域选 **华北2（北京）** →「创建 API Key」→ 业务空间选默认 →「确定」→ 复制。",
            "Open Bailian’s API Key page → set the region at the top right to **China (Beijing)** → “Create API Key” → default workspace → “OK” → copy."),
-        tr("**一定要是北京地域的 key**：百炼各地域的 key 不能混用，Podsum 连的是北京的接口。",
-           "**It must be a Beijing-region key**: Bailian keys don’t work across regions, and Podsum calls the Beijing endpoint."),
+        tr("**一定要是北京地域的 key**：百炼各地域的 key 不能混用，懂听连的是北京的接口。",
+           "**It must be a Beijing-region key**: Bailian keys don’t work across regions, and GotIt calls the Beijing endpoint."),
         tr("同一个 key 以后还能用于音频摘要。", "The same key also works for audio summaries."),
         ]
     }

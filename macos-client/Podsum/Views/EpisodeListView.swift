@@ -106,7 +106,7 @@ struct EpisodeListView: View {
                         .environment(categoryStore)
                     }
             }
-            .navigationTitle("Podsum")
+            .navigationTitle(AppBrand.name)
             .navigationSubtitle(subtitle)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

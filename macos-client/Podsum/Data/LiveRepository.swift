@@ -18,6 +18,9 @@ public struct LiveRepository: EpisodeRepository {
     public let backendRoot: URL?
 
     private let session: URLSession
+    /// 只给「新建剧集」用。后端要把音频抓完才回响应，中途一个字节都不发，
+    /// B 站慢的时候一集要下好几分钟——按普通请求的超时算，客户端先报错，后端照样建出来。
+    private let submitSession: URLSession
 
     /// `requestTimeout` 是两段数据之间最长的沉默。视频提交要等后端把音频抓完
     /// 才回响应，中途一个字节都不发——快捷提交因此要放得很宽，
@@ -32,7 +35,16 @@ public struct LiveRepository: EpisodeRepository {
         config.timeoutIntervalForResource = 600
         config.waitsForConnectivity = false
         self.session = URLSession(configuration: config)
+
+        let submit = URLSessionConfiguration.default
+        submit.timeoutIntervalForRequest = max(requestTimeout, Self.submitTimeout)
+        submit.timeoutIntervalForResource = max(requestTimeout, Self.submitTimeout)
+        submit.waitsForConnectivity = false
+        self.submitSession = URLSession(configuration: submit)
     }
+
+    /// 新建剧集最多等 15 分钟
+    static let submitTimeout: TimeInterval = 900
 
     // MARK: 读
 
@@ -61,14 +73,14 @@ public struct LiveRepository: EpisodeRepository {
         case .link(let ref, let sourceType):
             var body: [String: String] = ["source_type": sourceType.rawValue, "source_ref": ref.trimmed]
             body.merge(style.fields) { a, _ in a }
-            return try await send(CreateEpisodeResponse.self, "POST", "api/episodes", json: body)
+            return try await send(CreateEpisodeResponse.self, "POST", "api/episodes", json: body, slow: true)
 
         case .file(let url):
             var form = MultipartBody()
             form.addField("source_type", "local_file")
             for (key, value) in style.fields { form.addField(key, value) }
             try form.addFile(url, name: "file")
-            return try await send(CreateEpisodeResponse.self, "POST", "api/episodes", multipart: form)
+            return try await send(CreateEpisodeResponse.self, "POST", "api/episodes", multipart: form, slow: true)
         }
     }
 
@@ -89,7 +101,7 @@ public struct LiveRepository: EpisodeRepository {
             }
             var body: [String: Any] = ["items": items]
             for (key, value) in submission.style.fields { body[key] = value }
-            return try await send(CreateEpisodeBatchResponse.self, "POST", "api/episodes/batch", jsonAny: body).items
+            return try await send(CreateEpisodeBatchResponse.self, "POST", "api/episodes/batch", jsonAny: body, slow: true).items
         }
 
         var form = MultipartBody()
@@ -97,7 +109,7 @@ public struct LiveRepository: EpisodeRepository {
         for item in submission.items {
             if case .file(let url) = item { try form.addFile(url, name: "files") }
         }
-        return try await send(CreateEpisodeBatchResponse.self, "POST", "api/episodes/batch", multipart: form).items
+        return try await send(CreateEpisodeBatchResponse.self, "POST", "api/episodes/batch", multipart: form, slow: true).items
     }
 
     public func retry(id: String) async throws -> Job {
@@ -297,7 +309,8 @@ public struct LiveRepository: EpisodeRepository {
         _ type: T.Type, _ method: String, _ path: String,
         json: [String: String]? = nil,
         jsonAny: [String: Any]? = nil,
-        multipart: MultipartBody? = nil
+        multipart: MultipartBody? = nil,
+        slow: Bool = false
     ) async throws -> T {
         var request = URLRequest(url: baseURL.appending(path: path))
         request.httpMethod = method
@@ -311,7 +324,7 @@ public struct LiveRepository: EpisodeRepository {
             request.setValue(multipart.contentType, forHTTPHeaderField: "Content-Type")
             request.httpBody = multipart.finished()
         }
-        return try decode(type, from: try await perform(request))
+        return try decode(type, from: try await perform(request, on: slow ? submitSession : session))
     }
 
     @discardableResult
@@ -321,9 +334,9 @@ public struct LiveRepository: EpisodeRepository {
         return try await perform(request)
     }
 
-    private func perform(_ request: URLRequest) async throws -> Data {
+    private func perform(_ request: URLRequest, on session: URLSession? = nil) async throws -> Data {
         let data: Data, response: URLResponse
-        do { (data, response) = try await session.data(for: request) }
+        do { (data, response) = try await (session ?? self.session).data(for: request) }
         catch { throw RepositoryError.transport(tr("连不上后端：\(error.localizedDescription)", "Can’t reach the backend: \(error.localizedDescription)")) }
 
         guard let http = response as? HTTPURLResponse else {

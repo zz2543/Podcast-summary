@@ -102,8 +102,8 @@ final class QuickAddCenter {
             case .notAuthorized:
                 let name = BrowserTab.supported[bundleID] ?? bundleID
                 receiveClipboard(browserNote: tr(
-                    "读不到 \(name) 当前页面的地址：Podsum 还没被允许控制它。到「系统设置 › 隐私与安全性 › 自动化」里打开 Podsum 下的 \(name)，或者先复制链接再按快捷键。",
-                    "Couldn’t read the page address from \(name): Podsum isn’t allowed to control it. Turn on \(name) under Podsum in System Settings › Privacy & Security › Automation, or copy the link first and press the hotkey again."))
+                    "读不到 \(name) 当前页面的地址：懂听还没被允许控制它。到「系统设置 › 隐私与安全性 › 自动化」里打开懂听下的 \(name)，或者先复制链接再按快捷键。",
+                    "Couldn’t read the page address from \(name): GotIt isn’t allowed to control it. Turn on \(name) under GotIt in System Settings › Privacy & Security › Automation, or copy the link first and press the hotkey again."))
             case .unavailable:
                 receiveClipboard(browserNote: nil)
             }
@@ -160,9 +160,9 @@ final class QuickAddCenter {
                 ? tr("已收到，前面还有 \(pending.count - 1) 个", "Received — \(pending.count - 1) ahead of it")
                 : tr("已收到，正在提交", "Received — submitting")
         case .needsConfiguration:
-            return tr("Podsum 还没配置好，链接已保存", "Podsum isn’t set up yet — link saved")
+            return tr("懂听还没配置好，链接已保存", "GotIt isn’t set up yet — link saved")
         default:
-            return tr("已收到，等 Podsum 准备好后提交", "Received — will submit once Podsum is ready")
+            return tr("已收到，等懂听准备好后提交", "Received — will submit once GotIt is ready")
         }
     }
 
@@ -202,8 +202,8 @@ final class QuickAddCenter {
         guard let url = items.first(where: { $0.id == id })?.url else { return true }
         update(id) { $0.state = .submitting }
 
-        // 后端要把音频抓完才回响应，中途不发任何字节，超时放宽到 15 分钟
-        let repository = LiveRepository(baseURL: baseURL, requestTimeout: 900)
+        // 新建剧集的长超时由 LiveRepository 自己处理（submitTimeout）
+        let repository = LiveRepository(baseURL: baseURL)
         do {
             let created = try await repository.create(Submission(items: [.link(url, sourceType: .youtube)]))
             let episode = created.first?.episode
@@ -302,7 +302,7 @@ final class QuickAddCenter {
             try FileManager.default.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             try Self.encoder.encode(items).write(to: storeURL, options: .atomic)
         } catch {
-            NSLog("Podsum quick-add: couldn’t save queue: \(error)")
+            NSLog("GotIt quick-add: couldn’t save queue: \(error)")
         }
     }
 }

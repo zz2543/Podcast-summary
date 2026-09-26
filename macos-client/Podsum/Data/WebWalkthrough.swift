@@ -9,7 +9,7 @@ import Observation
 /// 点击路径按 2026-09 登录后的真实页面 / 官方文档核对过（见 specs/006-onboarding-guide/plan.md）。
 struct WebWalkthrough: Identifiable {
     enum ID: String {
-        case deepseek, bailian, volcKeys, volcApp
+        case deepseek, bailian, volcKeys, volcApp, volcTTS
     }
 
     struct Step: Identifiable {
@@ -38,7 +38,8 @@ struct WebWalkthrough: Identifiable {
 
 /// 能被「复制即填入」写进去的字段
 enum CaptureField {
-    case llmAPIKey, dashscopeAPIKey, volcAccessKeyID, volcSecretKey, doubaoASRAppID, doubaoASRToken
+    case llmAPIKey, dashscopeAPIKey, volcAccessKeyID, volcSecretKey, doubaoASRAppID, doubaoASRToken,
+         doubaoTTSAppID, doubaoTTSToken
 
     var label: String {
         switch self {
@@ -48,6 +49,8 @@ enum CaptureField {
         case .volcSecretKey:    return tr("火山 Secret Access Key", "Volcengine Secret Access Key")
         case .doubaoASRAppID:   return tr("豆包 ASR App ID", "Doubao ASR App ID")
         case .doubaoASRToken:   return tr("豆包 ASR Access Token", "Doubao ASR Access Token")
+        case .doubaoTTSAppID:   return tr("豆包 TTS App ID", "Doubao TTS App ID")
+        case .doubaoTTSToken:   return tr("豆包 TTS Access Token", "Doubao TTS Access Token")
         }
     }
 
@@ -59,6 +62,8 @@ enum CaptureField {
         case .volcSecretKey:    return s.volcSecretKey
         case .doubaoASRAppID:   return s.doubaoASRAppID
         case .doubaoASRToken:   return s.doubaoASRToken
+        case .doubaoTTSAppID:   return s.doubaoTTSAppID
+        case .doubaoTTSToken:   return s.doubaoTTSToken
         }
     }
 
@@ -70,6 +75,8 @@ enum CaptureField {
         case .volcSecretKey:    s.volcSecretKey = value
         case .doubaoASRAppID:   s.doubaoASRAppID = value
         case .doubaoASRToken:   s.doubaoASRToken = value
+        case .doubaoTTSAppID:   s.doubaoTTSAppID = value
+        case .doubaoTTSToken:   s.doubaoTTSToken = value
         }
     }
 }
@@ -83,6 +90,7 @@ extension WebWalkthrough {
         case .bailian:  return bailian
         case .volcKeys: return volcKeys
         case .volcApp:  return volcApp
+        case .volcTTS:  return volcTTS
         }
     }
 
@@ -111,11 +119,11 @@ extension WebWalkthrough {
                  title: tr("创建 API key", "Create an API key"),
                  details: [
                     tr("左侧菜单点「API keys」，再点列表上方的「创建 API key」。", "Click “API keys” in the left menu, then “Create API key” above the list."),
-                    tr("弹窗里「输入 API key 的名称」随便填，比如 Podsum，然后点「创建」。", "In the dialog, enter any name (e.g. Podsum) and click “Create”."),
+                    tr("弹窗里「输入 API key 的名称」随便填，比如 GotIt，然后点「创建」。", "In the dialog, enter any name (e.g. GotIt) and click “Create”."),
                  ],
                  url: URL(string: "https://platform.deepseek.com/api_keys")),
             Step(id: "copy",
-                 title: tr("点「复制」，Podsum 会自动认出来", "Click “Copy” — Podsum picks it up"),
+                 title: tr("点「复制」，懂听会自动认出来", "Click “Copy” — GotIt picks it up"),
                  details: [
                     tr("创建后弹窗里显示完整的 key，点它旁边的「复制」。**只显示这一次**，列表里之后只剩打码的样子。",
                        "After creating, the dialog shows the full key — click “Copy” next to it. It’s shown **only once**; the list only keeps a masked version."),
@@ -137,20 +145,20 @@ extension WebWalkthrough {
             Step(id: "region",
                  title: tr("确认地域是「华北2（北京）」", "Make sure the region is China (Beijing)"),
                  details: [
-                    tr("看页面顶部的地域，要显示 **华北2（北京）**；不是的话点它切过去（从 Podsum 打开的链接默认就是北京）。",
-                       "The region at the top must read **China (Beijing)**; switch it if not (the link from Podsum opens Beijing by default)."),
-                    tr("百炼各地域的 key 不能混用，Podsum 连的是北京的接口，别的地域的 key 用不了。",
-                       "Bailian keys don’t work across regions, and Podsum calls the Beijing endpoint."),
+                    tr("看页面顶部的地域，要显示 **华北2（北京）**；不是的话点它切过去（从懂听打开的链接默认就是北京）。",
+                       "The region at the top must read **China (Beijing)**; switch it if not (the link from GotIt opens Beijing by default)."),
+                    tr("百炼各地域的 key 不能混用，懂听连的是北京的接口，别的地域的 key 用不了。",
+                       "Bailian keys don’t work across regions, and GotIt calls the Beijing endpoint."),
                  ]),
             Step(id: "create",
                  title: tr("创建 API Key", "Create an API Key"),
                  details: [
                     tr("点「创建API-KEY」。", "Click “创建API-KEY” (Create API Key)."),
-                    tr("弹窗里「归属业务空间」保持「默认业务空间」，「描述」可以写 Podsum，「权限」选「全部」，点「确定」。",
-                       "In the dialog keep the default workspace, optionally describe it as Podsum, set permissions to “All”, and click “OK”."),
+                    tr("弹窗里「归属业务空间」保持「默认业务空间」，「描述」可以写 GotIt，「权限」选「全部」，点「确定」。",
+                       "In the dialog keep the default workspace, optionally describe it as GotIt, set permissions to “All”, and click “OK”."),
                  ]),
             Step(id: "copy",
-                 title: tr("复制新 key，Podsum 会自动认出来", "Copy the new key — Podsum picks it up"),
+                 title: tr("复制新 key，懂听会自动认出来", "Copy the new key — GotIt picks it up"),
                  details: [
                     tr("创建后会弹出完整的 key，点「复制」（或下载保存）。**它只显示这一次**，之后列表里只剩 `sk-a1****9z` 这样的打码。",
                        "After creating, the full key appears — click “Copy” (or download it). **It’s shown only once**; the list later shows only a masked form."),
@@ -216,17 +224,19 @@ extension WebWalkthrough {
             Step(id: "legacy",
                  title: tr("切换到「旧版」控制台", "Switch to the old console"),
                  details: [
-                    tr("新账号默认进**新版控制台**（左侧有「体验中心」「API Key管理」）。它发的是一个 API Key，Podsum 要的是 **APP ID + Access Token**。",
-                       "New accounts land in the **new console** (with “Experience Center” and “API Key Management” on the left). It issues an API Key, but Podsum needs the **APP ID + Access Token**."),
+                    tr("新账号默认进**新版控制台**（左侧有「体验中心」「API Key管理」）。它发的是一个 API Key，懂听要的是 **APP ID + Access Token**。",
+                       "New accounts land in the **new console** (with “Experience Center” and “API Key Management” on the left). It issues an API Key, but GotIt needs the **APP ID + Access Token**."),
                     tr("点页面**左上角的下拉框**，选「旧版」。已经在旧版（左侧有「应用管理」）就直接下一步。",
                        "Use the **dropdown at the top left** to pick the old console. Already there (with “App Management” on the left)? Move on."),
                  ]),
             Step(id: "create",
                  title: tr("创建应用，勾选录音文件识别", "Create an app with recording-file recognition"),
                  details: [
-                    tr("点「创建应用」，名称随便填（比如 Podsum），简介可留空。", "Click “Create App”; any name works (e.g. Podsum), description optional."),
-                    tr("在接入能力里勾选 **录音文件识别大模型**，以及它的**极速版**：前者转写网上链接里的音频，极速版转写你上传的本地文件。",
-                       "Under capabilities, tick **Recording-file Recognition (large model)** and its **Turbo** edition — links vs. uploaded files."),
+                    tr("点「创建应用」，名称随便填（比如 GotIt），简介可留空。", "Click “Create App”; any name works (e.g. GotIt), description optional."),
+                    tr("在接入能力里勾选 **豆包录音文件识别模型2.0**（认准 2.0，不是 1.0 的「录音文件识别大模型」），它转写网上链接里的音频。",
+                       "Under capabilities, tick **豆包录音文件识别模型2.0** (make sure it’s 2.0, not the 1.0 “录音文件识别大模型”) — it transcribes audio from links."),
+                    tr("再勾上录音文件识别的**极速版**，它转写你上传的本地文件。",
+                       "Also tick the **Turbo (极速版)** recording-file recognition — it transcribes files you upload."),
                     tr("以后想开音频摘要，顺手也勾上**语音合成**。勾过的能力之后不能取消。",
                        "Want audio summaries later? Also tick **Speech Synthesis**. Ticked capabilities can’t be removed."),
                     tr("新建的应用默认是**试用版**，带免费额度，够先跑通。", "New apps start as a **trial** with free quota — enough to get going."),
@@ -234,20 +244,73 @@ extension WebWalkthrough {
             Step(id: "copyAppID",
                  title: tr("复制 APP ID", "Copy the APP ID"),
                  details: [
-                    tr("在应用的服务详情里找到 **APP ID**（一串数字），点复制。", "In the app’s service details, find the **APP ID** (digits) and copy it."),
+                    tr("在左侧「API服务中心」下点 **豆包录音文件识别模型2.0**，顶部「应用名称」选刚建的应用。",
+                       "In the left sidebar under “API服务中心”, click **豆包录音文件识别模型2.0**, then pick your new app in “应用名称” at the top."),
+                    tr("「服务接口认证信息」里的 **APP ID**（一串数字），点复制。", "Under “服务接口认证信息”, copy the **APP ID** (digits)."),
                  ],
-                 capture: Capture(field: .doubaoASRAppID) { s in
-                     s.range(of: #"^[0-9]{6,20}$"#, options: .regularExpression) != nil
-                 }),
+                 capture: Capture(field: .doubaoASRAppID, matches: looksLikeAppID)),
             Step(id: "copyToken",
                  title: tr("复制 Access Token", "Copy the Access Token"),
                  details: [
-                    tr("同一页上的 **Access Token**，点显示后复制。它不是前面那对 Access Key。",
-                       "The **Access Token** on the same page — reveal and copy it. It isn’t the Access Key pair from before."),
+                    tr("同一页「服务接口认证信息」里的 **Access Token**，点显示后复制。它不是前面那对 Access Key。",
+                       "The **Access Token** under “服务接口认证信息” on the same page — reveal and copy it. It isn’t the Access Key pair from before."),
+                    tr("看不到？「应用管理」页不显示它，要先点左侧的 **豆包录音文件识别模型2.0**。",
+                       "Don’t see it? The App Management page doesn’t show it — click **豆包录音文件识别模型2.0** in the left sidebar first."),
                  ],
-                 capture: Capture(field: .doubaoASRToken) { s in
-                     s.range(of: #"^[A-Za-z0-9_\-]{16,64}$"#, options: .regularExpression) != nil
-                 }),
+                 capture: Capture(field: .doubaoASRToken, matches: looksLikeAppToken)),
+        ])
+    }
+
+    /// 豆包应用的 APP ID：一串数字
+    private static func looksLikeAppID(_ s: String) -> Bool {
+        s.range(of: #"^[0-9]{6,20}$"#, options: .regularExpression) != nil
+    }
+
+    /// 豆包应用的 Access Token
+    private static func looksLikeAppToken(_ s: String) -> Bool {
+        s.range(of: #"^[A-Za-z0-9_\-]{16,64}$"#, options: .regularExpression) != nil
+    }
+
+    /// 音频摘要用的豆包应用。APP ID / Access Token 是按应用发的，
+    /// 转写那个应用勾了「语音合成」就是同一对值。
+    private static var volcTTS: WebWalkthrough {
+        WebWalkthrough(id: .volcTTS, vendor: tr("火山引擎 · 豆包语音合成", "Volcengine · Doubao Speech Synthesis"), symbol: "speaker.wave.2", steps: [
+            Step(id: "open",
+                 title: tr("打开豆包语音控制台", "Open the Doubao Speech console"),
+                 details: [
+                    tr("用配转写时的同一个火山引擎账号登录。", "Sign in with the same Volcengine account you used for transcription."),
+                 ],
+                 url: URL(string: "https://console.volcengine.com/speech/app")),
+            Step(id: "legacy",
+                 title: tr("切换到「旧版」控制台", "Switch to the old console"),
+                 details: [
+                    tr("点页面**左上角的下拉框**，选「旧版」。已经在旧版（左侧有「应用管理」）就直接下一步。",
+                       "Use the **dropdown at the top left** to pick the old console. Already there (with “App Management” on the left)? Move on."),
+                 ]),
+            Step(id: "enable",
+                 title: tr("让应用带上「语音合成」", "Give the app Speech Synthesis"),
+                 details: [
+                    tr("左侧点「应用管理」，看转写用的那个应用的接入能力里有没有**语音合成**。有就直接下一步。",
+                       "Click “应用管理” on the left and check whether your transcription app lists **Speech Synthesis**. If it does, move on."),
+                    tr("没有就点那一行的「编辑」勾上**语音合成**并保存；或者「创建应用」新建一个勾选它的。勾过的能力之后不能取消。",
+                       "If not, click “Edit” on that row, tick **Speech Synthesis** and save — or “Create App” with it ticked. Ticked capabilities can’t be removed."),
+                 ]),
+            Step(id: "copyAppID",
+                 title: tr("复制 APP ID", "Copy the APP ID"),
+                 details: [
+                    tr("「应用管理」页看不到凭据：在左侧「API服务中心」下点这个应用开通的任一项服务（比如 **豆包录音文件识别模型2.0**），顶部「应用名称」选这个应用。",
+                       "App Management doesn’t show credentials: under “API服务中心” on the left, click any service this app has (e.g. **豆包录音文件识别模型2.0**) and pick the app in “应用名称” at the top."),
+                    tr("「服务接口认证信息」里的 **APP ID**（一串数字），点复制。跟转写共用一个应用时，就是转写那个 APP ID。",
+                       "Under “服务接口认证信息”, copy the **APP ID** (digits). If the app is shared with transcription, it’s the same APP ID."),
+                 ],
+                 capture: Capture(field: .doubaoTTSAppID, matches: looksLikeAppID)),
+            Step(id: "copyToken",
+                 title: tr("复制 Access Token", "Copy the Access Token"),
+                 details: [
+                    tr("同一页「服务接口认证信息」里的 **Access Token**，点显示后复制。它不是前面那对 Access Key。",
+                       "The **Access Token** under “服务接口认证信息” on the same page — reveal and copy it. It isn’t the Access Key pair from before."),
+                 ],
+                 capture: Capture(field: .doubaoTTSToken, matches: looksLikeAppToken)),
         ])
     }
 }
@@ -352,7 +415,7 @@ final class WebGuideController {
     func returnToApp() {
         close()
         NSApp.activate()
-        NSApp.windows.first { $0.isVisible && $0.title != "Podsum" && $0.canBecomeKey }?.makeKeyAndOrderFront(nil)
+        NSApp.windows.first { $0.isVisible && !AppBrand.allNames.contains($0.title) && $0.canBecomeKey }?.makeKeyAndOrderFront(nil)
     }
 
     func close() {
@@ -398,7 +461,7 @@ final class WebGuideController {
             let p = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 360, height: 600),
                             styleMask: [.titled, .closable, .nonactivatingPanel, .utilityWindow, .fullSizeContentView],
                             backing: .buffered, defer: false)
-            p.title = tr("Podsum 引导", "Podsum Guide")
+            p.title = tr("懂听引导", "GotIt Guide")
             p.titlebarAppearsTransparent = true
             p.isFloatingPanel = true
             p.level = .floating

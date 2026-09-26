@@ -269,8 +269,8 @@ public final class BackendController {
         return tr("找不到 \(missing.joined(separator: "、"))。抓取音频要用它们转码。找过：\n",
                   "Can’t find \(missing.joined(separator: ", ")), needed to convert downloaded audio. Looked in:\n")
             + dirs.joined(separator: "\n")
-            + tr("\n\n用 Homebrew 装一个（brew install ffmpeg），或使用打包好的 Podsum.app。",
-                 "\n\nInstall it with Homebrew (brew install ffmpeg), or use the packaged Podsum.app.")
+            + tr("\n\n用 Homebrew 装一个（brew install ffmpeg），或使用打包好的 GotIt.app。",
+                 "\n\nInstall it with Homebrew (brew install ffmpeg), or use the packaged GotIt.app.")
     }
 
     private func environment(_ runtime: Runtime, dataDir: URL) -> [String: String] {
@@ -284,9 +284,11 @@ public final class BackendController {
             .joined(separator: ":")
         env["PYTHONPATH"] = pythonPath
         env["PYTHONUNBUFFERED"] = "1"
-        // 不往 .app 里写 __pycache__：包内字节码已在打包时预编译，
-        // 运行期再写会让签名失效（codesign 报 sealed resource invalid）。
-        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        // 字节码一律写到 app 外面的缓存目录：往 .app 里写 __pycache__ 会让签名失效
+        // （codesign 报 sealed resource invalid），打进包里又要多占 70+ MB。
+        // 首次启动多花几秒编译，之后读缓存；缓存被系统清掉也只是再编一次。
+        env["PYTHONPYCACHEPREFIX"] = AppStorageRoot.caches
+            .appending(path: "pycache", directoryHint: .isDirectory).path(percentEncoded: false)
 
         // 从 Finder 启动时 PATH 只有 /usr/bin:/bin:/usr/sbin:/sbin。
         // 打包的 app 自带 ffmpeg / ffprobe / deno，放最前面；
@@ -324,7 +326,7 @@ public final class BackendController {
 
         if p.terminationStatus != 0 {
             let text = String(data: output, encoding: .utf8) ?? ""
-            throw NSError(domain: "Podsum", code: 1, userInfo: [
+            throw NSError(domain: "GotIt", code: 1, userInfo: [
                 NSLocalizedDescriptionKey: tr("数据库迁移失败：\n", "Database migration failed:\n") + Self.lastLines(text, 12),
             ])
         }

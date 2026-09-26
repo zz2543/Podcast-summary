@@ -63,13 +63,13 @@ struct WebGuidePanel: View {
                 .disabled(controller.index == 0)
             Spacer()
             if controller.isFinished {
-                Button(tr("回到 Podsum 继续", "Back to Podsum")) { controller.returnToApp() }
+                Button(tr("回到懂听继续", "Back to GotIt")) { controller.returnToApp() }
                     .buttonStyle(.borderedProminent)
             } else if controller.index + 1 < w.steps.count {
                 Button(tr("下一步", "Next")) { controller.next() }
                     .buttonStyle(.borderedProminent)
             } else {
-                Button(tr("回到 Podsum", "Back to Podsum")) { controller.returnToApp() }
+                Button(tr("回到懂听", "Back to GotIt")) { controller.returnToApp() }
             }
         }
         .controlSize(.regular)
@@ -176,8 +176,8 @@ private struct WatchingBar: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(tr("正在等你在网页上点「复制」", "Waiting for you to click “Copy” on the page"))
                     .font(.system(size: 12, weight: .medium))
-                Text(tr("macOS 第一次可能会问是否允许 Podsum 读取剪贴板，选「允许」。复制的内容不会离开这台 Mac。",
-                        "macOS may ask once whether Podsum can read the clipboard — choose Allow. Nothing leaves this Mac."))
+                Text(tr("macOS 第一次可能会问是否允许懂听读取剪贴板，选「允许」。复制的内容不会离开这台 Mac。",
+                        "macOS may ask once whether GotIt can read the clipboard — choose Allow. Nothing leaves this Mac."))
                     .font(.system(size: 11))
                     .foregroundStyle(Tone.textSubtle)
                     .fixedSize(horizontal: false, vertical: true)
@@ -207,7 +207,7 @@ private struct CaptureBar: View {
                 .padding(.horizontal, 8).padding(.vertical, 3)
                 .background(Tone.surface, in: Capsule())
             HStack {
-                Button(tr("填入 Podsum", "Fill into Podsum"), action: accept)
+                Button(tr("填入懂听", "Fill into GotIt"), action: accept)
                     .buttonStyle(.borderedProminent)
                 Button(tr("不是这个", "Not this one"), action: dismiss)
             }

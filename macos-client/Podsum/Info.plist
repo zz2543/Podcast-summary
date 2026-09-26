@@ -12,6 +12,6 @@
 	</array>
 	<!-- 全局快捷键读前台浏览器当前标签页的地址，每个浏览器首次使用时系统会拿这句话问用户 -->
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Podsum 读取当前标签页的地址，把你正在看的视频送去总结。Podsum reads the current tab’s address to summarize the video you’re watching.</string>
+	<string>懂听读取当前标签页的地址，把你正在看的视频送去总结。GotIt reads the current tab’s address to summarize the video you’re watching.</string>
 </dict>
 </plist>

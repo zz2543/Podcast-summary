@@ -34,8 +34,8 @@ struct QuickAddSettings: View {
             } header: {
                 Text(tr("全局快捷键", "Global Hotkey"))
             } footer: {
-                Text(tr("前台是 Safari、Chrome、Arc 或 Edge 时，直接读当前标签页；其他 app（比如 B 站客户端）里先复制链接再按。每个浏览器第一次用会问一次是否允许 Podsum 控制它。关掉主窗口后 Podsum 留在菜单栏，快捷键照样能用。",
-                        "With Safari, Chrome, Arc, or Edge in front, the current tab is read directly; in other apps (like the Bilibili client) copy the link first. Each browser asks once whether Podsum may control it. Closing the main window keeps Podsum in the menu bar, so the hotkey keeps working."))
+                Text(tr("前台是 Safari、Chrome、Arc 或 Edge 时，直接读当前标签页；其他 app（比如 B 站客户端）里先复制链接再按。每个浏览器第一次用会问一次是否允许懂听控制它。关掉主窗口后懂听留在菜单栏，快捷键照样能用。",
+                        "With Safari, Chrome, Arc, or Edge in front, the current tab is read directly; in other apps (like the Bilibili client) copy the link first. Each browser asks once whether GotIt may control it. Closing the main window keeps GotIt in the menu bar, so the hotkey keeps working."))
                     .podsumFont(.micro).foregroundStyle(Tone.textSubtle)
             }
 
@@ -200,7 +200,7 @@ struct MenuBarContent: View {
     var openEpisode: (String) -> Void
 
     var body: some View {
-        Button(tr("打开 Podsum", "Open Podsum"), action: openMainWindow)
+        Button(tr("打开懂听", "Open GotIt"), action: openMainWindow)
 
         Divider()
 
@@ -222,7 +222,7 @@ struct MenuBarContent: View {
 
         SettingsLink { Text(tr("设置…", "Settings…")) }
             .keyboardShortcut(",", modifiers: .command)
-        Button(tr("退出 Podsum", "Quit Podsum")) { NSApp.terminate(nil) }
+        Button(tr("退出懂听", "Quit GotIt")) { NSApp.terminate(nil) }
             .keyboardShortcut("q", modifiers: .command)
     }
 }

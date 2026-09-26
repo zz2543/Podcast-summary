@@ -157,7 +157,7 @@ python3 macos-client/package.py --skip-build --no-dmg        # 复用 Release �
 ```
 
 只支持 Apple Silicon。版本号在仓库根的 `VERSION`，build 号取 `git rev-list --count HEAD`。
-产出 `macos-client/dist/Podsum.app` 与 `dist/Podsum-<版本>-arm64.dmg`（后者附 `INSTALL.md`）。内容：
+产出发布版「懂听 / GotIt」：`macos-client/dist/GotIt.app` 与 `dist/GotIt-<版本>-arm64.dmg`（后者附 `INSTALL.md`）。内容：
 
 ```
 Contents/Resources/backend/{backend,prompts,scripts,specs}   后端源码、提示词、schema

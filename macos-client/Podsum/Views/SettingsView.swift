@@ -51,8 +51,8 @@ struct GeneralSettings: View {
                 }
                 if localizer.needsRelaunch {
                     HStack {
-                        Label(tr("菜单栏的系统项（文件、编辑、窗口…）要重启 Podsum 才会换语言。",
-                                 "System menus (File, Edit, Window…) switch language after Podsum restarts."),
+                        Label(tr("菜单栏的系统项（文件、编辑、窗口…）要重启懂听才会换语言。",
+                                 "System menus (File, Edit, Window…) switch language after GotIt restarts."),
                               systemImage: "arrow.clockwise.circle")
                             .foregroundStyle(Tone.warn)
                             .fixedSize(horizontal: false, vertical: true)
@@ -126,6 +126,12 @@ struct ProviderSettings: View {
     @State private var testResult: String?
     @State private var testPassed = false
     @State private var testing = false
+    @State private var asrTestResult: String?
+    @State private var asrTestPassed = false
+    @State private var asrTesting = false
+    @State private var ttsTestResult: String?
+    @State private var ttsTestPassed = false
+    @State private var ttsTesting = false
 
     var body: some View {
         @Bindable var settings = settings
@@ -191,6 +197,16 @@ struct ProviderSettings: View {
                         .onboardingTarget(.asrAppID)
                     SecureField(tr("豆包 ASR Access Token", "Doubao ASR Access Token"), text: $settings.doubaoASRToken)
                         .onboardingTarget(.asrToken)
+                    HStack {
+                        Button(asrTesting ? tr("测试中…", "Testing…") : tr("测试连接", "Test Connection")) { testDoubaoASR() }
+                            .disabled(asrTesting || settings.doubaoASRAppID.isBlank || settings.doubaoASRToken.isBlank)
+                        if let asrTestResult {
+                            Text(asrTestResult)
+                                .podsumFont(.micro)
+                                .foregroundStyle(asrTestPassed ? Tone.ok : Tone.err)
+                                .textSelection(.enabled)
+                        }
+                    }
                 case .openaiWhisper:
                     SecureField("OpenAI API Key", text: $settings.openAIAPIKey)
                         .onboardingTarget(.asrOpenAIKey)
@@ -221,6 +237,16 @@ struct ProviderSettings: View {
                             .onboardingTarget(.ttsAppID)
                         SecureField(tr("豆包 TTS Access Token", "Doubao TTS Access Token"), text: $settings.doubaoTTSToken)
                             .onboardingTarget(.ttsToken)
+                        HStack {
+                            Button(ttsTesting ? tr("测试中…", "Testing…") : tr("测试连接", "Test Connection")) { testDoubaoTTS() }
+                                .disabled(ttsTesting || settings.doubaoTTSAppID.isBlank || settings.doubaoTTSToken.isBlank)
+                            if let ttsTestResult {
+                                Text(ttsTestResult)
+                                    .podsumFont(.micro)
+                                    .foregroundStyle(ttsTestPassed ? Tone.ok : Tone.err)
+                                    .textSelection(.enabled)
+                            }
+                        }
                     case .qwen:
                         SecureField("DashScope API Key", text: $settings.dashscopeAPIKey)
                             .onboardingTarget(.ttsDashscopeKey)
@@ -261,6 +287,12 @@ struct ProviderSettings: View {
         // 地址、模型、key 任何一个改了，上一次的测试结果就不算数了
         .onChange(of: [settings.llmBaseURL, settings.llmModel, settings.llmAPIKey]) { _, _ in
             if guide.llmTest != .untested { guide.llmTest = .untested }
+        }
+        .onChange(of: [settings.doubaoASRAppID, settings.doubaoASRToken]) { _, _ in
+            asrTestResult = nil
+        }
+        .onChange(of: [settings.doubaoTTSAppID, settings.doubaoTTSToken]) { _, _ in
+            ttsTestResult = nil
         }
         }
     }
@@ -316,6 +348,118 @@ struct ProviderSettings: View {
             }
         }
     }
+}
+
+extension ProviderSettings {
+    /// 跟后端转写走同一个接口和资源（录音文件识别模型2.0），提交 1 秒静音，
+    /// 只看提交是否被受理：App ID、Token 对不对、这个应用开没开通这项服务，一次就能看出来。
+    /// 不去查识别结果——静音本来也识别不出字。
+    fileprivate func testDoubaoASR() {
+        asrTesting = true
+        asrTestResult = nil
+        asrTestPassed = false
+        let appID = settings.doubaoASRAppID.trimmed
+        let token = settings.doubaoASRToken.trimmed
+
+        Task {
+            defer { asrTesting = false }
+            var request = URLRequest(url: URL(string: "https://openspeech.bytedance.com/api/v3/auc/bigmodel/submit")!)
+            request.httpMethod = "POST"
+            request.timeoutInterval = 20
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(appID, forHTTPHeaderField: "X-Api-App-Key")
+            request.setValue(token, forHTTPHeaderField: "X-Api-Access-Key")
+            request.setValue("volc.seedasr.auc", forHTTPHeaderField: "X-Api-Resource-Id")
+            request.setValue(UUID().uuidString, forHTTPHeaderField: "X-Api-Request-Id")
+            request.setValue("-1", forHTTPHeaderField: "X-Api-Sequence")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: [
+                "user": ["uid": "podsum"],
+                "audio": ["format": "wav", "data": Self.silentWAV.base64EncodedString()],
+                "request": ["model_name": "bigmodel"],
+            ])
+
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                let http = response as? HTTPURLResponse
+                let status = http?.value(forHTTPHeaderField: "X-Api-Status-Code") ?? ""
+                if status == "20000000" {
+                    asrTestPassed = true
+                    asrTestResult = tr("通过", "Passed")
+                } else if status == "45000010" {
+                    asrTestResult = tr("App ID 或 Access Token 不对，或这个应用没开通「豆包录音文件识别模型2.0」",
+                                       "Wrong App ID or Access Token, or this app doesn’t have 豆包录音文件识别模型2.0 enabled")
+                } else {
+                    let message = http?.value(forHTTPHeaderField: "X-Api-Message")
+                        ?? String(data: data.prefix(200), encoding: .utf8) ?? ""
+                    asrTestResult = "\(status.isEmpty ? "HTTP \(http?.statusCode ?? 0)" : status) \(message)"
+                }
+            } catch {
+                asrTestResult = error.localizedDescription
+            }
+        }
+    }
+
+    /// 跟后端音频摘要走同一个接口（语音合成 v1，cluster volcano_tts，默认中文音色），
+    /// 合成「测试」两个字：能拿回音频，App ID、Token 和「语音合成」能力就都对。
+    fileprivate func testDoubaoTTS() {
+        ttsTesting = true
+        ttsTestResult = nil
+        ttsTestPassed = false
+        let appID = settings.doubaoTTSAppID.trimmed
+        let token = settings.doubaoTTSToken.trimmed
+
+        Task {
+            defer { ttsTesting = false }
+            var request = URLRequest(url: URL(string: "https://openspeech.bytedance.com/api/v1/tts")!)
+            request.httpMethod = "POST"
+            request.timeoutInterval = 20
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer;\(token)", forHTTPHeaderField: "Authorization")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: [
+                "app": ["appid": appID, "token": token, "cluster": "volcano_tts"],
+                "user": ["uid": "podsum"],
+                "audio": ["voice_type": "BV700_streaming", "encoding": "mp3"],
+                "request": ["reqid": UUID().uuidString, "text": "测试", "text_type": "plain", "operation": "query"],
+            ])
+
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                let http = response as? HTTPURLResponse
+                let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+                let code = (json?["code"] as? NSNumber)?.intValue
+                let message = json?["message"] as? String ?? ""
+                if http?.mimeType?.hasPrefix("audio/") == true
+                    || (code == 3000 && !((json?["data"] as? String) ?? "").isEmpty) {
+                    ttsTestPassed = true
+                    ttsTestResult = tr("通过", "Passed")
+                } else if message.contains("grant") {
+                    ttsTestResult = tr("App ID 或 Access Token 不对，或这个应用没勾「语音合成」",
+                                       "Wrong App ID or Access Token, or this app doesn’t have Speech Synthesis enabled")
+                } else if let code {
+                    ttsTestResult = "\(code) \(message)"
+                } else {
+                    ttsTestResult = "HTTP \(http?.statusCode ?? 0) \(String(data: data.prefix(200), encoding: .utf8) ?? "")"
+                }
+            } catch {
+                ttsTestResult = error.localizedDescription
+            }
+        }
+    }
+
+    /// 1 秒 16 kHz 单声道 16-bit 静音
+    private static let silentWAV: Data = {
+        let sampleRate: UInt32 = 16_000
+        let pcm = Data(count: Int(sampleRate) * 2)
+        var d = Data()
+        func u32(_ v: UInt32) { withUnsafeBytes(of: v.littleEndian) { d.append(contentsOf: $0) } }
+        func u16(_ v: UInt16) { withUnsafeBytes(of: v.littleEndian) { d.append(contentsOf: $0) } }
+        d.append(contentsOf: Array("RIFF".utf8)); u32(36 + UInt32(pcm.count))
+        d.append(contentsOf: Array("WAVEfmt ".utf8)); u32(16); u16(1); u16(1)
+        u32(sampleRate); u32(sampleRate * 2); u16(2); u16(16)
+        d.append(contentsOf: Array("data".utf8)); u32(UInt32(pcm.count))
+        d.append(pcm)
+        return d
+    }()
 }
 
 // MARK: - 服务

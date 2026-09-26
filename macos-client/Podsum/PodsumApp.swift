@@ -97,7 +97,7 @@ struct PodsumApp: App {
 
     var body: some Scene {
         // 单一主窗口：通知、菜单栏、Dock 反复打开它时不会多开窗口
-        Window("Podsum", id: "main") {
+        Window(AppBrand.name, id: "main") {
             RootView()
                 .environment(settings)
                 .environment(backend)
