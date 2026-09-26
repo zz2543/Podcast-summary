@@ -19,35 +19,56 @@ python3 macos-client/package.py             # build a self-contained .app
 
 See `specs/002-macos-native/README.md`.
 
-## Prerequisites
+Prebuilt DMG (懂听 / GotIt): [GotIt releases](https://github.com/zz2543/GotIt.An-open-source-app-for-native-Mac-video-transcription-summaries/releases/latest).
 
-- Python 3.11+
-- Node 20+
-- ffmpeg and ffprobe on PATH
-- Cloud API credentials for the default stack:
-  - Volcengine / Doubao for ASR and TTS
-  - DeepSeek for LLM summarization
+## Web version (macOS / Windows / Linux)
 
-On macOS, the assumed Homebrew packages are:
+The web version runs the same backend locally and opens the UI in your browser.
+It needs:
+
+- Python 3.11+ (Windows: tick "Add python.exe to PATH" in the installer)
+- Node.js 20+
+- ffmpeg and ffprobe on PATH — macOS `brew install ffmpeg`, Windows `winget install Gyan.FFmpeg`
+- Recommended for YouTube: Deno — macOS `brew install deno`, Windows `winget install DenoLand.Deno`
+- Your own cloud API keys (see below)
 
 ```bash
-brew install python@3.11 node@20 ffmpeg
+git clone https://github.com/zz2543/Podcast-summary.git
+cd Podcast-summary
+python3 scripts/web.py install    # Windows: py scripts\web.py install
+# edit .env: replace the replace-me-* values with your own keys
+python3 scripts/web.py            # Windows: py scripts\web.py
 ```
 
-## Quick Start
+Or double-click `start-web.command` (macOS) / `start-web.bat` (Windows): the
+first run installs everything and opens `.env`; the next run starts the servers.
+
+The launcher starts the backend on `http://127.0.0.1:8000` and the UI on
+`http://127.0.0.1:5174`, then opens the browser. Closing the window or pressing
+Ctrl+C stops both.
+
+Minimum `.env` for the default stack:
+
+| What | Keys |
+|---|---|
+| Summaries (LLM) | `DEEPSEEK_API_KEY` (any OpenAI-compatible endpoint via `DEEPSEEK_BASE_URL` / `DEEPSEEK_MODEL`), or `LLM_PROVIDER=qwen` + `DASHSCOPE_API_KEY`, or `LLM_PROVIDER=anthropic` + `ANTHROPIC_API_KEY` |
+| Transcription (ASR) | `VOLC_ACCESS_KEY_ID`, `VOLC_SECRET_ACCESS_KEY`, `DOUBAO_ASR_APP_ID`, `DOUBAO_ASR_ACCESS_TOKEN` — or `ASR_PROVIDER=openai_whisper` / `deepgram` / `qwen` with that provider's key |
+| Audio digest (TTS) | optional; set `TTS_ENABLED=false` if you don't use it |
+
+For Doubao ASR, the Volcengine app must enable **豆包录音文件识别模型2.0**
+(`volc.seedasr.auc`, used for links) and the recording-file **极速版**
+(`volc.bigasr.auc_turbo`, used for uploaded files).
+
+## Development
+
+The Makefile targets below assume a POSIX shell (macOS / Linux).
 
 ```bash
-make install
+make install         # .venv + backend dev deps + frontend (v1) deps
+make install-v2      # frontend-v2 deps
 cp .env.example .env
-make run
+make run-v2          # backend with --reload + frontend-v2 on 5174
 ```
-
-Then open `http://127.0.0.1:5173`. The backend API runs at
-`http://127.0.0.1:8000`.
-
-The copied `.env` contains non-secret placeholders so the local UI/API can start
-from a clean checkout. Replace the `replace-me-*` values before processing real
-episodes; otherwise cloud ASR/LLM/TTS stages will fail at provider call time.
 
 ## Commands
 
