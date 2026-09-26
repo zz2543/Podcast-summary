@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
+import { GlassSurface } from "@/components/ui/liquid-glass";
 import type { Job } from "@/api/client";
 
 const STAGE_ORDER = ["queued", "fetching", "transcribing", "summarizing", "tts"] as const;
@@ -24,7 +25,7 @@ export function ActiveJobsStrip({
   if (active.length === 0) return null;
 
   return (
-    <div className="mb-6 overflow-hidden rounded-2xl glass shadow-card">
+    <GlassSurface className="mb-6 overflow-hidden rounded-2xl" bezel={16} strength={0.65}>
       <div className="flex items-center gap-2 border-b border-black/5 px-4 py-2">
         <span className="h-2 w-2 animate-pulse rounded-full bg-status-warn" />
         <span className="text-xs font-medium uppercase tracking-wider text-text-muted">
@@ -50,7 +51,7 @@ export function ActiveJobsStrip({
           ))}
         </AnimatePresence>
       </div>
-    </div>
+    </GlassSurface>
   );
 }
 

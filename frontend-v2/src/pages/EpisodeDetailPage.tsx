@@ -22,6 +22,7 @@ import { ChatPanel } from "@/components/ChatPanel";
 import { IridescentButton } from "@/components/ui/iridescent-button";
 import type { AudioControls } from "@/components/AudioPlayer";
 import { useRef } from "react";
+import { useLiquidGlass } from "@/components/ui/liquid-glass";
 
 export default function EpisodeDetailPage() {
   const { episodeId } = useParams();
@@ -35,6 +36,12 @@ export default function EpisodeDetailPage() {
   const { jobsById, episodeStatuses } = useJobStream();
   const originalAudioRef = useRef<AudioControls>(null);
   const audioSectionRef = useRef<HTMLElement>(null);
+  const audioGlassRef = useLiquidGlass<HTMLDivElement>({
+    radius: 20,
+    bezel: 20,
+    strength: 0.8,
+    blur: 10
+  });
 
   const load = useCallback(async () => {
     if (!episodeId) return;
@@ -166,14 +173,15 @@ export default function EpisodeDetailPage() {
         className="sticky top-[60px] z-20 -mx-4 px-4 py-2 sm:-mx-6 sm:px-6"
       >
         <div
+          ref={audioGlassRef}
           className="rounded-2xl"
           style={{
-            background: "rgba(255,255,255,0.55)",
-            backdropFilter: "blur(24px) saturate(200%)",
-            WebkitBackdropFilter: "blur(24px) saturate(200%)",
-            border: "1px solid rgba(255,255,255,0.55)",
+            background: "rgba(255,255,255,0.38)",
+            backdropFilter: "blur(10px) saturate(2) brightness(1.05) contrast(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(2) brightness(1.05) contrast(1.08)",
+            border: "1px solid rgba(255,255,255,0.65)",
             boxShadow:
-              "0 1px 0 rgba(255,255,255,0.8) inset, 0 8px 28px rgba(0,0,0,0.08)"
+              "0 1px 0 rgba(255,255,255,0.95) inset, 0 -1px 0 rgba(255,255,255,0.45) inset, 0 8px 28px rgba(0,0,0,0.08)"
           }}
         >
           <div className="flex items-center justify-between px-4 pt-2.5">

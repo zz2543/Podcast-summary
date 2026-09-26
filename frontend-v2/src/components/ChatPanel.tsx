@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { chatEpisode, type ChatMessage } from "@/api/client";
+import { useLiquidGlass } from "@/components/ui/liquid-glass";
 
 interface ChatPanelProps {
   episodeId: string;
@@ -15,6 +16,16 @@ export function ChatPanel({ episodeId, open, onClose }: ChatPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<(() => void) | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Only refract while the panel is on screen; a filtered off-canvas panel is
+  // pure cost.
+  const panelRef = useLiquidGlass<HTMLDivElement>({
+    radius: 24,
+    bezel: 26,
+    strength: 0.9,
+    blur: 18,
+    saturate: 2.2,
+    enabled: open
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -102,6 +113,7 @@ export function ChatPanel({ episodeId, open, onClose }: ChatPanelProps) {
 
       {/* Floating glass panel — margins on all sides, clears the bottom dock */}
       <div
+        ref={panelRef}
         style={{
           position: "fixed",
           top: "56px",   /* flush below h-14 header */
@@ -109,9 +121,9 @@ export function ChatPanel({ episodeId, open, onClose }: ChatPanelProps) {
           bottom: "82px",
           width: "min(400px, 30vw)",
           /* glass */
-          background: "rgba(246, 246, 250, 0.82)",
-          backdropFilter: "blur(52px) saturate(220%)",
-          WebkitBackdropFilter: "blur(52px) saturate(220%)",
+          background: "rgba(246, 246, 250, 0.55)",
+          backdropFilter: "blur(18px) saturate(2.2) brightness(1.05) contrast(1.08)",
+          WebkitBackdropFilter: "blur(18px) saturate(2.2) brightness(1.05) contrast(1.08)",
           borderTop: "1px solid rgba(255,255,255,0.72)",
           borderLeft: "1px solid rgba(255,255,255,0.72)",
           borderBottom: "1px solid rgba(255,255,255,0.72)",

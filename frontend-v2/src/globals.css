@@ -21,22 +21,49 @@
 }
 
 @layer components {
+  /*
+   * Glass base layer. The blur declared here is the fallback for engines that
+   * cannot resolve an SVG filter inside backdrop-filter; useLiquidGlass()
+   * overrides `backdrop-filter` inline with a displacement map where it works.
+   * Tints stay light on purpose — an opaque pane has nothing left to refract.
+   */
   .glass {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgba(255, 255, 255, 0.48);
+    background-image:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 20%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.16));
+    backdrop-filter: blur(8px) saturate(1.8) brightness(1.04) contrast(1.08);
+    -webkit-backdrop-filter: blur(8px) saturate(1.8) brightness(1.04) contrast(1.08);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+      0 8px 32px rgba(0, 0, 0, 0.07);
   }
   .glass-strong {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(28px) saturate(200%);
-    -webkit-backdrop-filter: blur(28px) saturate(200%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.58);
+    background-image:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 22%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+    backdrop-filter: blur(12px) saturate(1.9) brightness(1.05) contrast(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.9) brightness(1.05) contrast(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.45),
+      0 12px 40px rgba(0, 0, 0, 0.09);
   }
   .glass-dark {
-    background: rgba(29, 29, 31, 0.85);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(29, 29, 31, 0.62);
+    background-image:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 22%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(12px) saturate(1.8) brightness(0.92) contrast(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.8) brightness(0.92) contrast(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 12px 40px rgba(0, 0, 0, 0.28);
     color: white;
   }
   .hairline {
@@ -152,5 +179,22 @@
   }
   100% {
     background-position: 280% 50%;
+  }
+}
+
+/* Users who ask for less transparency get flat, readable panes. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong {
+    background-color: rgba(255, 255, 255, 0.96);
+    background-image: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glass-dark {
+    background-color: rgba(29, 29, 31, 0.96);
+    background-image: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
