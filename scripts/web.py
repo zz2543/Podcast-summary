@@ -80,7 +80,8 @@ def install() -> None:
 
     say("2. 安装后端依赖")
     subprocess.run([str(VENV_PYTHON), "-m", "pip", "install", "--upgrade", "pip"], cwd=ROOT, check=True)
-    subprocess.run([str(VENV_PYTHON), "-m", "pip", "install", "-e", "backend", "yt-dlp[default]"],
+    # --upgrade 让重跑 install 顺带把 yt-dlp 升到最新：视频站改版后旧版会下载失败
+    subprocess.run([str(VENV_PYTHON), "-m", "pip", "install", "--upgrade", "-e", "backend", "yt-dlp[default]"],
                    cwd=ROOT, check=True)
 
     say("3. 安装网页依赖（frontend-v2）")
